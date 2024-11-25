@@ -246,8 +246,8 @@
                                             data-stock="<%= product.stock %>"
                                             data-images="<%= product.images.join(',') %>" 
                                             data-category="<%= product.category %>">
-                                            Edit
-                                        </button>
+                                        Edit
+                                    </button>
                                         
 
             <% if (product.isDeleted) { %> 
@@ -272,88 +272,67 @@
 <!-- Edit Product Modal -->
 
  
-   <div class="modal fade" id="editProductModal" tabindex="-1" aria-labelledby="editProductModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" style="max-width: 800px;">
+<div class="modal fade" id="editProductModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="editProductModalLabel">Edit Product</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <h5 class="modal-title">Edit Product</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body">
-          <form id="editProductForm" enctype="multipart/form-data">
-            <input type="hidden" id="editProductId" name="productId" />
+          <form id="editProductForm">
+            <!-- Hidden Product ID -->
+            <input type="hidden" id="editProductId" name="editProductId">
   
             <!-- Product Name -->
             <div class="mb-3">
               <label for="editProductName" class="form-label">Product Name</label>
-              <input type="text" class="form-control" id="editProductName" name="productName" required />
-              <div class="text-danger" id="editProductNameError" style="display: none;"></div>
+              <input type="text" id="editProductName" class="form-control" required>
             </div>
   
             <!-- Product Category -->
             <div class="mb-3">
-              <label for="editProductCategory" class="form-label">Product Category</label>
-              <select class="form-control" id="editProductCategory" name="productCategory" required>
-                <option value="">Select Category</option>
+              <label for="productCategory" class="form-label">Category</label>
+              <select id="editProductCategory" class="form-select" required>
+                <option value="">Select a category</option>
                 <% categories.forEach(category => { %>
                   <option value="<%= category.categoryName %>"><%= category.categoryName %></option>
                 <% }); %>
               </select>
-              <div class="text-danger" id="editProductCategoryError" style="display: none;"></div>
             </div>
   
             <!-- Product Price -->
             <div class="mb-3">
-              <label for="editProductPrice" class="form-label">Product Price</label>
-              <input type="number" class="form-control" id="editProductPrice" name="productPrice" required />
-              <div class="text-danger" id="editProductPriceError" style="display: none;"></div>
+              <label for="productPrice" class="form-label">Price</label>
+              <input type="number" id="editProductPrice" class="form-control" required>
             </div>
   
             <!-- Product Stock -->
             <div class="mb-3">
-              <label for="editProductStock" class="form-label">Product Stock</label>
-              <input type="number" class="form-control" id="editProductStock" name="productStock" required />
-              <div class="text-danger" id="editProductStockError" style="display: none;"></div>
+              <label for="productStock" class="form-label">Stock</label>
+              <input type="number" id="editProductStock" class="form-control" required>
             </div>
   
             <!-- Product Description -->
             <div class="mb-3">
-              <label for="editProductDescription" class="form-label">Product Description</label>
-              <textarea class="form-control" id="editProductDescription" name="productDescription" rows="3" required></textarea>
-              <div class="text-danger" id="editProductDescriptionError" style="display: none;"></div>
+              <label for="productDescription" class="form-label">Description</label>
+              <textarea id="editProductDescription" class="form-control" rows="3" required></textarea>
             </div>
   
             <!-- Existing Images -->
+            <div id="existingImagesContainer" class="mb-3">
+              <label>Existing Images</label>
+              <div class="d-flex flex-wrap gap-2"></div>
+            </div>
+  
+            <!-- New Images -->
             <div class="mb-3">
-              <label class="form-label">Existing Images</label>
-              <div id="existingImagesContainer" class="d-flex flex-wrap gap-2">
-                <!-- Existing images and their remove buttons will be appended here dynamically by JS -->
-              </div>
+              <label for="newImages" class="form-label">Upload New Images</label>
+              <input name="productImage" type="file" id="newImages" class="form-control" accept="image/*" multiple>
+              <div id="cropPreview" class="mt-3"></div>
             </div>
   
-            <!-- Upload New Images -->
-            <div class="mb-3">
-              <label for="editProductImage" class="form-label">Upload New Images</label>
-              <input 
-                type="file" 
-                class="form-control" 
-                id="editProductImage" 
-                name="productImages" 
-                accept="image/*" 
-                multiple 
-              />
-            </div>
-  
-            <!-- Cropping Area -->
-            <div id="imageCropContainer" class="mt-3">
-              <!-- Cropping interface for new images will be appended here dynamically by JS -->
-            </div>
-  
-            <!-- Modal Footer -->
-            <div class="modal-footer">
-              <button type="submit" class="btn btn-primary">Save Changes</button>
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-            </div>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
           </form>
         </div>
       </div>
@@ -389,14 +368,14 @@
     <script src="/Admin/assets/js/settings.js"></script>
     <script src="/Admin/assets/js/todolist.js"></script>
     <!-- endinject -->
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
     <!-- custom Js -->
     <script src="/script/Admin/product.js"></script>
 
 
 <!-- jQuery and Bootstrap JavaScript (include at the end of the body) -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+
 <script>
 
 

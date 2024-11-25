@@ -27,6 +27,6 @@ const upload = multer({
     console.error(`Unsupported file type: ${file.originalname}`);
     cb(new Error("Error: File type not supported"));
   },
-}).array("productImage", 5); // Handles up to 5 files with the name 'productImage'
+}).array("productImage", 10); // Handles up to 5 files with the name 'productImage'
 
 module.exports = upload;

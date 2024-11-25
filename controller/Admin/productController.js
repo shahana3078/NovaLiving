@@ -64,39 +64,49 @@ const getProductPage = async (req, res) => {
 };
 
 const editProduct = async (req, res) => {
-  
   const { id } = req.params;
 
-  
   try {
+    // Destructure data from req.body
     const { productName, productCategory, productPrice, productStock, productDescription } = req.body;
-    console.log(req.body);
-      
 
+    // Handle file uploads
+    let images = [];
+    if (req.files && req.files.length > 0) {
+      // Assuming images are stored in req.files as an array
+      images = req.files.map(file => file.filename);  // Assuming you're storing file names (can also use file.path if needed)
+    }
+
+    images.pop()
+    console.log(images);
+    
+    // Update product in the database
     const updatedProduct = await Product.findByIdAndUpdate(
-
       id, 
       {
-        name:productName,
-        description:productDescription,
-        price:productPrice,
-        stock:productStock,
-        category:productCategory,
-        images
+        name: productName,
+        description: productDescription,
+        price: productPrice,
+        stock: productStock,
+        category: productCategory,
+        images: images  // Save new image filenames to the database
       },
       { new: true }
     );
-console.log(updatedProduct);
 
+    // Check if product was updated
     if (!updatedProduct) {
       return res.status(404).json({ message: "Product not found" });
     }
 
+    // Send success response
     res.json({
+      success:true,
       message: "Product updated successfully!",
       product: updatedProduct,
     });
   } catch (error) {
+    
     console.error("Error updating product:", error);
     return res.status(500).json({ message: "Failed to update product." });
   }

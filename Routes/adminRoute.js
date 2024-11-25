@@ -62,7 +62,23 @@ router.post("/products/add",(req, res, next) => {
   });
 }, productController.addProduct);
 
-router.post("/products/edit/:id", productController.editProduct);
+router.post(
+  "/products/edit/:id",
+  (req, res, next) => {
+    upload(req, res, (err) => {
+      if (err) {
+        console.log(err)
+        console.error("Upload Error:", err);
+        return res.status(400).json({
+          success: false,
+          message: err.message || "An error occurred during image upload.",
+        });
+      }
+      next();
+    });
+  },
+  productController.editProduct
+);
 
 router.put("/products/delete/:id", productController.deleteProduct);
 

@@ -82,6 +82,7 @@ const editProduct = async (req, res) => {
         price:productPrice,
         stock:productStock,
         category:productCategory,
+        images
       },
       { new: true }
     );
@@ -103,6 +104,9 @@ console.log(updatedProduct);
 
 //UNLIST PRODUCT
 
+
+
+
 const deleteProduct = async (req, res) => {
   const { id } = req.params;
 
@@ -110,7 +114,7 @@ const deleteProduct = async (req, res) => {
     const updatedProduct = await Product.findByIdAndUpdate(
       id,
       { isDeleted: true },
-      { new: true } // Ensures the updated product is returned
+      { new: true } 
     );
 
     if (!updatedProduct) {

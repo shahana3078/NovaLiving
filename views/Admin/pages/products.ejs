@@ -270,7 +270,9 @@
 
 
 <!-- Edit Product Modal -->
-<div class="modal fade" id="editProductModal" tabindex="-1" aria-labelledby="editProductModalLabel" aria-hidden="true">
+
+ 
+   <div class="modal fade" id="editProductModal" tabindex="-1" aria-labelledby="editProductModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" style="max-width: 800px;">
       <div class="modal-content">
         <div class="modal-header">
@@ -281,13 +283,14 @@
           <form id="editProductForm" enctype="multipart/form-data">
             <input type="hidden" id="editProductId" name="productId" />
   
-            <!-- Product Fields -->
+            <!-- Product Name -->
             <div class="mb-3">
               <label for="editProductName" class="form-label">Product Name</label>
               <input type="text" class="form-control" id="editProductName" name="productName" required />
               <div class="text-danger" id="editProductNameError" style="display: none;"></div>
             </div>
   
+            <!-- Product Category -->
             <div class="mb-3">
               <label for="editProductCategory" class="form-label">Product Category</label>
               <select class="form-control" id="editProductCategory" name="productCategory" required>
@@ -299,18 +302,21 @@
               <div class="text-danger" id="editProductCategoryError" style="display: none;"></div>
             </div>
   
+            <!-- Product Price -->
             <div class="mb-3">
               <label for="editProductPrice" class="form-label">Product Price</label>
               <input type="number" class="form-control" id="editProductPrice" name="productPrice" required />
               <div class="text-danger" id="editProductPriceError" style="display: none;"></div>
             </div>
   
+            <!-- Product Stock -->
             <div class="mb-3">
               <label for="editProductStock" class="form-label">Product Stock</label>
               <input type="number" class="form-control" id="editProductStock" name="productStock" required />
               <div class="text-danger" id="editProductStockError" style="display: none;"></div>
             </div>
   
+            <!-- Product Description -->
             <div class="mb-3">
               <label for="editProductDescription" class="form-label">Product Description</label>
               <textarea class="form-control" id="editProductDescription" name="productDescription" rows="3" required></textarea>
@@ -320,16 +326,30 @@
             <!-- Existing Images -->
             <div class="mb-3">
               <label class="form-label">Existing Images</label>
-              <div id="existingImagesContainer" class="d-flex flex-wrap"></div>
+              <div id="existingImagesContainer" class="d-flex flex-wrap gap-2">
+                <!-- Existing images and their remove buttons will be appended here dynamically by JS -->
+              </div>
             </div>
   
-            <!-- Upload and Crop New Images -->
+            <!-- Upload New Images -->
             <div class="mb-3">
               <label for="editProductImage" class="form-label">Upload New Images</label>
-              <input type="file" class="form-control" id="editProductImage" name="productImages" accept="image/*" multiple />
+              <input 
+                type="file" 
+                class="form-control" 
+                id="editProductImage" 
+                name="productImages" 
+                accept="image/*" 
+                multiple 
+              />
             </div>
-            <div id="imageCropContainer" class="mt-3"></div>
   
+            <!-- Cropping Area -->
+            <div id="imageCropContainer" class="mt-3">
+              <!-- Cropping interface for new images will be appended here dynamically by JS -->
+            </div>
+  
+            <!-- Modal Footer -->
             <div class="modal-footer">
               <button type="submit" class="btn btn-primary">Save Changes</button>
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -340,7 +360,6 @@
     </div>
   </div>
   
-      
       
     <!-- Include necessary JS libraries -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css">

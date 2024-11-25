@@ -16,49 +16,42 @@ document.addEventListener("DOMContentLoaded", function () {
   const existingImagesContainer = document.getElementById("existingImagesContainer");
   const cropContainer = document.getElementById("imageCropContainer");
   const imageInput = document.getElementById("editProductImage");
+  
+  
   let cropInstances = [];
   let croppedImages = [];
 
-  // Form Submission with Cropped Images
+  // Handle form submission
   editForm.addEventListener("submit", function (e) {
     e.preventDefault();
 
-    // Clear previous error messages
+    // Validate form fields
     document.querySelectorAll(".text-danger").forEach(el => (el.style.display = "none"));
-
     let isValid = true;
 
-    // Validate required fields
     ["editProductName", "editProductCategory", "editProductPrice", "editProductStock", "editProductDescription"].forEach(fieldId => {
       const field = document.getElementById(fieldId);
       if (!field.value.trim()) {
         isValid = false;
-        document.getElementById(`${fieldId}Error`).textContent = "This field cannot be empty.";
-        document.getElementById(`${fieldId}Error`).style.display = "block";
+        const errorElement = document.getElementById(`${fieldId}Error`);
+        errorElement.textContent = "This field cannot be empty.";
+        errorElement.style.display = "block";
       }
     });
 
     if (!isValid) return;
 
+    // Prepare form data
     const productId = document.getElementById("editProductId").value;
-    const productName = document.getElementById("editProductName").value;
-    const productCategory = document.getElementById("editProductCategory").value;
-    const productPrice = document.getElementById("editProductPrice").value;
-    const productStock = document.getElementById("editProductStock").value;
-    const productDescription = document.getElementById("editProductDescription").value;
+    const productData = new FormData();
+    productData.append("productId", productId);
+    productData.append("productName", document.getElementById("editProductName").value);
+    productData.append("productCategory", document.getElementById("editProductCategory").value);
+    productData.append("productPrice", document.getElementById("editProductPrice").value);
+    productData.append("productStock", document.getElementById("editProductStock").value);
+    productData.append("productDescription", document.getElementById("editProductDescription").value);
 
-    // Create FormData object to send the data
-    const productData = {
-      productId: document.getElementById("editProductId").value,
-      productName: document.getElementById("editProductName").value,
-      productCategory: document.getElementById("editProductCategory").value,
-      productPrice: document.getElementById("editProductPrice").value,
-      productStock: document.getElementById("editProductStock").value,
-      productDescription: document.getElementById("editProductDescription").value,
-      productImages: [] 
-    };
-
-    // Append cropped images to FormData
+    // Add cropped images
     croppedImages.forEach((croppedImage, index) => {
       const byteString = atob(croppedImage.split(",")[1]);
       const arrayBuffer = new ArrayBuffer(byteString.length);
@@ -67,92 +60,69 @@ document.addEventListener("DOMContentLoaded", function () {
         uintArray[i] = byteString.charCodeAt(i);
       }
       const blob = new Blob([uintArray], { type: "image/jpeg" });
-      productData.productImages.push({
-        imageBlob: blob, // Adding the image blob to productImages
-        filename: `image_${index}.jpg`, // Optional: if you want to track filenames
-      });
+      productData.append(`productImages`, blob, `image_${index}.jpg`);
     });
 
-    
-  
-    
-
+    // Send data via Axios
     axios
       .post(`/admin/products/edit/${productId}`, productData)
       .then(response => {
+        console.log(response);
+        
         if (response.data.success) {
-          // Close the modal and reload page after success
           const modal = bootstrap.Modal.getInstance(document.getElementById("editProductModal"));
           modal.hide();
           location.reload();
         } else {
-          console.error("Update failed:", response.data.message);
+          console.error("Update failed:");
         }
       })
       .catch(error => console.error("Error updating product:", error));
   });
 
-  // Edit Button Click Event
+  // Open edit modal and populate data
   document.querySelectorAll(".editBtn").forEach(button => {
     button.addEventListener("click", function () {
-      try {
-        // Retrieve data from button's data-* attributes
-        const productId = this.dataset.id;
-        const productName = this.dataset.name;
-        const productDescription = this.dataset.description;
-        const productPrice = this.dataset.price;
-        const productStock = this.dataset.stock;
-        const productImages = this.dataset.images ? this.dataset.images.split(",") : [];
-        const productCategory = this.dataset.category;
+      const productId = this.dataset.id;
+      const productName = this.dataset.name;
+      const productDescription = this.dataset.description;
+      const productPrice = this.dataset.price;
+      const productStock = this.dataset.stock;
+      const productImages = this.dataset.images ? this.dataset.images.split(",") : [];
+      const productCategory = this.dataset.category;
 
-        // Populate modal fields
-        document.getElementById("editProductId").value = productId || "";
-        document.getElementById("editProductName").value = productName || "";
-        document.getElementById("editProductDescription").value = productDescription || "";
-        document.getElementById("editProductPrice").value = productPrice || "";
-        document.getElementById("editProductStock").value = productStock || "";
-        document.getElementById("editProductCategory").value = productCategory || "";
+      document.getElementById("editProductId").value = productId || "";
+      document.getElementById("editProductName").value = productName || "";
+      document.getElementById("editProductDescription").value = productDescription || "";
+      document.getElementById("editProductPrice").value = productPrice || "";
+      document.getElementById("editProductStock").value = productStock || "";
+      document.getElementById("editProductCategory").value = productCategory || "";
 
-        // Populate existing images container
-        existingImagesContainer.innerHTML = ""; // Clear previous images
-        productImages.forEach(image => {
-          const wrapper = document.createElement("div");
-          wrapper.className = "image-wrapper position-relative mb-3";
-          wrapper.style.width = "100px";
-          wrapper.style.height = "100px";
+      existingImagesContainer.innerHTML = ""; // Clear existing images
+      productImages.forEach(image => {
+        const wrapper = document.createElement("div");
+        wrapper.className = "image-wrapper position-relative mb-3";
+        wrapper.style.width = "100px";
+        wrapper.style.height = "100px";
 
-          const img = document.createElement("img");
-          img.src = `/uploads/images/${image}`;
-          img.style.width = "100%";
-          img.style.height = "100%";
-          img.style.objectFit = "cover";
+        const img = document.createElement("img");
+        img.src = `/uploads/images/${image}`;
+        img.style.width = "100%";
+        img.style.height = "100%";
+        img.style.objectFit = "cover";
 
-          const removeBtn = document.createElement("button");
-          removeBtn.textContent = "X";
-          removeBtn.className = "btn btn-sm btn-danger position-absolute top-0 end-0";
-          removeBtn.onclick = () => {
-            // Remove image from the UI and backend (to be implemented)
-            wrapper.remove();
-          };
+        wrapper.appendChild(img);
+        existingImagesContainer.appendChild(wrapper);
+      });
 
-          wrapper.appendChild(img);
-          wrapper.appendChild(removeBtn);
-          existingImagesContainer.appendChild(wrapper);
-        });
-
-        // Show the modal
-        const modal = new bootstrap.Modal(document.getElementById("editProductModal"));
-        modal.show();
-      } catch (error) {
-        console.error("Error populating product data:", error);
-        alert("Failed to load product details. Please try again.");
-      }
+      const modal = new bootstrap.Modal(document.getElementById("editProductModal"));
+      modal.show();
     });
   });
 
-  // Crop Images
+  // Handle new image cropping
   imageInput.addEventListener("change", function () {
-    cropContainer.innerHTML = "";
+    cropContainer.innerHTML = ""; // Clear previous crop fields
     cropInstances = [];
     croppedImages = [];
 
@@ -170,19 +140,33 @@ document.addEventListener("DOMContentLoaded", function () {
 
         cropContainer.appendChild(wrapper);
 
-        // Initialize cropper instance
         const cropper = new Cropper(img, {
-          aspectRatio: 1,
+          aspectRatio: 1, // Change based on your aspect ratio
           viewMode: 1,
           autoCropArea: 0.8,
           responsive: true,
           crop() {
-            // Save cropped image as data URL
             croppedImages[index] = cropper.getCroppedCanvas().toDataURL("image/jpeg");
           },
         });
 
         cropInstances.push(cropper);
+
+        
+        const controls = document.createElement("div");
+        controls.className = "mt-2 d-flex gap-2";
+        controls.innerHTML = `
+          <button type="button" class="btn btn-primary btn-sm save-crop">Save</button>
+        `;
+        wrapper.appendChild(controls);
+
+        controls.querySelector(".save-crop").addEventListener("click", function () {
+          const croppedData = cropper.getCroppedCanvas().toDataURL("image/jpeg");
+          croppedImages[index] = croppedData;
+          wrapper.querySelector("img").src = croppedData;
+          cropper.destroy();
+          controls.remove();
+        });
       };
       reader.readAsDataURL(file);
     });
@@ -192,7 +176,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
-  // Function to show messages
+  //  show messages
  
   function showMessage(message, type) {
     const messageContainer = document.createElement("div");

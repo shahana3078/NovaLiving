@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management</title>
+    <!-- Vendor CSS -->
+    <link rel="stylesheet" href="/assets/vendors/css/vendor.bundle.base.css">
+    <link rel="stylesheet" href="/Admin/vendors/jvectormap/jquery-jvectormap.css">
+    <link rel="stylesheet" href="/Admin/assets/vendors/flag-icon-css/css/flag-icon.min.css">
+    <link rel="stylesheet" href="/Admin/assets/vendors/owl-carousel-2/owl.carousel.min.css">
+    <link rel="stylesheet" href="/Admin/assets/vendors/owl-carousel-2/owl.theme.default.min.css">
+    <!-- Custom Admin Layout Styles -->
+    <link rel="stylesheet" href="/Admin/css/admin.css">
+
+    <!-- Font Awsome Cdn -->
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+
+    <link rel="shortcut icon" href="assets/images/favicon.png" />
+   
+</head>
+<body>
+    <div class="container-scroller">
+        <!-- partial:../../partials/_sidebar.html -->
+        <%- include('./Partials/sideBar'); %>
+        <!-- partial -->
+        <div class="container-fluid page-body-wrapper">
+          <!-- partial:../../partials/_navbar.html -->
+          <%- include('./Partials/navBar'); %>
+          <!-- partial -->
+          <div class="main-panel">
+            <div class="content-wrapper">
+                <!-- conted area start -->
+                <div class="container">
+                    <h2>User Management</h2>
+                    <!-- Search bar with debouncing -->
+                    <input type="text" id="searchBar" class="form-control" placeholder="Search users..." oninput="debounceSearch()">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Date Joined</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="userList">
+                            <% users.forEach(user => { %>
+                            <tr>
+                                <td><%= user.full_name %></td>
+                                <td><%= user.email %></td>
+                                <td><%= user.dateJoined ? user.dateJoined.toDateString() : 'N/A' %></td>
+                                <td>
+                                    <form action="/admin/users/block/<%= user._id %>" method="POST" style="display:inline;">
+                                        <% if (user.isBlocked) { %>
+                                            <button class="btn btn-success btn-sm">Unblock</button>
+                                        <% } else { %>
+                                            <button class="btn btn-warning btn-sm">Block</button>
+                                        <% } %>
+                                    </form>
+                                </td>
+                            </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- conted area End -->
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete this user?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    
+                    <form id="deleteForm" method="POST">
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap and custom JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function confirmDelete(userId) {
+           
+            document.getElementById('deleteForm').action = `/admin/users/delete/${userId}`;
+            // Show the modal
+            new bootstrap.Modal(document.getElementById('deleteModal')).show();
+        }
+
+        let debounceTimeout;
+
+function debounceSearch() {
+    clearTimeout(debounceTimeout);
+    debounceTimeout = setTimeout(() => searchUsers(), 300);  // 300ms debounce
+}
+
+function searchUsers() {
+    const query = document.getElementById('searchBar').value;
+    fetch(`/admin/users/search?query=${query}`)
+        .then(response => response.json())
+        .then(users => {
+            const userList = document.getElementById('userList');
+            userList.innerHTML = users.map(user => `
+                <tr>
+                    <td>${user._id}</td>
+                    <td>${user.googleId}</td>
+                    <td>${user.email}</td>
+                    <td>${user.dateJoined ? new Date(user.dateJoined).toDateString() : 'N/A'}</td>
+                    <td>
+                        <form action="/admin/users/block/${user._id}" method="POST" style="display:inline;">
+                            <button class="btn btn-${user.isBlocked ? 'success' : 'warning'} btn-sm">${user.isBlocked ? 'Unblock' : 'Block'}</button>
+                        </form>
+                    </td>
+                </tr>`).join('');
+        });
+}
+    </script>
+
+</body>
+</html>

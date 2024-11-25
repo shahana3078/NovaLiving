@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #3b5d50;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+      }
+      .container {
+        background-color: #fff;
+        padding: 2rem;
+        border-radius: 10px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        width: 350px;
+      }
+      h2 {
+        text-align: center;
+        color: #3b5d50;
+      }
+      input[type="email"],
+      input[type="password"] {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 16px;
+        box-sizing: border-box;
+      }
+      button {
+        width: 100%;
+        padding: 10px;
+        background-color: #3b5d50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-top: 10px;
+      }
+      .google-login {
+        background-color: #4285f4;
+        color: white;
+        margin-top: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px;
+        border-radius: 5px;
+        border: none;
+        cursor: pointer;
+      }
+      .google-login img {
+        width: 20px;
+        height: 20px;
+        margin-right: 10px;
+      }
+      p {
+        text-align: center;
+        color: #333;
+      }
+      p a {
+        color: #3b5d50;
+        text-decoration: none;
+      }
+      .error-message {
+  color: red;
+  font-size: 14px;
+  display: none; /* Hidden by default */
+  margin-bottom: 10px; /* Add spacing from the input fields */
+}
+  .input-group {
+    margin-bottom: 10px;
+  }
+
+  #errorMessage {
+    color: red;
+    font-size: 14px;
+    display: none; /* Hide the general error message initially */
+  }
+      .forgot-password {
+        font-size: 0.8rem;
+        color: black;
+        text-align: right;
+        margin-bottom: 10px;
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>Login</h2>
+    
+      <!-- Server-side error message -->
+      <% if (message) { %>
+        <p style="color: red;"><%= message %></p>
+      <% } %>
+    
+      <form id="loginForm" action="/login" method="POST">
+        <!-- Client-side error message -->
+        <p id="clientErrorMessage" class="error-message"></p>
+    
+        <input
+          type="email"
+          id="email"
+          name="email"
+          placeholder="Email"
+          required
+        />
+        <input
+          type="password"
+          id="password"
+          name="password"
+          placeholder="Password"
+          required
+        />
+        <a href="/forgot-password" class="forgot-password">Forgot Password?</a>
+        <button type="submit">Login</button>
+    
+        <!-- Google login button -->
+        <button type="button" class="google-login" onclick="loginWithGoogle()">
+          <img
+            src="https://developers.google.com/identity/images/g-logo.png"
+            alt="Google Logo"
+          />
+          Login with Google
+        </button>
+      </form>
+    
+      <p>Don't have an account? <a href="/signup">Signup</a></p>
+    </div>
+    
+<script src="/script/User/auth.js"></script>
+  </body>
+</html>

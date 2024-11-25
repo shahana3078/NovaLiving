@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Signup</title>
+    <style>
+      body {
+        background-color: #3b5d50;
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+
+      .signup-container {
+        background-color: white;
+        padding: 40px;
+        border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        max-width: 400px;
+        width: 100%;
+      }
+
+      h2 {
+        text-align: center;
+        margin-bottom: 20px;
+        color: #333;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 8px;
+        color: #333;
+        font-weight: bold;
+      }
+
+      input[type="text"],
+      input[type="email"],
+      input[type="password"] {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-sizing: border-box;
+        font-size: 14px;
+      }
+
+      .password-toggle {
+        cursor: pointer;
+        margin-left: 5px;
+        color: #3b5d50;
+      }
+
+      button {
+        width: 100%;
+        padding: 12px;
+        background-color: #3b5d50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background-color: #2e4b41;
+      }
+
+      .google-login {
+        background-color: #4285f4;
+        color: white;
+        margin-top: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      .google-login img {
+        width: 20px;
+        height: 20px;
+        margin-right: 10px;
+      }
+
+      #error-message {
+        margin-bottom: 20px;
+        text-align: center;
+        color: red;
+        font-size: 14px;
+      }
+    </style>
+
+  </head>
+  <body>
+    <div class="signup-container">
+      <h2>Signup</h2>
+      <p id="error-message"><%= error ? error : '' %></p>
+      <form action="/signup" method="POST" onsubmit="return validateForm()">
+        <label for="full_name">Full Name:</label>
+        <input
+          type="text"
+          id="fullname"
+          name="full_name"
+          placeholder="Enter your full name"
+          required
+          value="<%= full_name ? full_name : '' %>"
+        />
+
+        <label for="email">Email:</label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          placeholder="Enter your email"
+          required
+          value="<%= email ? email : '' %>"
+        />
+
+        <label for="password">Password:</label>
+        <input
+          type="password"
+          id="password"
+          name="password"
+          placeholder="Enter your password"
+          required
+        />
+        <span
+          id="togglePassword"
+          class="password-toggle"
+          onclick="togglePassword('password', 'togglePassword')"
+          >Show</span
+        >
+
+        <label for="confirmPassword">Confirm Password:</label>
+        <input
+          type="password"
+          id="confirmPassword"
+          name="confirmPassword"
+          placeholder="Confirm your password"
+          required
+        />
+        <span
+          id="toggleConfirmPassword"
+          class="password-toggle"
+          onclick="togglePassword('confirmPassword', 'toggleConfirmPassword')"
+          >Show</span
+        >
+
+        <button type="submit">Sign Up</button>
+      </form>
+      <button type="button" class="google-login" onclick="signupWithGoogle()">
+        <img
+          src="https://developers.google.com/identity/images/g-logo.png"
+          alt="Google Logo"
+        />
+        Sign up with Google
+      </button>
+    </div>
+    <script>
+ 
+
+      function signupWithGoogle() {
+        window.location.href = "/auth/google";
+      }
+      function validateForm() {
+      const errorElement = document.getElementById("error-message");
+      const fullName = document.getElementById("fullname").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const confirmPassword = document.getElementById("confirmPassword").value.trim();
+
+      errorElement.textContent = "";
+
+      if (!fullName) {
+        errorElement.textContent = "Full Name cannot be empty or spaces only.";
+        return false;
+      }
+      if (!email) {
+        errorElement.textContent = "Email cannot be empty or spaces only.";
+        return false;
+      }
+      if (!password) {
+        errorElement.textContent = "Password cannot be empty or spaces only.";
+        return false;
+      }
+      if (password.length < 6) {
+        errorElement.textContent = "Password must be at least 6 characters long.";
+        return false;
+      }
+      if (!confirmPassword) {
+        errorElement.textContent = "Confirm Password cannot be empty or spaces only.";
+        return false;
+      }
+
+      if (password !== confirmPassword) {
+        errorElement.textContent = "Passwords do not match.";
+        return false;
+      }
+
+      return true;
+    }
+
+    function togglePassword(fieldId, toggleId) {
+      const field = document.getElementById(fieldId);
+      const toggle = document.getElementById(toggleId);
+
+      if (field.type === "password") {
+        field.type = "text";
+        toggle.textContent = "Hide";
+      } else {
+        field.type = "password";
+        toggle.textContent = "Show";
+      }
+    }
+     
+    </script>
+  </body>
+</html>

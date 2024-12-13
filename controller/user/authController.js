@@ -89,6 +89,7 @@ const getVerifyOtp = (req, res) => {
   res.render("User/verify-otp", { email });
 };
 
+
 const postVerifyOtp = async (req, res) => {
   const { email, otp } = req.body;
 
@@ -96,7 +97,12 @@ const postVerifyOtp = async (req, res) => {
     const user = await User.findOne({ email });
 
     if (!user || user.otp !== otp || user.otpExpires < Date.now()) {
-      return res.status(400).json({error:"invalid OTP or OTP expired"});
+      console.log('Entered wrong OTP or OTP expired');
+
+      return res.render('User/verify-otp', {
+        email,
+        errorMessage: 'Invalid OTP or OTP expired!'
+      });
     }
 
     user.otp = undefined;
@@ -106,12 +112,15 @@ const postVerifyOtp = async (req, res) => {
 
     req.session.userId = user._id;  
 
-    res.render("User/login", { message: "Signup successful! You can log in now." });
+    return res.render("User/login", { message: "Signup successful! You can log in now." });
   } catch (error) {
-    res.status(500).send("Error during OTP verification");
+    console.error('Error occurred during OTP verification:', error);
+    return res.render('User/verify-otp', {
+      email,
+      errorMessage: 'An error occurred during OTP verification'
+    });
   }
 };
-
 
 //RESEND-OTP
 
@@ -152,11 +161,25 @@ const getLogin = (req, res) => {
 };
 
 const postLogin = async (req, res) => {
-  console.log("User login attempt");
 
   const { email, password } = req.body;
 
   try {
+
+    if(typeof email!=='string'){
+      return res.render('User/login',{
+        message:'please enter a valid email'
+      })
+    }
+    const emailReg= /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+    if(!emailReg.test(email)){
+      return res.render("User/login", {
+        message:'please enter a email address'
+      })
+    }
+   
+
     const user = await User.findOne({ email });
     if (!user) {
       return res.render("User/login", {
@@ -172,6 +195,7 @@ const postLogin = async (req, res) => {
         message: "Invalid email or password.",
       });
     }
+   
 
     if (user.isBlocked) {
       req.session.destroy((err) => {
@@ -192,6 +216,8 @@ const postLogin = async (req, res) => {
     return res.status(500).send("Error during login");
   }
 };
+
+
 
 
 
@@ -274,7 +300,9 @@ const getResetPassword = (req, res) => {
 };
 
 const postResetPassword = async (req, res) => {
+  
   const { password, confirmPassword, token } = req.body;
+
 
   try {
     if (password !== confirmPassword) {
@@ -304,6 +332,7 @@ const postResetPassword = async (req, res) => {
 
     await user.save();
 
+   
     return res.redirect(
       "/login?message=Password has been reset successfully. You can now log in."
     );
@@ -320,6 +349,8 @@ const postResetPassword = async (req, res) => {
 
 
 const googleLogin = async (req, res, next) => {
+  console.log('loginned by google');
+  
   passport.authenticate("google", { failureRedirect: "/login" }, async (err, user, info) => {
     if (err || !user) {
       console.error("Google Authentication Error:", err || info);

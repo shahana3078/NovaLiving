@@ -2,7 +2,6 @@ require('dotenv').config();
 
 const express = require('express'); 
 const session=require('express-session')
-const MongoStore = require('connect-mongo');
 const passport = require('passport');
 const cors = require('cors');
 const mongoose = require('mongoose');
@@ -13,6 +12,7 @@ const passportSetup = require('./config/passport-setup');
 const multer=require('multer')
 const generateBreadcrumbs = require('./middlewares/generateBreadcrumbs');
 const mongodb=require('./config/db.js')
+const MongoStore = require('connect-mongo');
 const app = express();
 
 
@@ -22,10 +22,7 @@ const cookieParser=require('cookie-parser')
 
 
 const PORT = process.env.PORT || 3000;
- 
 
-
-// Use the breadcrumbs middleware
 
 app.set('view engine', 'ejs');
 app.set('views', __dirname + '/views');
@@ -36,7 +33,10 @@ app.use(session({
     secret: 'secret',  
     resave: false,
     saveUninitialized: true,
-    cookie: { 
+    store: MongoStore.create({
+        mongoUrl: 'mongodb://localhost/test-app'
+    }),
+    cookie: {
         httpOnly:true,
         maxAge: 24 * 60 * 60 * 1000
     },
@@ -46,15 +46,7 @@ app.use(session({
 
 app.use(passport.initialize());
 app.use(passport.session());
-// passport.serializeUser((user, done) => {
-//     done(null, user.id);  
-// });
 
-// passport.deserializeUser((id, done) => {
-//     User.findById(id, (err, user) => {
-//         done(err, user);
-//     });
-// });
 
 
 app.use(express.json());

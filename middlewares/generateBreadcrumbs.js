@@ -9,22 +9,27 @@ function generateBreadcrumbs(req, res, next) {
   const pathParts = path.split("/").filter((part) => part);
 
   pathParts.forEach((part, index) => {
-    const isLast = index === pathParts.length - 1;
-    let breadcrumbName = part.charAt(0).toUpperCase() + part.slice(1);
+    const isLast = index === pathParts.length - 1; 
+    let breadcrumbName;
 
-    if (part === "shop") {
-      breadcrumbName = "Shop";
+    switch (part) {
+      case "shop":
+        breadcrumbName = "Shop";
+        break;
+      case "details":
+        breadcrumbName = res.locals.product
+          ? res.locals.product.name
+          : "Details";
+        break;
+      default:
+        breadcrumbName = part.charAt(0).toUpperCase() + part.slice(1); 
     }
 
-    if (part === "details" && req.params.id && res.locals.product) {
-      breadcrumbName = res.locals.product.name;
-    }
-
-    const link = "/" + pathParts.slice(0, index + 1).join("/");
+    const link = isLast ? null : "/" + pathParts.slice(0, index + 1).join("/");
 
     breadcrumbs.push({
       name: breadcrumbName,
-      link: isLast ? null : link,
+      link,
     });
   });
 

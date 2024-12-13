@@ -6,6 +6,7 @@ const Category = require("../../Models/categoryModel");
 const getProducts = async (req, res) => {
   try {
     const products = await Product.find();
+    
     const categories = await Category.find({ isDeleted: false });
 
     res.render("Admin/pages/products", { categories, products });
@@ -20,8 +21,10 @@ const addProduct = async (req, res) => {
     const { productName, productDescription, productPrice, productStock, productCategory } = req.body;
     const uploadImages = req.files.map((val) => val.filename);
 
-    const existingProduct = await Product.findOne({ name: productName });
-
+    const existingProduct = await Product.findOne({ name: productName }); 
+    const category=await Category.findOne({ categoryName: productCategory });
+    console.log(productCategory);
+    
     if (existingProduct) {
       return res.status(400).json({
         message: `Product name "${productName}" already exists. Please choose a different name.`,
@@ -32,6 +35,7 @@ const addProduct = async (req, res) => {
     const newProduct = new Product({
       name: productName,
       category: productCategory,
+      categoryId: category._id,
       price: productPrice,
       stock: productStock,
       description: productDescription,
@@ -63,58 +67,51 @@ const getProductPage = async (req, res) => {
   }
 };
 
+
+
+
+//UNLIST PRODUCT
 const editProduct = async (req, res) => {
   const { id } = req.params;
 
   try {
-    // Destructure data from req.body
-    const { productName, productCategory, productPrice, productStock, productDescription } = req.body;
+    const { productName, productCategory, productPrice, productStock, productDescription, existingImages } = req.body;
 
-    // Handle file uploads
-    let images = [];
+    let images = existingImages ? JSON.parse(existingImages) : [];
+
+  
     if (req.files && req.files.length > 0) {
-      // Assuming images are stored in req.files as an array
-      images = req.files.map(file => file.filename);  // Assuming you're storing file names (can also use file.path if needed)
+      const newImages = req.files.map(file => file.filename);
+      images = [ ...newImages]; 
     }
 
-    images.pop()
-    console.log(images);
-    
-    // Update product in the database
     const updatedProduct = await Product.findByIdAndUpdate(
-      id, 
+      id,
       {
         name: productName,
         description: productDescription,
         price: productPrice,
         stock: productStock,
         category: productCategory,
-        images: images  // Save new image filenames to the database
+        images: images, 
       },
       { new: true }
     );
 
-    // Check if product was updated
     if (!updatedProduct) {
       return res.status(404).json({ message: "Product not found" });
     }
 
-    // Send success response
     res.json({
-      success:true,
+      success: true,
       message: "Product updated successfully!",
       product: updatedProduct,
     });
   } catch (error) {
-    
     console.error("Error updating product:", error);
     return res.status(500).json({ message: "Failed to update product." });
   }
 };
-
-//UNLIST PRODUCT
-
-
 
 
 const deleteProduct = async (req, res) => {

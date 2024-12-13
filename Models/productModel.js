@@ -8,10 +8,12 @@ const productSchema = new mongoose.Schema({
         required: true,
         unique:true
     },
-    category: {
-        type: String,
+   
+    categoryId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Category',
         required: true,
-    },
+      },
     price: {
         type: Number,
         required: true,
@@ -33,8 +35,10 @@ const productSchema = new mongoose.Schema({
         default: Date.now,
     },
     isDeleted: {
-         type: Boolean, default: false
+         type: Boolean, 
+         default: false
          } 
+         
 
 });
 

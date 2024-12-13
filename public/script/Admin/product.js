@@ -10,6 +10,8 @@ async function fetchProducts() {
   }
 }
 
+
+
 //edit
 document.addEventListener("DOMContentLoaded", function () {
   const editProductForm = document.getElementById("editProductForm");
@@ -20,11 +22,9 @@ document.addEventListener("DOMContentLoaded", function () {
   let cropperInstances = [];
   let croppedImages = [];
 let productId2=''
-  // Open Modal and Populate Fields
- // Handle the click event for the edit button
+ 
 document.querySelectorAll(".editBtn").forEach(button => {
   button.addEventListener("click", function () {
-    // Extract data from button
     const productId = this.dataset.id;
     productId2=productId;
     const productName = this.dataset.name;
@@ -34,7 +34,6 @@ document.querySelectorAll(".editBtn").forEach(button => {
     const productCategory = this.dataset.category;
     const productImages = this.dataset.images ? this.dataset.images.split(",") : [];
 
-    // Populate the modal fields
     document.getElementById("editProductId").value = productId || "";
     document.getElementById("editProductName").value = productName || "";
     document.getElementById("editProductDescription").value = productDescription || "";
@@ -42,9 +41,8 @@ document.querySelectorAll(".editBtn").forEach(button => {
     document.getElementById("editProductStock").value = productStock || "";
     document.getElementById("editProductCategory").value = productCategory || "";
 
-    // Clear existing images and populate
     const existingImagesContainer = document.getElementById("existingImagesContainer");
-    existingImagesContainer.innerHTML = ""; // Clear old images
+    existingImagesContainer.innerHTML = ""; 
     productImages.forEach(image => {
       const wrapper = document.createElement("div");
       wrapper.className = "image-wrapper position-relative mb-3";
@@ -52,7 +50,7 @@ document.querySelectorAll(".editBtn").forEach(button => {
       wrapper.style.height = "100px";
 
       const img = document.createElement("img");
-      img.src = `/uploads/images/${image.trim()}`; // Ensure trimmed image path
+      img.src = `/uploads/images/${image.trim()}`; 
       img.style.width = "100%";
       img.style.height = "100%";
       img.style.objectFit = "cover";
@@ -61,7 +59,7 @@ document.querySelectorAll(".editBtn").forEach(button => {
       existingImagesContainer.appendChild(wrapper);
     });
 
-    // Show the modal
+    
     const modal = new bootstrap.Modal(document.getElementById("editProductModal"));
     modal.show();
   });
@@ -70,8 +68,8 @@ document.querySelectorAll(".editBtn").forEach(button => {
 
   // Handle New Image Upload
   newImagesInput.addEventListener("change", function () {
-    cropPreview.innerHTML = ""; // Clear existing previews
-    croppedImages = []; // Reset cropped images
+    cropPreview.innerHTML = ""; 
+    croppedImages = []; 
     cropperInstances.forEach(cropper => cropper.destroy());
     cropperInstances = [];
 
@@ -101,26 +99,22 @@ document.querySelectorAll(".editBtn").forEach(button => {
     });
   });
 
-  // Handle Form Submission
+
   editProductForm.addEventListener("submit", function (e) {
     e.preventDefault();
-    
-
-    console.log(productId2)
-    // const productId = document.getElementById("editProductId").value;
-    // Create FormData and append text fields
+  
     const formData = new FormData();
     formData.append("productName", document.getElementById("editProductName").value);
     formData.append("productCategory", document.getElementById("editProductCategory").value);
     formData.append("productPrice", document.getElementById("editProductPrice").value);
     formData.append("productStock", document.getElementById("editProductStock").value);
     formData.append("productDescription", document.getElementById("editProductDescription").value);
-
-
-   
   
+    const existingImages = Array.from(
+      document.querySelectorAll("#existingImagesContainer img")
+    ).map(img => img.src.split("/").pop());
+    formData.append("existingImages", JSON.stringify(existingImages));
   
-    // Convert croppedImages to Blob and append
     croppedImages.forEach((img, index) => {
       const byteString = atob(img.split(",")[1]);
       const mimeString = img.split(",")[0].split(":")[1].split(";")[0];
@@ -135,27 +129,25 @@ document.querySelectorAll(".editBtn").forEach(button => {
       formData.append("productImage", blob, `cropped_image_${index}.jpg`);
     });
   
-    // Send the request with Axios
     axios
       .post(`/admin/products/edit/${productId2}`, formData)
       .then(response => {
         if (response.data.success) {
-          alert("Product updated successfully!");
-          location.reload(); // Reload the page
+          showMessage("Product updated successfully!", "success");
+          location.reload();
         } else {
           alert("Error updating product.");
         }
       })
       .catch(error => {
         console.error("Error updating product:", error);
-        alert("An error occurred while updating the product.");
+        showMessage("An error occurred while updating the product.", "error");
       });
   });
+  
+  
+  
 });
-
-
-
-
 
 
 
@@ -427,7 +419,7 @@ async function deleteProduct(id) {
 
     const result = await response.json();
     
-
+location.reload()
     if (response.ok) {
    
       showMessage(result.message || "Product unlisted successfully!", "success");
@@ -454,7 +446,7 @@ async function undoProduct(id) {
     });
 
     const result = await response.json();
-
+location.reload()
     if (response.ok) {
       showMessage(result.message || "Product listed successfully!", "success"); 
      

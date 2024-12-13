@@ -79,13 +79,17 @@
         z-index: 1000;
         display: none;
       }
+
       .success {
         background-color: #28a745;
         color: white;
+        font-weight: bold;
       }
+
       .error {
         background-color: #dc3545;
         color: white;
+        font-weight: bold;
       }
     </style>
   </head>
@@ -93,8 +97,8 @@
     <div class="otp-container">
       <h2>Verify OTP</h2>
       <div class="timer" id="timer">5:00</div>
-      <div id="message-container" style="display:none; margin-top:10px;"></div>
-
+      <div id="message-container" style="display: none; margin-top: 10px"></div>
+   
       <form action="/verify-otp" method="POST">
         <input type="hidden" name="email" value="<%= email %>" />
         <label for="otp">Enter OTP:</label>
@@ -103,8 +107,6 @@
       </form>
       <button class="resend-btn" onclick="resendOTP()">Resend OTP</button>
     </div>
-
-    <div id="message-container"></div>
 
     <script>
       let timeLeft = 5 * 60;
@@ -152,7 +154,7 @@
 
             if (data.success) {
               clearInterval(timerInterval);
-              timeLeft = 5 * 60; 
+              timeLeft = 5 * 60;
               startCountdown();
               document.querySelector('input[type="text"]').disabled = false;
               document.querySelector('button[type="submit"]').disabled = false;
@@ -173,43 +175,46 @@
               messageContainer.style.display = "none";
             }, 3000);
           });
-
-          document.getElementById("otp-form").addEventListener("submit", async (event) => {
-  event.preventDefault();
-
-  const otp = document.getElementById("otp").value;
-  const email = "<%= email %>";
-  const messageContainer = document.getElementById("message-container");
-
-  try {
-    const response = await fetch("/verify-otp", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ otp, email }),
-    });
-
-    const result = await response.json();
-
-    messageContainer.style.display = "block";
-    messageContainer.textContent = result.error || "OTP verified successfully!";
-    messageContainer.className = result.error ? "error" : "success";
-
-    if (!result.error) {
-      setTimeout(() => {
-        window.location.href = "/dashboard"; 
-      }, 2000);
-    }
-  } catch (error) {
-    console.error("Error verifying OTP:", error);
-    messageContainer.style.display = "block";
-    messageContainer.textContent = "An error occurred while verifying the OTP.";
-    messageContainer.className = "error";
-  }
-});
-
       }
+
+      document
+        .getElementById("otp-form")
+        .addEventListener("submit", async (event) => {
+          event.preventDefault();
+
+          const otp = document.getElementById("otp").value;
+          const email = "<%= email %>";
+          const messageContainer = document.getElementById("message-container");
+
+          try {
+            const response = await fetch("/verify-otp", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ otp, email }),
+            });
+
+            const result = await response.json();
+
+            messageContainer.style.display = "block";
+            messageContainer.textContent =
+              result.error || "OTP verified successfully!";
+            messageContainer.className = result.error ? "error" : "success";
+
+            if (!result.error) {
+              setTimeout(() => {
+                window.location.href = "/dashboard";
+              }, 2000);
+            }
+          } catch (error) {
+            console.error("Error verifying OTP:", error);
+            messageContainer.style.display = "block";
+            messageContainer.textContent =
+              "An error occurred while verifying the OTP.";
+            messageContainer.className = "error";
+          }
+        });
     </script>
   </body>
 </html>

@@ -12,6 +12,10 @@ const UserSchema = new mongoose.Schema({
         required: true,
         match: [/.+\@.+\..+/, 'Please fill a valid email address']
     },
+    phoneNumber: {
+        type: String, // Optional phone number
+        required: false,
+    },
     password: {
         type: String,
         
@@ -31,10 +35,10 @@ const UserSchema = new mongoose.Schema({
     otpExpires:{
         type:Date
     },
-    resetToken: { // Field for password reset token
+    resetToken: { 
         type: String,
     },
-    resetTokenExpires: { // Field for password reset token expiration
+    resetTokenExpires: { 
         type: Date,
     },
     googleId: { 
@@ -55,4 +59,4 @@ const UserSchema = new mongoose.Schema({
 
 const User = mongoose.model('User', UserSchema);
 
-module.exports = User; // Export the User model
+module.exports = User; 

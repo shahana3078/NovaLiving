@@ -52,12 +52,15 @@ document.getElementById("categoryForm").addEventListener("submit", async functio
 
 
 async function deleteCategory(id) {
-  try {
-    await axios.put(`/admin/categories/delete/${id}`);
-    location.reload();
-  } catch (error) {
-    console.error("Error deleting category:", error);
-  }
+
+  axios.put(`/admin/categories/delete/${id}`)
+  .then(res => {
+    console.log(res.data); 
+    location.reload()
+  })
+  .catch(error => {
+    console.log(`Error while category deleting axios: ${error.message}`);
+  });
 }
 
 async function undoCategory(id) {
@@ -67,6 +70,9 @@ async function undoCategory(id) {
   } catch (error) {
     console.error("Error undoing category:", error);
   }
+
+  
+
 }
 
 

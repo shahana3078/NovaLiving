@@ -5,6 +5,9 @@ const router = express.Router();
 
 const authController = require("../controller/user/authController.js");
 const homeController = require("../controller/user/homeController.js");
+const addressController=require("../controller/user/addressController.js")
+const cartController=require('../controller/user/cartController.js')
+const profileController=require('../controller/user/profileController.js')
 
 const { requireLogin, userLogined } = require("../middlewares/auth.js");
 router
@@ -53,10 +56,6 @@ router.get(
 router.get(
   "/auth/google/callback",authController.googleLogin);
 
-router.get("/profile", (req, res) => {
-  res.render("userDropdown.ejs");
-});
- 
 router.get("/logout", (req, res) => {
   req.session.userId = null;
   res.redirect("/");
@@ -65,5 +64,23 @@ router.get("/logout", (req, res) => {
 router.route("/shop").get(requireLogin, homeController.getShop);
 
 router.get("/product/details/:id", requireLogin,homeController.productDetails);
+
+
+router.get('/address',addressController.getAddresses)
+router.post('/address',addressController.addAddress)
+
+router.post('/remove-address/:id',addressController.removeAddress)
+router.get('/edit-address/:id',addressController.getEditAddress)
+router.put('/edit-address/:id',addressController.updateAddress)
+
+router.get('/cart',cartController.getCart)
+router.post('/cart/add',cartController.addCart)
+router.post('/cart/remove', cartController.removeProductFromCart)
+
+router.get('/profile',profileController.getUserProfile)
+router.get('/my-profile',profileController.getMyProfile)
+
+router.post('/update-profile',profileController.updateProfile)
+
 
 module.exports = router;

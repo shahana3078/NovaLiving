@@ -1,4 +1,5 @@
 const Category = require("../../Models/categoryModel");
+const Product = require("../../Models/productModel");
 
 // CATEGORY MANAGEMENT
 
@@ -91,6 +92,7 @@ const addOrUpdateCategory = async (req, res) => {
 
 //DELETE AND UNDO
 
+
 const deleteCategory = async (req, res) => {
   const { id } = req.params;
 
@@ -99,13 +101,22 @@ const deleteCategory = async (req, res) => {
     if (!category) {
       return res.status(404).json({ message: "Category not found." });
     }
+
     category.isDeleted = true;
+    
     await category.save();
-    res.status(200).json({ message: "category deletinggg" });
+    
+    console.log(category);
+    
+      const dat = await Product.updateMany({ category: category.categoryName }, { isDeleted: true });
+
+    res.status(200).json({ message: "Category deleted and products unlisted." });
   } catch (error) {
+    console.log(error);
     res.status(500).json({ message: "Error deleting category", error });
   }
 };
+
 
 const undoDelete = async (req, res) => {
   const { id } = req.params;
@@ -117,6 +128,9 @@ const undoDelete = async (req, res) => {
     }
     category.isDeleted = false;
     await category.save();
+
+    await Product.updateMany({ categoryId: id }, { isDeleted: false });
+    
     res.status(200).json({ message: "Category restored successfully." });
   } catch (error) {
     res.status(500).json({ message: "Error restoring category", error });

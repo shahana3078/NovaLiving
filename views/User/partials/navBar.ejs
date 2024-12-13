@@ -17,36 +17,67 @@
             </ul>
 
             <ul class="navbar-nav mb-2 mb-md-0">
-                <!-- User Dropdown -->
+                <!-- User Profile Link with Dropdown -->
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <a
+                        class="nav-link dropdown-toggle"
+                        href="#"
+                        id="navbarDropdown"
+                        role="button"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false"
+                    >
                         <img src="images/user.svg" alt="User Icon" width="24">
                     </a>
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
-                        <li><a class="dropdown-item text-danger" href="/logout">Logout</a></li>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <li><a class="dropdown-item" href="/profile">Profile</a></li>
+
+                        <li>
+                            <a class="dropdown-item" href="/wishlist">
+                                Wishlist
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item text-danger" href="/logout">Logout</a>
+                        </li>
+                    
                     </ul>
                 </li>
+            </ul>
+            
+            
+            
                 <!-- Cart Icon -->
                 <li class="nav-item">
-                    <a class="nav-link" href="cart.html"><img src="images/cart.svg" alt="Cart Icon" width="24"></a>
+                    <a class="nav-link" href="/cart"><img src="images/cart.svg" alt="Cart Icon" width="24"></a>
                 </li>
-            </ul>
+                
+                <li class="nav-item">
+                    <a class="nav-link" href="/wishlist">
+                        <i class="fa-regular fa-heart" style="font-size: 24px; color: white;"></i>
+                    </a>
+                </li>
+                
+            </ul> 
         </div>
     </div>
 </nav>
 
+
+
 <% if (breadcrumbs && breadcrumbs.length > 1) { %>
     <nav aria-label="breadcrumb" style="background-color: #3b5d50;">
-        <div class="container py-2">
-            <ol class="breadcrumb mb-0">
-                <% breadcrumbs.forEach((crumb, index) => { %>
-                    <% if (index === breadcrumbs.length - 1) { %>
-                        <li class="breadcrumb-item active"><%= crumb.name %></li>
-                    <% } else { %>
-                        <li class="breadcrumb-item"><a href="<%= crumb.link %>"><%= crumb.name %></a></li>
-                    <% } %>
-                <% }); %>
-            </ol>
-        </div>
+      <div class="container py-2">
+        <ol class="breadcrumb mb-0">
+          <% breadcrumbs.forEach((crumb, index) => { %>
+            <% if (index === breadcrumbs.length - 1) { %>
+              <li class="breadcrumb-item active" aria-current="page"><%= crumb.name %></li>
+            <% } else { %>
+              <li class="breadcrumb-item"><a href="<%= crumb.link %>"><%= crumb.name %></a></li>
+            <% } %>
+          <% }); %>
+        </ol>
+      </div>
     </nav>
-<% } %>
+  <% } %>
+  

@@ -22,7 +22,8 @@ const categorySchema = new mongoose.Schema({
 
 isDeleted: { 
   type: Boolean, default: false 
-} 
+},
+
 });
 
 module.exports = mongoose.model('Category', categorySchema);

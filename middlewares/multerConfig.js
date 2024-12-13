@@ -14,7 +14,7 @@ const storage = multer.diskStorage({
 // Multer instance
 const upload = multer({
   storage: storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // Max file size 5MB
+  limits: { fileSize: 10 * 1024 * 1024 }, // Max file size 10MB
   fileFilter: (req, file, cb) => {
     const filetypes = /jpeg|jpg|png|gif|webp/;
     const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
@@ -27,6 +27,8 @@ const upload = multer({
     console.error(`Unsupported file type: ${file.originalname}`);
     cb(new Error("Error: File type not supported"));
   },
-}).array("productImage", 10); // Handles up to 5 files with the name 'productImage'
+}).array("productImage", 10); // Allows up to 10 files with the name 'productImage'
+
+
 
 module.exports = upload;

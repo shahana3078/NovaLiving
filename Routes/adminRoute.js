@@ -7,6 +7,7 @@ const authController=require('../controller/Admin/authController.js')
 const adminController = require("../controller/Admin/adminController.js");
 const categoryController=require('../controller/Admin/categoryController.js')
 const productController=require('../controller/Admin/productController.js')
+const orderController=require('../controller/Admin/orderController.js')
 
 const path = require("path");
 
@@ -22,23 +23,16 @@ router.get("/dashboard", noCache, adminAuth, adminController.getDashboard);
 // USER LISTING
 
 router.get("/users/search", adminController.searchUsers);
-
 router.get("/users", noCache, adminAuth, adminController.getUsers);
-
 router.post("/users/block/:id", adminController.blockUser);
-
 router.post("/users/delete/:id", adminController.deleteUser);
 
 //CATEGORIES
 
 router.get("/categories", noCache, adminAuth, categoryController.getCategories);
-
 router.post("/categories/add", categoryController.addOrUpdateCategory);
-
 router.put("/categories/delete/:id", categoryController.deleteCategory);
-
 router.put("/categories/undo/:id", categoryController.undoDelete);
-
 router.put("/categories/update/:id", categoryController.updateCategory);
 
 
@@ -81,7 +75,14 @@ router.post(
 );
 
 router.put("/products/delete/:id", productController.deleteProduct);
-
 router.put("/products/undo/:id",productController.undoProduct);
+
+router.get('/orders',orderController.getOrder)
+router.post('/updateOrderStatus',orderController.updateOrderStatus)
+
+router.get('/orderDetails',orderController.orderDetails)
+
+
+
 
 module.exports = router;

@@ -124,15 +124,17 @@
 
     <!-- Address List -->
     <div id="addressContainer" class="d-flex flex-wrap gap-3 ms-3 mt-4">
+      
       <% addresses.forEach(address => { %>
         <div class="address-box border p-3 rounded" style="width: 250px; margin-right: 20px;">
+          <% if (address.defaultAddress) { %>
+            <span class="badge " style="color:#9a9a9a; font-size: small; padding-inline-start: 0%;">Default Address</span>
+          <% } %>
           <h5><%= address.fullName %></h5>
           <p><%= address.address %>, <%= address.city %>, <%= address.state %> - <%= address.pincode %></p>
           <p><%= address.landmark ? 'Landmark: ' + address.landmark : '' %></p>
           <p>Mobile: <%= address.mobile %></p>
-          <% if (address.defaultAddress) { %>
-            <span class="badge bg-success">Default Address</span>
-          <% } %>
+        
           <br>
         
             <button type="button" style="background-color: #eeca05; color: white; border: 10px; padding: 0px 18px; font-size: 12px; cursor: pointer;" 
@@ -282,6 +284,7 @@
               <label class="form-check-label" for="editDefaultAddress">Make this my default address</label>
             </div>
   
+            
             <button type="button" class="btn btn-success" onclick="saveEditedAddress()">Save Changes</button>
           </form>
         </div>

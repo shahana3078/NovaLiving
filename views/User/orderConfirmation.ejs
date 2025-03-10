@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order Confirmed</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f4f4f4;
+    }
+    .confirmation-box {
+      text-align: center;
+      background-color: #fff;
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    }
+    .confirmation-box h1 {
+      color: #4CAF50;
+      font-size: 32px;
+      margin-bottom: 10px;
+    }
+    .confirmation-box p {
+      color: #555;
+      font-size: 18px;
+      margin-top: 0;
+    }
+    .confirmation-box .icon {
+      font-size: 60px;
+      color: #4CAF50;
+      animation: pop 0.6s ease forwards;
+    }
+    @keyframes pop {
+      0% { transform: scale(0); }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+  </style>
+</head>
+<body>
+  <div class="confirmation-box">
+    <div class="icon">✔</div>
+    <h1><%= message %></h1>
+    <p>Thank you for your order! It has been placed successfully.</p>
+
+
+  <a href="/shop">
+    <button style="background-color:#4CAF50; width:50%; height: 31px;
+    border-radius: 7px;
+    border: none;
+    color: white; ">continue shopping</button>
+  </a>
+  </div>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</body>
+
+
+</html>

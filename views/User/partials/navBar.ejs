@@ -16,6 +16,28 @@
                 </li>
             </ul>
 
+              <!-- Search Bar -->
+              <form class="d-flex ms-auto me-3" action="/search" method="GET" role="search">
+                <div class="input-group">
+                    <input 
+                        class="form-control" 
+                        type="search" 
+                        placeholder="Search products..." 
+                        aria-label="Search" 
+                        name="query" 
+                        style="background-color: white; color: black;"
+                    >
+                    <button 
+                        class="btn" 
+                        type="submit" 
+                        style="background-color: white; color: black; border: 1px solid lightgray;"
+                    >
+                        <i class="fa fa-search"></i>
+                    </button>
+                </div>
+            </form>
+            
+
             <ul class="navbar-nav mb-2 mb-md-0">
                 <!-- User Profile Link with Dropdown -->
                 <li class="nav-item dropdown">
@@ -54,7 +76,7 @@
                 
                 <li class="nav-item">
                     <a class="nav-link" href="/wishlist">
-                        <i class="fa-regular fa-heart" style="font-size: 24px; color: white;"></i>
+                        <i class="fa-regular fa-heart" style="font-size: 24px; color: white; padding-top: 10px;"></i>
                     </a>
                 </li>
                 

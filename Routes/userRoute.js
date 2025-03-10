@@ -8,8 +8,9 @@ const homeController = require("../controller/user/homeController.js");
 const addressController=require("../controller/user/addressController.js")
 const cartController=require('../controller/user/cartController.js')
 const profileController=require('../controller/user/profileController.js')
+const orderController=require('../controller/user/orderController.js')
 
-const { requireLogin, userLogined } = require("../middlewares/auth.js");
+const { requireLogin, userLogined,preventBackToOrder,noCache } = require("../middlewares/auth.js");
 router
   .route("/signup")
   .get(authController.getSignup)
@@ -76,11 +77,21 @@ router.put('/edit-address/:id',addressController.updateAddress)
 router.get('/cart',cartController.getCart)
 router.post('/cart/add',cartController.addCart)
 router.post('/cart/remove', cartController.removeProductFromCart)
+router.post('/cart/update-quantity',cartController.updateQuantity)
 
 router.get('/profile',profileController.getUserProfile)
 router.get('/my-profile',profileController.getMyProfile)
-
 router.post('/update-profile',profileController.updateProfile)
+
+router.get('/checkout', cartController.getCheckout)
+router.post('/place-order',cartController.placeOrder)
+router.get('/order-confirmed',cartController.orderConfirmed)
+
+router.get('/orders',orderController.getOrder )
+router.get('/order/details',orderController.orderDetails)
+router.post('/cancel-order/:orderId',orderController.cancelOrder)
+
+
 
 
 module.exports = router;

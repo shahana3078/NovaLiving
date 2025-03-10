@@ -78,25 +78,53 @@
 																	<img src="/uploads/images/<%= item.image %>" alt="<%= item.image %>" class="img-fluid" style="width: 100px; height: auto;"/>
 															</td>
 															<!-- Product Name -->
+
 															<td class="product-name">
-																	<h2 class="h5 text-black" style="font-size: 14px; color: #333;"><%= item.name %></h2>
-															</td>
+																<h2 class="h5 text-black" style="font-size: 14px; color: #333;">
+																		<a href="/product/details/<%= item.productId %>" style="text-decoration: underline; color: inherit;">
+																				<%= item.name %>
+																		</a>
+																</h2>
+														</td>
+														
 															<!-- Product Price -->
 															<td class="product-price" style="font-size: 14px; color: #333;">
 																	₹<%= item.price %>
 															</td>
 															<!-- Product Quantity -->
 															<td class="product-quantity">
-																	<div class="input-group mb-3 d-flex align-items-center quantity-container" style="max-width: 120px;">
-																			<div class="input-group-prepend">
-																					<button class="btn btn-outline-secondary decrease" type="button" onclick="updateQuantity('<%= item.productId %>', 'decrement')">&minus;</button>
-																			</div>
-																			<input type="text" class="form-control text-center quantity-amount" value="<%= item.quantity %>" aria-label="Example text with button addon" aria-describedby="button-addon1" style="font-size: 14px;"/>
-																			<div class="input-group-append">
-																					<button class="btn btn-outline-secondary increase" type="button" onclick="updateQuantity('<%= item.productId %>', 'increment')">&plus;</button>
-																			</div>
-																	</div>
-															</td>
+																<div class="input-group mb-3 d-flex align-items-center quantity-container" style="max-width: 120px;">
+																		<div class="input-group-prepend">
+																				<button
+																						class="btn btn-outline-secondary decrease"
+																						style="color: rgb(176, 9, 9);"
+																						type="button"
+																						onclick="updateQuantity('<%= item.productId %>', 'decrement')"
+																				>
+																						&minus;
+																				</button>
+																		</div>
+																		<input
+																				type="text"
+																				class="form-control text-center quantity-amount"
+																				data-product-id="<%= item.productId %>"
+																				value="<%= item.quantity %>"
+																				aria-label="Example text with button addon"
+																				aria-describedby="button-addon1"
+																				style="font-size: 14px;"
+																		/>
+																		<div class="input-group-append">
+																				<button
+																						class="btn btn-outline-secondary increase"
+																						type="button"
+																						onclick="updateQuantity('<%= item.productId %>', 'increment')"
+																				>
+																						&plus;
+																				</button>
+																		</div>
+																</div>
+														</td>
+														
 															<!-- Product Total -->
 															<td class="product-total" style="font-size: 14px; color: #333;">
 																	₹<%= item.total %>
@@ -108,9 +136,7 @@
 																		<i class="fa-solid fa-trash" style="color: rgb(204, 49, 49);"></i>
 																</button>
 														</td>
-														
-														
-														
+												
 													</tr>
 											<% }) %>
 									<% } else { %>
@@ -128,24 +154,39 @@
 		
 					<!-- Right: Checkout Box -->
 					<div class="col-md-3">
-						<div class="checkout-box" style="background-color: white; padding: 20px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
-							<h3 style="font-size: 16px; color: #333; margin-bottom: 15px;">Checkout</h3>
-							<hr style="margin-bottom: 15px;"/>
-							<div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-								<span style="font-size: 14px; color: #666;">Total Price:</span>
-								<span style="font-size: 14px; color: #333;">₹<%= totalPrice %></span>
+
+						<% if (items.length>0) { %>
+							<div class="checkout-box" style="background-color: white; padding: 20px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+								<h3 style="font-size: 16px; color: #333; margin-bottom: 15px;">Checkout</h3>
+								<hr style="margin-bottom: 15px;"/>
+								<div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+									<span style="font-size: 14px; color: #666;">Total Price:</span>
+									<span style="font-size: 14px; color: #333;">₹<%= totalPrice %></span>
+								</div>
+								<hr style="margin-bottom: 20px;"/>
+								<button onclick="proceedToCheckout()" style="width: 100%; padding: 12px; background-color: #3B5D50; color: #fff; border: none; border-radius: 5px; font-size: 16px; cursor: pointer;">
+									Proceed to Checkout →
+								</button>
 							</div>
-							<hr style="margin-bottom: 20px;"/>
-							<button onclick="proceedToCheckout()" style="width: 100%; padding: 12px; background-color: #3B5D50; color: #fff; border: none; border-radius: 5px; font-size: 16px; cursor: pointer;">
-								Proceed to Checkout →
-							</button>
-						</div>
+						<% } else { %>
+							<div class="checkout-box" style="background-color: white; padding: 20px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+								<h3 style="font-size: 16px; color: #333; margin-bottom: 15px;">Checkout</h3>
+								<hr style="margin-bottom: 15px;"/>
+								<div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+									<span style="font-size: 14px; color: #666;">Total Price:</span>
+									<span style="font-size: 14px; color: #333;">₹<%= totalPrice %></span>
+								</div>
+								<hr style="margin-bottom: 20px;"/>
+								<button  onclick="onclickMessage()" style="width: 100%; padding: 12px; background-color: #3B5D50; color: #fff; border: none; border-radius: 5px; font-size: 16px; cursor: pointer;">
+									Proceed to Checkout →
+								</button>
+						<% } %>
 					</div>
 				</div>
 			</div>
 		</div>
 	
-		
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
 		<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
 

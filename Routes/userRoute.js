@@ -20,7 +20,7 @@ router.route("/otp/resend").post(authController.postResendOtp);
 
 router
   .route("/")
-  .get(userLogined, authController.getLogin)
+  .get(noCache,userLogined, authController.getLogin)
 
   router.post('/login',authController.postLogin);
 
@@ -32,7 +32,7 @@ router
 router
   .route("/home")
 
-  .get(requireLogin, authController.getHome);
+  .get(noCache,requireLogin, authController.getHome);
 
 router
   .route("/forgot-password")

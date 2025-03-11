@@ -70,6 +70,8 @@
 										</tr>
 									</thead>
 									<tbody>
+						
+										
 										<% if (items.length > 0) { %>
 											<% items.forEach(item => { %>
 													<tr id="cart-item-<%= item.productId %>" style="border-bottom: 1px solid #ddd;">
@@ -139,10 +141,13 @@
 												
 													</tr>
 											<% }) %>
+
 									<% } else { %>
 											<tr>
 													<td colspan="6" class="text-center">Your cart is empty.</td>
 											</tr>
+										
+											
 									<% } %>
 									
 												
@@ -174,7 +179,7 @@
 								<hr style="margin-bottom: 15px;"/>
 								<div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
 									<span style="font-size: 14px; color: #666;">Total Price:</span>
-									<span style="font-size: 14px; color: #333;">₹<%= totalPrice %></span>
+									<span style="font-size: 14px; color: #333;">₹<%=0 %></span>
 								</div>
 								<hr style="margin-bottom: 20px;"/>
 								<button  onclick="onclickMessage()" style="width: 100%; padding: 12px; background-color: #3B5D50; color: #fff; border: none; border-radius: 5px; font-size: 16px; cursor: pointer;">

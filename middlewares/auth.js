@@ -1,14 +1,7 @@
 const User=require('../Models/userSchema')
-// function requireLogin(req, res, next) {
-//   console.log("Checking");
-//   if (!req.session.userId) {
-//     return res.redirect("/");
-//   }
-//   next();
-// }
+
 
 async function requireLogin(req, res, next) {
-  console.log("Checking");
 
   if (!req.session.userId) {
     return res.redirect("/");
@@ -34,6 +27,14 @@ const noCache = (req, res, next) => {
   res.set('Expires', '0'); 
   next();
 };
+
+const userLogined = async (req, res, next) => {
+  if (req.session.userId) {
+   return res.redirect("/home");
+  }
+  next();
+};
+
 
 const preventBackToOrder = (req, res, next) => {
   console.log("Checking order completion status: ", req.session.orderCompleted);
@@ -62,12 +63,6 @@ const adminAuth = async (req, res, next) => {
 };
 
 
-const userLogined = async (req, res, next) => {
-  if (req.session.userId) {
-   return res.redirect("/home");
-  }
-  next();
-};
 
 
 

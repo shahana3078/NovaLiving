@@ -46,30 +46,32 @@
               <tbody>
                 <% orders.forEach(order => { %>
                   <tr>                 
-                    <td><%= order.addressId.fullName %></td>
+                    <td><%= order.addressId?.fullName  %></td>
                     <td><%= order._id %></td>
                     <td><%= new Date(order.orderDate).toLocaleDateString() %></td>
                     <td>₹<%= order.grandTotal ? order.grandTotal.toFixed(2) : '0.00' %></td>
                     <td>Cash on Delivery</td> 
                     <td>
                       <select
-  name="orderStatus"
-  onchange="updateOrderStatus('<%= order._id %>', this.value)"
-  class="form-control"
->
-  <% if (order.orderStatus === 'pending') { %>
-    <option value="pending" selected>Pending</option>
-    <option value="shipped">Shipped</option>
-    <option value="delivered">Delivered</option>
-  <% } else if (order.orderStatus === 'shipped') { %>
-    <option value="shipped" selected>Shipped</option>
-    <option value="delivered">Delivered</option>
-  <% } else if (order.orderStatus === 'delivered') { %>
-    <option value="delivered" selected>Delivered</option>
-  <% } else if (order.orderStatus === 'cancelled') { %>
-    <option value="cancelled" selected style="color: red;">Cancelled</option>
-  <% } %>
-</select>
+                      name="orderStatus"
+                      onchange="updateOrderStatus('<%= order._id %>', this.value)"
+                      class="form-control"
+                    >
+                      <% if (order.orderStatus === 'pending') { %>
+                        <option value="pending" selected>Pending</option>
+                        <option value="shipped">Shipped</option>
+                        <option value="delivered">Delivered</option>
+                        <option value="cancelled">Cancel</option>
+                      <% } else if (order.orderStatus === 'shipped') { %>
+                        <option value="shipped" selected>Shipped</option>
+                        <option value="delivered">Delivered</option>
+                        <option value="cancelled">Cancel</option>
+                      <% } else if (order.orderStatus === 'delivered') { %>
+                        <option value="delivered" selected>Delivered</option>
+                      <% } else if (order.orderStatus === 'cancelled') { %>
+                        <option value="cancelled" selected style="color: red;">Cancelled</option>
+                      <% } %>
+                    </select>
 
                     </td>
                     
@@ -94,7 +96,7 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body" id="orderDetailsContent">
-          <!-- Order details will be dynamically injected here -->
+   
         </div>
       </div>
     </div>

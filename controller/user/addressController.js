@@ -4,7 +4,7 @@ const Address=require("../../Models/addressModel")
 const getAddresses = async (req, res) => {
   try {
     const addresses = await Address.find();
-    
+  
     res.render('User/address', { addresses });
   } catch (err) {
     console.error(err);

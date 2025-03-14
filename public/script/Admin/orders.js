@@ -39,19 +39,19 @@ function showOrderDetails(orderId) {
     .then(order => {
       const modalContent = `
         <div style="display: flex; flex-wrap: wrap; gap: 20px;">
-          <!-- Left Side -->
           <div style="flex: 1; min-width: 300px; padding-right: 20px; border-right: 1px solid #ddd;">
             <p><strong>Order ID:</strong> ${order._id}</p>
             <p><strong>Order Date:</strong> ${new Date(order.orderDate).toLocaleDateString()}</p>
-            <p><strong>User Name:</strong> ${order.addressId.fullName}</p>
-            <p><strong>Address:</strong> ${order.addressId.address}, ${order.addressId.city}, ${order.addressId.state} - ${order.addressId.pincode}</p>
-            <p><strong>Mobile:</strong> ${order.addressId.mobile}</p>
-            <p><strong>Total Amount:</strong> ₹${order.grandTotal.toFixed(2)}</p>
+            <p><strong>User Name:</strong> ${order.addressId ? order.addressId.fullName : 'N/A'}</p>
+            <p><strong>Address:</strong> ${order.addressId 
+                ? `${order.addressId.address}, ${order.addressId.city}, ${order.addressId.state} - ${order.addressId.pincode}` 
+                : 'N/A'}</p>
+            <p><strong>Mobile:</strong> ${order.addressId ? order.addressId.mobile : 'N/A'}</p>
+            <p><strong>Total Amount:</strong> ₹${order.grandTotal?.toFixed(2) || '0.00'}</p>
             <p><strong>Payment Method:</strong> ${order.paymentMethod || 'Cash on Delivery'}</p>
             <p><strong>Status:</strong> ${order.orderStatus}</p>
           </div>
 
-          <!-- Right Side -->
           <div style="flex: 1; min-width: 300px; padding-left: 20px;">
             <h5>Order Items:</h5>
             <div class="order-items">
@@ -84,8 +84,3 @@ function showOrderDetails(orderId) {
       alert('An error occurred while fetching order details.');
     });
 }
-
-
-
-
- 

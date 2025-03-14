@@ -191,14 +191,27 @@ const getCheckout = async (req, res) => {
     let cartItems = [];
 
     if (cart) {
+
+         
+
       cartItems = cart.items.map((item) => {
         totalPrice += item.quantity * item.productId.price;
+        const date = new Date(item.date);
+          date.setDate(date.getDate() + 7); 
+      
+        const deliveryDate = date.toLocaleDateString("en-GB", {
+          day: "2-digit",     
+          month: "short",     
+          year: "numeric"    
+        });
         return {
           name: item.productId.name,
           price: item.productId.price,
           quantity: item.quantity,
           image: item.image,
           description: item.productId.description,
+          deliveryDate:deliveryDate
+          
         };
       });
     }
@@ -220,14 +233,10 @@ const placeOrder = async (req, res) => {
   try {
     const { addressId } = req.body;
     const userId = req.session.userId;
-
-    // Fetch cart items and address
     const cart = await Cart.findOne({ userId }).populate("items.productId");
     if (!cart || cart.items.length === 0) {
       return res.status(400).send("Cart is empty");
     }
-
-    // Calculate subtotal
     let subtotal = 0;
     const orderItems = cart.items.map((item) => {
       subtotal += item.quantity * item.productId.price;
@@ -238,12 +247,9 @@ const placeOrder = async (req, res) => {
         quantity: item.quantity,
       };
     });
-
-    // Define shipping charge and calculate grand total
-    const shippingCharge = 50; // Default shipping charge
+    const shippingCharge = 50;
     const grandTotal = subtotal + shippingCharge;
 
-    // Create and save the order
     const order = new Order({
       userId,
       addressId: addressId,
@@ -256,8 +262,6 @@ const placeOrder = async (req, res) => {
     });
 
     await order.save();
-
-    // Clear the cart after placing the order
     await Cart.updateOne({ userId }, { $set: { items: [] } });
 
     res.json({ message: "Order placed successfully" });

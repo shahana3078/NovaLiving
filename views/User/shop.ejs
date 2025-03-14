@@ -211,7 +211,7 @@
 
           <% products.forEach((val) => { %>
           <!-- Start Column 1 -->
-          <div class="col-12 col-md-4 col-lg-3 mb-5">
+          <div class="col-12 col-md-4 col-lg-3 mb-5" >
             <div class="product-item">
               <a href="/product/details/<%= val._id %>">
                 <img
@@ -272,24 +272,27 @@
                 </button>
 
                 <!-- Wishlist Icon -->
-                <span
-                  class="icon-wishlist"
-                  style="
-                    display: inline-flex;
-                    align-items: center;
-                    justify-content: center;
-                    width: 40px;
-                    height: 40px;
-                    background-color: #d23b3b;
-                    border-radius: 50%;
-                    padding: 12px;
-                  "
-                >
-                  <i
-                    class="fas fa-heart"
-                    style="font-size: 18px; color: #fff"
-                  ></i>
-                </span>
+                <button
+    onclick="addToWishlist('<%= val._id %>')"
+    id="wishlist-button"
+    style="
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      background-color: #d23b3b;
+      border-radius: 50%;
+      padding: 12px;
+      border: none;
+      cursor: pointer;
+    "
+  >
+    <i
+        class="fas fa-heart"
+      style="font-size: 18px; color: #fff"
+    ></i>
+  </button>
               </div>
             </div>
           </div>
@@ -343,12 +346,10 @@
       
         urlParams.set("sortBy", sortBy);
 
-        // Keep the page query parameter the same (if already set)
         if (!urlParams.has("page")) {
-          urlParams.set("page", 1); // Reset to the first page when sorting is changed
+          urlParams.set("page", 1); 
         }
 
-        // Redirect to the updated URL (this triggers the server-side sorting)
         window.location.search = urlParams.toString();
       }
     </script>
@@ -357,6 +358,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
 
     <script src="/script/User/cart.js"></script>
+    <script src="/script/user/wishlist.js"></script>
     <script src="js/bootstrap.bundle.min.js"></script>
     <script src="js/tiny-slider.js"></script>
     <script src="js/custom.js"></script>

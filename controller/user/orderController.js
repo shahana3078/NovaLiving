@@ -3,12 +3,16 @@ const Order=require('../../Models/orderModel')
 const getOrder = async (req, res) => {
   try {
     const userId = req.session.userId;
-    
-    const orders = await Order.find({ userId })
-      .populate("items.productId")
-      .populate("addressId")
-      .lean();
 
+    const orders = await Order.find({ userId })
+    .populate({
+      path: "addressId",
+      select: "fullName mobile address city state pincode"
+    })
+      .populate("items.productId")
+     
+      .lean();
+console.log('oprders:',orders)
     orders.forEach(order => {
       let subtotal = 0;
       order.items.forEach(item => {
@@ -34,7 +38,10 @@ const orderDetails = async (req, res) => {
 
     const order = await Order.findOne({ _id: orderId, userId })
       .populate("items.productId")
-      .populate("addressId")
+      .populate({
+        path: "addressId",
+        select: "fullName mobile address city state pincode"
+      })
       .lean();
 
     if (!order) {
@@ -65,6 +72,7 @@ const orderDetails = async (req, res) => {
 const cancelOrder=async (req, res) => {
   try {
     const { orderId } = req.params;
+ 
 
 
     const order = await Order.findByIdAndUpdate(orderId, {
@@ -89,5 +97,7 @@ module.exports={
  
   getOrder,
   orderDetails,
-  cancelOrder
+  cancelOrder,
+
+ 
 }

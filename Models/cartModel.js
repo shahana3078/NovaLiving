@@ -29,6 +29,10 @@ items: [
         },
         image: {
             type: String
+        },
+        deliveryDate: {
+            type: Date,
+            default: Date.now 
         }
     }
 ],

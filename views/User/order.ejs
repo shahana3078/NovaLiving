@@ -26,7 +26,7 @@
           <div class="order" style="border: 1px solid #ddd; border-radius: 5px; margin-bottom: 11px; padding: 15px; background: #fff; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);">
       
             <div class="order-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-              <h2 style="font-size: 16px; margin: 0; color: #333;">Order Placed: <%= new Date(order.orderDate).toLocaleDateString() %></h2>
+              <h2 style="font-size: 16px; margin: 0; color: #624211;">Order Placed: <%= new Date(order.orderDate).toLocaleDateString() %></h2>
               <span style="font-size: 14px; color: #555;">Total: ₹<%= order.grandTotal.toFixed(2) %></span>
             </div>
             
@@ -34,17 +34,17 @@
             <div class="ship-to" style="margin-top: 10px;">
               <strong>Ship To:</strong>
               <button onclick="toggleAddress('<%= order._id %>')" style="background: none; border: none; color: #007bff; font-size: 14px; padding: 0; cursor: pointer; text-decoration: underline;">
-                <%= order.addressId.fullName %>
+                <%= order.addressId?.fullName %>
               </button>
               <div id="address-details-<%= order._id %>" class="address-details" style="display: none; margin-top: 10px; padding: 10px; background-color: #f9f9f9; border: 1px solid #ddd; border-radius: 5px;">
                 <p>
-                  <%= order.addressId.fullName %><br>
-                  <%= order.addressId.mobile %><br>
-                  <%= order.addressId.address %><br>
-                  <%= order.addressId.city %>, 
-                  <%= order.addressId.state %> - 
-                  <%= order.addressId.pincode %><br>
-                  India
+                  <%= order.addressId?.fullName %><br>
+                   <%= order.addressId?.mobile %><br>
+                   <%= order.addressId?.address %><br>
+                   <%= order.addressId?.city  %>,
+                   <%= order.addressId?.state %> -
+                   <%= order.addressId ?.pincode %><br>
+                    India
                 </p>
               </div>
             </div>
@@ -66,12 +66,16 @@
               <% }); %>
             </div>
             
-            <!-- View Order Details Button -->
-            <div style="text-align: right; margin-top: 15px; font-size: small;">
-              <a href="/order/details?orderId=<%= order._id %>">
-                View Order Details
-              </a>
+            <div style="text-align: right; margin-top: 15px; font-size: small; display: flex; gap: 10px; justify-content: flex-end;">
+              <a href="/order/details?orderId=<%= order._id %>" style="text-decoration: none; color: #007bff;">View Order Details</a>
+              <div class="dropdown" style="position: relative; display: inline-block;">
+                <span style="color: #02360e; cursor: pointer; text-decoration: underline;">Invoice</span>
+                <div class="dropdown-content" style="display: none; position: absolute; background-color: #f9f9f9; min-width: 160px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); border-radius: 5px; z-index: 1;">
+                  <a href="/order/invoice?orderId=<%= order._id %>" style="padding: 6px 25px; display: block; text-decoration: none; color: #02360e;">Download Invoice</a>
+                </div>
+              </div>
             </div>
+           
           </div>
         <% }); %>
       <% } else { %>
@@ -90,13 +94,23 @@
         details.style.display = "none";
       }
     }
+
+    document.querySelectorAll('.dropdown').forEach(dropdown => {
+      dropdown.addEventListener('click', function() {
+        const dropdownContent = this.querySelector('.dropdown-content');
+        dropdownContent.style.display = dropdownContent.style.display === 'none' || dropdownContent.style.display === '' ? 'block' : 'none';
+      });
+    });
+
   </script>
+  
   		<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
     <script src="/User/js/bootstrap.bundle.min.js"></script>
     <script src="/User/js/tiny-slider.js"></script>
     <script src="/User/js/custom.js"></script>
+   
     <%- include('partials/footer') %>
 </body>
 </html>

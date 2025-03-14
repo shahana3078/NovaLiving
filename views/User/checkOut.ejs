@@ -53,6 +53,7 @@
   <div class="col-md-6" style="max-width: 800px; width: 100%;"> 
     <h5 class="mb-3" style="color: rgb(77, 76, 76);">Delivery Address:</h5>
     <% const defaultAddress = addresses.find(addr => addr.defaultAddress); %>
+ 
     <div class="address-box rounded p-3 mb-4" style="border: 1px solid #ddd; box-shadow: 0 2px 8px rgba(0,0,0,0.1); background-color: #fff;">
       <% if (defaultAddress) { %>
         <div class="address-content" style="text-align: left;">
@@ -65,15 +66,19 @@
           </p>
           <p style="margin: 5px 0; font-size: 14px;">Mobile: <%= defaultAddress.mobile %></p>
         </div>
+        <div style="text-align: left; margin-top: 10px;">
+          <button class="change-btn btn-link p-0" style="color: blue; text-decoration: underline;" data-bs-toggle="modal" data-bs-target="#changeAddressModal">
+            Change
+          </button>
       <% } else { %>
         <div class="address-content" style="text-align: left;">
-          <p style="margin: 5px 0; font-size: 14px;">No default address available.</p>
+          <p style="margin: 5px 0; font-size: 14px;">Please select an address </p>
         </div>
-      <% } %>
-      <div style="text-align: left; margin-top: 10px;">
         <button class="change-btn btn-link p-0" style="color: blue; text-decoration: underline;" data-bs-toggle="modal" data-bs-target="#changeAddressModal">
-          Change
+          select address
         </button>
+      <% } %>
+  
      
       </div>
     </div>
@@ -241,10 +246,10 @@
 <div style="width: 80%; max-width: 800px; margin: 50px auto; padding: 20px; background-color: white; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0px 0px 8px rgba(0,0,0,0.1); text-align: left;">
   
   <h2 style="font-size: 20px; margin-bottom: 15px;">Review Your Items</h2>
-  <div style="font-size: small; color: #ab6e11;"> Delivery by 30 december 2024</div>
+
   <% if (cartItems.length > 0) { %>
     <% cartItems.forEach(item => { %>
-      
+      <div style="font-size: small; color: #ab6e11;"> Delivery by: <%= item.deliveryDate %></div>
       <div style="border: 1px solid #ddd; border-radius: 8px; padding: 10px; margin-bottom: 15px; display: flex; align-items: center; background-color: #f9f9f9;">
         
         <img src="/uploads/images/<%= item.image %>" alt="<%= item.image %>"
@@ -253,7 +258,7 @@
         <div style="flex: 1;">
           <h4 style="margin: 0 0 5px; font-size: 16px; color: #333;"><%= item.name %></h4>
           <h6 style="font-size: x-small;"> <%= item.description %></h6>
-          <p style="margin: 0; font-size: 14px; color: #777;">Price: ₹<%= item.price %></p>
+          <p style="margin: 0; font-size: 14px; color: #777;">MRP: ₹<%= item.price %></p>
           <p style="display: flex; justify-content: end;" >Qty: <%=item.quantity%></p>
         </div>
       </div>

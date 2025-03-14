@@ -74,7 +74,7 @@ function openEditModal(addressId) {
       return response.json();
     })
     .then(data => {
-      // Populate modal fields with fetched data
+    
       document.getElementById('editAddressId').value = addressId;
       document.getElementById('editFullName').value = data.fullName;
       document.getElementById('editMobile').value = data.mobile;

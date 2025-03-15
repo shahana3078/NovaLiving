@@ -13,7 +13,7 @@ const getOrder = async (req, res) => {
       .sort({ orderDate: -1 })
      
       .lean();
-console.log('oprders:',orders)
+      
     orders.forEach(order => {
       let subtotal = 0;
       order.items.forEach(item => {

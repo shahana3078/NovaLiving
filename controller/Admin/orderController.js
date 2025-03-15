@@ -8,6 +8,7 @@ const getOrder = async (req, res) => {
     const orders = await Order.find()
       .populate('userId') 
       .populate('addressId','fullName') 
+      .sort({orderDate:-1})
       .lean();
 
     orders.forEach(order => {
@@ -56,6 +57,7 @@ const orderDetails=async (req, res) => {
     const order = await Order.findById(orderId)
     .populate('addressId')
     .populate('items.productId')
+   
     .populate('addressId')
     if (!order) {
       return res.status(404).send('Order not found');

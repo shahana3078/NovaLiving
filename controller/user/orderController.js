@@ -10,6 +10,7 @@ const getOrder = async (req, res) => {
       select: "fullName mobile address city state pincode"
     })
       .populate("items.productId")
+      .sort({ orderDate: -1 })
      
       .lean();
 console.log('oprders:',orders)
@@ -52,6 +53,7 @@ const orderDetails = async (req, res) => {
     let subtotal = 0;
     order.items.forEach(item => {
       subtotal += item.productId.price * item.quantity;
+
     });
 
     const shippingCharge = order.shippingCharge || 50; 
@@ -61,6 +63,7 @@ const orderDetails = async (req, res) => {
     order.subtotal = subtotal;
     order.shippingCharge = shippingCharge;
     order.grandTotal = grandTotal;
+   
 
     res.render("User/orderDetails", { order });
   } catch (error) {

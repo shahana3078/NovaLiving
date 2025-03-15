@@ -196,7 +196,9 @@ const getCheckout = async (req, res) => {
 
       cartItems = cart.items.map((item) => {
         totalPrice += item.quantity * item.productId.price;
-        const date = new Date(item.date);
+
+        const date = item.date ? new Date(item.date) : new Date();
+       
           date.setDate(date.getDate() + 7); 
       
         const deliveryDate = date.toLocaleDateString("en-GB", {
@@ -237,7 +239,7 @@ const placeOrder = async (req, res) => {
     if (!cart || cart.items.length === 0) {
       return res.status(400).send("Cart is empty");
     }
-    let subtotal = 0;
+    let subtotal = 0; 
     const orderItems = cart.items.map((item) => {
       subtotal += item.quantity * item.productId.price;
       return {

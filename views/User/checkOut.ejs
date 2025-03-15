@@ -12,10 +12,10 @@
 
   <style>
    .address-box {
-    background-color: #f8f9fa; /* Light gray background */
+    background-color: #f8f9fa;
     border: 2px solid #ddd;
-    max-width: 100%; /* Take up column space */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    max-width: 100%; 
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
     position: relative;
   }
 
@@ -210,32 +210,12 @@
 <div style="width: 80%; max-width: 800px; margin: 50px auto; padding: 20px 20px 40px; background-color: white; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0px 0px 8px rgba(0,0,0,0.1); text-align: left;">
   
   <h2 style="font-size: 20px; margin-bottom: 15px;">Payment Method</h2>
-  
-  <div style="border: 1px solid #ddd; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-    <strong style="font-size: 16px;">Your available balance</strong>
-    <div style="display: flex; margin-top: 10px;">
-      <input type="text" placeholder="Enter Code" style="flex: 1; padding: 8px; font-size: 14px; border: 1px solid #ccc; border-radius: 4px;">
-      <button style="padding: 8px 15px; margin-left: 10px; background-color: #fff; border: 1px solid #ccc; border-radius: 4px; cursor: pointer;">Apply</button>
-    </div>
-  </div>
-
-  <div>
-    <strong style="font-size: 16px; margin-bottom: 10px; display: block;">Another payment method</strong>
-
-
-    <label style="display: flex; align-items: center; margin: 10px 0;">
-      <input type="radio" name="payment" style="margin-right: 10px;">
-      <strong>Other UPI Apps</strong>
-    </label>
-
-    <div style="border: 1px solid #ffcc99; background-color: #fff8f0; border-radius: 8px; margin: 20px 0; padding: 10px;">
-      <label style="display: flex; align-items: center;">
-        <input type="radio" name="payment" checked style="margin-right: 10px;">
-        <div>
           <strong style="font-size: 16px;">Cash on Delivery/Pay on Delivery</strong><br>
-          <span style="color: green;">Scan and Pay at delivery with the NovaLiving app and win rewards up to ₹500</span>
+          <span style="color: green;">Cash, UPI and Cards accepted.</span>
+          <button style="margin-left: 488px;  background-color: #FFFFFF; border: none; text-decoration:underline; color: blue;"> Change</button>
         </div>
       </label>
+      
     </div>
   </div>
 </div>
@@ -245,11 +225,12 @@
 
 <div style="width: 80%; max-width: 800px; margin: 50px auto; padding: 20px; background-color: white; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0px 0px 8px rgba(0,0,0,0.1); text-align: left;">
   
-  <h2 style="font-size: 20px; margin-bottom: 15px;">Review Your Items</h2>
+
 
   <% if (cartItems.length > 0) { %>
     <% cartItems.forEach(item => { %>
-      <div style="font-size: small; color: #ab6e11;"> Delivery by: <%= item.deliveryDate %></div>
+      <h2 style="font-size: 15px; margin-bottom: 15px;  color: #ab6e11;">Delivery by: <%= item.deliveryDate %></h2>
+      
       <div style="border: 1px solid #ddd; border-radius: 8px; padding: 10px; margin-bottom: 15px; display: flex; align-items: center; background-color: #f9f9f9;">
         
         <img src="/uploads/images/<%= item.image %>" alt="<%= item.image %>"

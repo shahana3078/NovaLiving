@@ -19,8 +19,6 @@ const addAddress = async (req, res) => {
   try {
     const { fullName, mobile, pincode, address, landmark, city, state, defaultAddress } = req.body;
 
-      console.log(req.body)
-
     if (!fullName || !mobile || !pincode || !address || !city || !state) {
       return res.status(400).json({ message: "Please provide all required fields." });
     }

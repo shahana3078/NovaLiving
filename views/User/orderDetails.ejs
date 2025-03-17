@@ -100,7 +100,7 @@
         </div>
 
 
-        <% if (order.orderStatus !== 'cancelled' && order.orderStatus !== 'delivered') { %>
+        <% if (order.orderStatus !== 'cancelled' && order.orderStatus !== 'delivered' && order.orderStatus!== 'returned') { %>
           <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
               <button id="cancelOrderBtn"  data-order-id="<%= order._id %>"  style="background-color: #d9534f; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: small;">
                   Cancel Order

@@ -66,6 +66,10 @@ const orderSchema = new mongoose.Schema({
     type: String, 
     default: ""
    },
+   returnRequest: { 
+    status: { type: String, enum: ['requested', 'approved', 'rejected'] },
+    reason: { type: String } 
+}
 });
 
 const Order = mongoose.model("Order", orderSchema);

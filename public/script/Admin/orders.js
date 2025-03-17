@@ -50,6 +50,7 @@ function showOrderDetails(orderId) {
             <p><strong>Total Amount:</strong> ₹${order.grandTotal?.toFixed(2) || '0.00'}</p>
             <p><strong>Payment Method:</strong> ${order.paymentMethod || 'Cash on Delivery'}</p>
             <p><strong>Status:</strong> ${order.orderStatus}</p>
+            <p><strong style='color:red'>Cancellation Reason:</strong> ${order.cancelReason}</p>
           </div>
 
           <div style="flex: 1; min-width: 300px; padding-left: 20px;">

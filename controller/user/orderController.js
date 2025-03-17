@@ -1,26 +1,26 @@
-const Order=require('../../Models/orderModel')
+const Order = require("../../Models/orderModel");
 
 const getOrder = async (req, res) => {
   try {
     const userId = req.session.userId;
 
     const orders = await Order.find({ userId })
-    .populate({
-      path: "addressId",
-      select: "fullName mobile address city state pincode"
-    })
+      .populate({
+        path: "addressId",
+        select: "fullName mobile address city state pincode",
+      })
       .populate("items.productId")
       .sort({ orderDate: -1 })
-     
+
       .lean();
-      
-    orders.forEach(order => {
+
+    orders.forEach((order) => {
       let subtotal = 0;
-      order.items.forEach(item => {
+      order.items.forEach((item) => {
         subtotal += item.productId.price * item.quantity;
       });
-      const shippingCharge = 50; 
-      order.grandTotal = subtotal + shippingCharge; 
+      const shippingCharge = 50;
+      order.grandTotal = subtotal + shippingCharge;
     });
 
     res.render("User/order", { orders });
@@ -30,18 +30,16 @@ const getOrder = async (req, res) => {
   }
 };
 
-
 const orderDetails = async (req, res) => {
   try {
     const { orderId } = req.query;
     const userId = req.session.userId;
 
-
     const order = await Order.findOne({ _id: orderId, userId })
       .populate("items.productId")
       .populate({
         path: "addressId",
-        select: "fullName mobile address city state pincode"
+        select: "fullName mobile address city state pincode",
       })
       .lean();
 
@@ -49,21 +47,17 @@ const orderDetails = async (req, res) => {
       return res.redirect("/404");
     }
 
-
     let subtotal = 0;
-    order.items.forEach(item => {
+    order.items.forEach((item) => {
       subtotal += item.productId.price * item.quantity;
-
     });
 
-    const shippingCharge = order.shippingCharge || 50; 
+    const shippingCharge = order.shippingCharge || 50;
     const grandTotal = subtotal + shippingCharge;
 
-   
     order.subtotal = subtotal;
     order.shippingCharge = shippingCharge;
     order.grandTotal = grandTotal;
-   
 
     res.render("User/orderDetails", { order });
   } catch (error) {
@@ -72,35 +66,33 @@ const orderDetails = async (req, res) => {
   }
 };
 
-const cancelOrder=async (req, res) => {
+const cancelOrder = async (req, res) => {
   try {
     const { orderId } = req.params;
- 
+    const { cancelReason } = req.body;
 
+    console.log("req.body", req.body);
 
     const order = await Order.findByIdAndUpdate(orderId, {
-      orderStatus: 'cancelled'
+      orderStatus: "cancelled",
+      cancelReason: cancelReason || "No reason provided",
     });
 
     if (!order) {
-      return res.status(404).json({ success: false, message: 'Order not found' });
+      return res
+        .status(404)
+        .json({ success: false, message: "Order not found" });
     }
 
-    res.json({ success: true, message: 'Order cancelled successfully' });
+    res.json({ success: true, message: "Order cancelled successfully" });
   } catch (error) {
-    console.error('Error cancelling order:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    console.error("Error cancelling order:", error);
+    res.status(500).json({ success: false, message: "Server error" });
   }
-}
+};
 
-
-
-
-module.exports={
- 
+module.exports = {
   getOrder,
   orderDetails,
   cancelOrder,
-
- 
-}
+};

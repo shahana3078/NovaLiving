@@ -8,18 +8,34 @@ function toggleAddress(orderId) {
 }
 
 document.getElementById('cancelOrderBtn').addEventListener('click', function () {
-  const orderId = this.getAttribute('data-order-id');  // Correctly fetches order ID
+  const orderId = this.getAttribute('data-order-id');  
   const cancelReasonModal = document.getElementById('cancelReasonModal');
+  const customReasonRadio = document.getElementById('customReason');
+  const customReasonInput = document.getElementById('customReasonInput');
+
+
   cancelReasonModal.style.display = 'block';
+  document.querySelectorAll('input[name="cancelReason"]').forEach(radio => {
+    radio.addEventListener('change', function () {
+      if (customReasonRadio.checked) {
+        customReasonInput.style.display = 'block';
+        customReasonInput.setAttribute('required', 'true');
+      } else {
+        customReasonInput.style.display = 'none';
+        customReasonInput.removeAttribute('required');
+        customReasonInput.value = ''; 
+      }
+    });
+  });
 
   document.getElementById('doneBtn').addEventListener('click', function () {
     const selectedReason = document.querySelector('input[name="cancelReason"]:checked');
-    const customReasonInput = document.getElementById('customReasonInput').value.trim();
+    const customReasonValue = customReasonInput.value.trim();
 
     let finalReason = selectedReason ? selectedReason.value : '';
 
-    if (finalReason === 'custom' && customReasonInput) {
-      finalReason = customReasonInput;
+    if (finalReason === 'custom' && customReasonValue) {
+      finalReason = customReasonValue; 
     }
 
     if (!finalReason) {
@@ -64,6 +80,7 @@ document.getElementById('cancelOrderBtn').addEventListener('click', function () 
       }
     });
 
-    cancelReasonModal.style.display = 'none'; // Hide modal after reason selection
+    cancelReasonModal.style.display = 'none'; 
   });
 });
+

@@ -59,11 +59,9 @@ const addCart = async (req, res) => {
 
     if (existingItem) {
       if (existingItem.quantity >= 5) {
-        return res
-          .status(400)
-          .json({
-            message: "You can only add a maximum of 5 of this product.",
-          });
+        return res.status(400).json({
+          message: "You can only add a maximum of 5 of this product.",
+        });
       }
       existingItem.quantity += 1;
     } else {
@@ -86,11 +84,9 @@ const addCart = async (req, res) => {
     res.json({ message: "Product added to cart", cart });
   } catch (error) {
     console.error("Error adding product to cart:", error);
-    res
-      .status(500)
-      .json({
-        message: "An error occurred while adding the product to the cart.",
-      });
+    res.status(500).json({
+      message: "An error occurred while adding the product to the cart.",
+    });
   }
 };
 
@@ -191,20 +187,17 @@ const getCheckout = async (req, res) => {
     let cartItems = [];
 
     if (cart) {
-
-         
-
       cartItems = cart.items.map((item) => {
         totalPrice += item.quantity * item.productId.price;
 
         const date = item.date ? new Date(item.date) : new Date();
-       
-          date.setDate(date.getDate() + 7); 
-      
+
+        date.setDate(date.getDate() + 7);
+
         const deliveryDate = date.toLocaleDateString("en-GB", {
-          day: "2-digit",     
-          month: "short",     
-          year: "numeric"    
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
         });
         return {
           name: item.productId.name,
@@ -212,8 +205,7 @@ const getCheckout = async (req, res) => {
           quantity: item.quantity,
           image: item.image,
           description: item.productId.description,
-          deliveryDate:deliveryDate
-          
+          deliveryDate: deliveryDate,
         };
       });
     }
@@ -229,8 +221,6 @@ const getCheckout = async (req, res) => {
   }
 };
 
-
-
 const placeOrder = async (req, res) => {
   try {
     const { addressId } = req.body;
@@ -239,7 +229,7 @@ const placeOrder = async (req, res) => {
     if (!cart || cart.items.length === 0) {
       return res.status(400).send("Cart is empty");
     }
-    let subtotal = 0; 
+    let subtotal = 0;
     const orderItems = cart.items.map((item) => {
       subtotal += item.quantity * item.productId.price;
       return {
@@ -273,19 +263,11 @@ const placeOrder = async (req, res) => {
   }
 };
 
-
 const orderConfirmed = (req, res) => {
-  res.render('User/orderConfirmation', {
-    message: 'Your order has been confirmed!',
+  res.render("User/orderConfirmation", {
+    message: "Your order has been confirmed!",
   });
 };
-
-
-
-
-
-
-
 
 module.exports = {
   getCart,
@@ -295,7 +277,4 @@ module.exports = {
   getCheckout,
   placeOrder,
   orderConfirmed,
-
-
-
 };

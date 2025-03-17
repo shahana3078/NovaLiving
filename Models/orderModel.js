@@ -60,7 +60,7 @@ const orderSchema = new mongoose.Schema({
   },
   cancelReason: {
     type:String,
-    required:true
+    required:false
   },
 });
 

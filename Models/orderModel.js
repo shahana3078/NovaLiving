@@ -59,9 +59,13 @@ const orderSchema = new mongoose.Schema({
     default: Date.now,
   },
   cancelReason: {
-    type:String,
-    required:false
+    type: String,
+    required: false,
   },
+  returnReason: { 
+    type: String, 
+    default: ""
+   },
 });
 
 const Order = mongoose.model("Order", orderSchema);

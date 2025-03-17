@@ -98,8 +98,7 @@
             </div>
           <% }); %>
         </div>
-    
-           <!-- cancellation reason -->
+
 
         <% if (order.orderStatus !== 'cancelled' && order.orderStatus !== 'delivered') { %>
           <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
@@ -107,9 +106,9 @@
                   Cancel Order
               </button>
           </div>
-      <% } else if (order.orderStatus !== 'cancelled' && order.orderStatus === 'delivered') { %>
+      <% } else if (order.orderStatus !== 'cancelled' || order.orderStatus === 'delivered') { %>
           <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
-              <button id="returnOrderBtn" style="background-color: #f37e18; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: small;">
+              <button id="returnOrderBtn" data-order-id="<%= order._id %>" style="background-color: #f37e18; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: small;">
                   Return Order
               </button>
           </div>
@@ -168,17 +167,88 @@
    </div>
  </div>
 </div>
+
+
+<div id="returnReasonModal" class="modal" 
+  style="
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+    background-color: rgba(0, 0, 0, 0.5);
+    width: 100%;
+    height: 100%;
+  ">
+
+  <div class="modal-content"
+    style="
+      padding: 20px;
+      border-radius: 8px;
+      background-color: #fff;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      width: 300px;
+      max-width: 80%;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    ">
+
+    <h3 style="margin-bottom: 15px;">Why are you returning this order?</h3>
+
+    <div>
+      <label>
+        <input type="radio" name="returnReason" value="Product not needed">
+        Product not needed
+      </label><br>
+
+      <label>
+        <input type="radio" name="returnReason" value="Found a better price">
+        Found a better price
+      </label><br>
+
+      <label>
+        <input type="radio" name="returnReason" value="Order placed by mistake">
+        Order placed by mistake
+      </label><br>
+
+      <label>
+        <input type="radio" name="returnReason" value="Delayed delivery">
+        Delivery delayed from expected date
+      </label><br>
+
+      <label>
+        <input type="radio" name="returnReason" id="customReturnReason" value="custom">
+        Other (Specify below)
+      </label>
+      <input type="text" id="customReturnReasonInput" 
+            style="display: none; width: 100%; margin-top: 5px;" 
+            placeholder="Enter your reason here" />
+
+      <div style="display: flex; justify-content: flex-end; margin-top: 15px;">
+        <button id="doneBtnReturn"
+                style="background-color: #5bc0de; color: white; border: none; border-radius: 5px; cursor: pointer; padding: 5px 10px;">
+          Done
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
   </body>
   
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-  <script src="/script/User/order.js"></script>
+ 
  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
  <script src="/User/js/bootstrap.bundle.min.js"></script>
  <script src="/User/js/tiny-slider.js"></script>
  <script src="/User/js/custom.js"></script>
+ <script src="/script/User/order.js"></script>
  <%- include('partials/footer') %>
 </body>
 </html>

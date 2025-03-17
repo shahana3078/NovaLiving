@@ -61,16 +61,19 @@
                         <option value="pending" selected>Pending</option>
                         <option value="shipped">Shipped</option>
                         <option value="delivered">Delivered</option>
-                        <option value="cancelled">Cancel</option>
-                      <% } else if (order.orderStatus === 'shipped') { %>
+                        <option value="cancelled">Cancelled</option>
+                    <% } else if (order.orderStatus === 'shipped') { %>
                         <option value="shipped" selected>Shipped</option>
                         <option value="delivered">Delivered</option>
-                        <option value="cancelled">Cancel</option>
-                      <% } else if (order.orderStatus === 'delivered') { %>
+                        <option value="cancelled">Cancelled</option>
+                    <% } else if (order.orderStatus === 'delivered') { %>
                         <option value="delivered" selected>Delivered</option>
-                      <% } else if (order.orderStatus === 'cancelled') { %>
+                    <% } else if (order.orderStatus === 'cancelled') { %>
                         <option value="cancelled" selected style="color: red;">Cancelled</option>
-                      <% } %>
+                    <% } else if (order.orderStatus === 'returned') { %>
+                        <option value="returned" selected style="color: orange;">Returned</option>
+                    <% } %>
+                    
                     </select>
 
                     </td>

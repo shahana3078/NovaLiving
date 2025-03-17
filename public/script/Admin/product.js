@@ -1,6 +1,4 @@
 
-
-
 async function fetchProducts() {
   try {
     const response = await axios.get("/products");
@@ -8,9 +6,7 @@ async function fetchProducts() {
   } catch (error) {
     console.error("Error fetching products:", error);
   }
-}
-
-
+}   
 
 //edit
 document.addEventListener("DOMContentLoaded", function () {
@@ -357,7 +353,7 @@ document.addEventListener("DOMContentLoaded", function () {
     formData.append("productStock", productStock.value);
     formData.append("productCategory", productCategory.value);
 
-    // Add cropped images as Blob
+
     croppedImages.forEach((croppedImage, index) => {
         const byteString = atob(croppedImage.split(',')[1]); 
         const arrayBuffer = new ArrayBuffer(byteString.length);
@@ -368,7 +364,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const blob = new Blob([arrayBuffer], { type: "image/jpeg" });
 
-        // Append the Blob to FormData
+      
         formData.append("productImage", blob, `image_${index}.jpg`);
     });
 
@@ -405,7 +401,6 @@ document.addEventListener("DOMContentLoaded", function () {
     
 
 });
-
 
 
 

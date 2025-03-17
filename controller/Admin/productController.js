@@ -158,6 +158,20 @@ const undoProduct = async (req, res) => {
   }
 };
 
+const stockUpdate= async(req,res)=>{
+  const { stock } = req.body;
+  const productId = req.params.id;
+
+  try {
+    await Product.findByIdAndUpdate(productId, { stock });
+    res.json({ success: true, message: 'Stock updated successfully' });
+  } catch (error) {
+    console.error('Error updating stock:', error);
+    res.status(500).json({ success: false, message: 'Failed to update stock' });
+  }
+}
+
+
 
 
 
@@ -169,4 +183,5 @@ module.exports={
   editProduct,
   deleteProduct,
   undoProduct,
+  stockUpdate
 }

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Wallet</title>
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <link href="/css/tiny-slider.css" rel="stylesheet">
+  <link href="/css/style.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@2.1.4/css/boxicons.min.css">
+   
+</head>
+
+<body>
+  <%- include('partials/navBar') %>
+  <div class="hero">
+    <div class="container">
+      <div class="row justify-content-between">
+        <div class="col-lg-5">
+          <div class="intro-excerpt">
+            <h1>Wallet</h1>
+          </div>
+        </div>
+        <div class="col-lg-7">
+          
+        </div>
+      </div>
+    </div>
+  </div>
+<!-- End Hero Section -->
+<h1 class="text-center" style="font-weight:100; margin-top: 30px;">My Wallet</h1>
+<div class="container mt-5" style="margin-bottom: 155px;">
+  <div class="card shadow-lg p-4">
+
+    <div class="text-center bg-light p-3 rounded mb-4">
+    
+          <h3 class="text-success fw-bold" >Total Balance: ₹<%= wallet.balance.toFixed(2) %></h3>
+          
+      </div>
+
+      <h4 class="text-secondary">Transaction History</h4>
+      <% if (wallet.transactions.length > 0) { %>
+          <ul class="list-group mt-3">
+              <% wallet.transactions.forEach(transaction => { %>
+                  <li class="list-group-item d-flex justify-content-between align-items-center">
+                      <span class="fw-bold <%= transaction.type === 'credit' ? 'text-success' : 'text-danger' %>">
+                          <%= transaction.type === 'credit' ? '+' : '-' %> ₹<%= transaction.amount %>
+                      </span>
+                      <span><%= transaction.description || 'N/A' %></span>
+                      <small class="text-muted">(<%= new Date(transaction.date).toLocaleDateString() %>)</small>
+                  </li>
+              <% }) %>
+          </ul>
+      <% } else { %>
+          <p class="text-center text-muted mt-3">No transactions found.</p>
+      <% } %>
+  </div>
+</div>
+    <%- include('partials/footer') %>
+</body>
+</html>

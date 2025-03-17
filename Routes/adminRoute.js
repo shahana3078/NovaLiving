@@ -76,7 +76,7 @@ router.post(
 
 router.put("/products/delete/:id", productController.deleteProduct);
 router.put("/products/undo/:id",productController.undoProduct);
-
+router.post('/products/stock-update/:id',productController.stockUpdate)
 router.get('/orders',orderController.getOrder)
 router.post('/updateOrderStatus',orderController.updateOrderStatus)
 

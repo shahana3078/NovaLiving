@@ -91,8 +91,32 @@ const cancelOrder = async (req, res) => {
   }
 };
 
+const returnOrder = async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    const { returnReason } = req.body;
+
+    const order = await Order.findByIdAndUpdate(orderId, {
+      orderStatus: "returned",
+      returnReason: returnReason || "No reason provided",  // ✅ Corrected typo here
+    });
+
+    if (!order) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Order not found" });
+    }
+
+    res.json({ success: true, message: "Order returned successfully" });
+  } catch (error) {
+    console.error("Error returning order:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
 module.exports = {
   getOrder,
   orderDetails,
   cancelOrder,
+  returnOrder
 };

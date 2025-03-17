@@ -10,6 +10,7 @@ const cartController=require('../controller/user/cartController.js')
 const profileController=require('../controller/user/profileController.js')
 const orderController=require('../controller/user/orderController.js')
 const wishlistController=require('../controller/user/wishlistController.js')
+const walletController=require('../controller/user/walletController')
 
 const { requireLogin, userLogined,preventBackToOrder,noCache } = require("../middlewares/auth.js");
 router
@@ -94,6 +95,7 @@ router.get('/order-confirmed',cartController.orderConfirmed)
 router.get('/orders',orderController.getOrder )
 router.get('/order/details',orderController.orderDetails)
 router.post('/cancel-order/:orderId',orderController.cancelOrder)
+router.post('/return-order/:orderId',orderController.returnOrder)
 
 
 //wishlist
@@ -102,6 +104,8 @@ router.get('/wishlist',wishlistController.getWishlist)
 router.post('/wishlist/add',wishlistController.addToWishlist)
 router.post('/wishlist/remove',wishlistController.removeProduct)
 
+//wallet
 
+router.get('/wallet',walletController.getWallet)
 
 module.exports = router;

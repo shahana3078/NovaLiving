@@ -81,6 +81,9 @@ router.get('/orders',orderController.getOrder)
 router.post('/updateOrderStatus',orderController.updateOrderStatus)
 
 router.get('/orderDetails',orderController.orderDetails)
+router.get('/return-requests', orderController.showReturnRequests);
+router.post('/accept-return/:orderId', orderController.acceptReturn);
+router.post('/reject-return/:orderId', orderController.rejectReturn);
 
 
 

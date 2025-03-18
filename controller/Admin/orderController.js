@@ -68,10 +68,75 @@ const orderDetails=async (req, res) => {
   }
 }
 
+const showReturnRequests = async (req, res) => {
+  try {
+    const returnRequests = await Order.find({
+      'returnRequest.status': { $nin: ['approved', 'rejected'] } 
+    })
+    .populate('userId', 'name email')
+    .lean();
+
+    res.json({ requests: returnRequests });
+  } catch (error) {
+    console.error('Error fetching return requests:', error);
+    res.status(500).json({ error: 'Failed to load return requests.' });
+  }
+};
+
+
+
+const acceptReturn = async (req, res) => {
+  const { orderId } = req.params;
+
+  try {
+    const order = await Order.findById(orderId);
+
+    if (!order) {
+      return res.status(404).json({ success: false, message: 'Order not found' });
+    }
+
+    order.orderStatus = 'returned';
+    order.returnRequest.status = 'approved';
+
+    await order.save();
+
+    res.json({ success: true, message: 'Return request approved successfully.' });
+  } catch (error) {
+    console.error('Error approving return request:', error);
+    res.status(500).json({ success: false, message: 'Failed to approve return request.' });
+  }
+};
+const rejectReturn = async (req, res) => {
+  const { orderId } = req.params;
+
+  try {
+    const order = await Order.findById(orderId);
+
+    if (!order) {
+      return res.status(404).json({ success: false, message: 'Order not found' });
+    }
+
+    order.returnRequest.status = 'rejected'; 
+
+    await order.save();
+
+    res.json({ success: true, message: 'Return request rejected successfully.' });
+  } catch (error) {
+    console.error('Error rejecting return request:', error);
+    res.status(500).json({ success: false, message: 'Failed to reject return request.' });
+  }
+};
+
+
+
+
 
 module.exports={
   getOrder,
   updateOrderStatus,
-  orderDetails
+  orderDetails,
+  showReturnRequests,
+  acceptReturn,
+  rejectReturn
  
 }

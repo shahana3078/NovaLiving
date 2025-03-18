@@ -96,6 +96,7 @@ router.get('/orders',orderController.getOrder )
 router.get('/order/details',orderController.orderDetails)
 router.post('/cancel-order/:orderId',orderController.cancelOrder)
 router.post('/return-order/:orderId',orderController.returnOrder)
+router.post('/request-return/:orderId', orderController.requestReturn);
 
 
 //wishlist

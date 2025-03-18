@@ -57,7 +57,9 @@
             <h3 style="color: red; text-align: center;">Order Cancelled!</h3>
           <% } else if (order.orderStatus === 'returned') { %>
             <h3 style="color: orange; text-align: center;">Order Returned!</h3>
-          <% } else { %>
+          <% } else if (order.returnRequest.status === 'rejected') { %>
+            <h3 style="color: orange; text-align: center;">your return request is rejected!</h3>
+          <% }else { %>
             <div style="position: relative; width: 100%; height: 20px;">
               <div style="position: absolute; top: 50%; left: 0; width: 100%; height: 2px; background-color: #ccc; transform: translateY(-50%);"></div>
               <div
@@ -79,6 +81,8 @@
               </div>
             </div>
           <% } %>
+
+
         </div>
 
         <!-- Order Items -->
@@ -98,21 +102,32 @@
             </div>
           <% }); %>
         </div>
+        
 
-
-        <% if (order.orderStatus !== 'cancelled' && order.orderStatus !== 'delivered' && order.orderStatus!== 'returned') { %>
+        <% if (order.orderStatus !== 'cancelled' && order.orderStatus !== 'delivered' && order.orderStatus !== 'returned') { %>
           <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
-              <button id="cancelOrderBtn"  data-order-id="<%= order._id %>"  style="background-color: #d9534f; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: small;">
+              <button id="cancelOrderBtn"
+                      data-order-id="<%= order._id %>"
+                      style="background-color: #d9534f; color: white; border: none; 
+                      border-radius: 5px; cursor: pointer; font-size: small;">
                   Cancel Order
               </button>
           </div>
-      <% } else if (order.orderStatus !== 'cancelled' || order.orderStatus === 'delivered') { %>
+      <% } else if (order.orderStatus === 'delivered' && order.orderStatus !== 'cancelled' && returnRequestStatus !== 'requested' && returnRequestStatus !== 'approved' && returnRequestStatus !== 'rejected') { %>
           <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
-              <button id="returnOrderBtn" data-order-id="<%= order._id %>" style="background-color: #f37e18; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: small;">
+              <button id="returnOrderBtn"
+                      data-order-id="<%= order._id %>"
+                      style="background-color: #f37e18; color: white; border: none;
+                      border-radius: 5px; cursor: pointer; font-size: small;">
                   Return Order
               </button>
           </div>
+      <% } else if (returnRequestStatus === 'requested' && order.orderStatus !== 'returned') { %>
+          <div style="color: orange; text-align: center; margin-top: 10px;">
+              Return request sent! You will be informed within 2-3 days.
+          </div>
       <% } %>
+      
       </div>
     </div>
 

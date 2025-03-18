@@ -11,86 +11,205 @@ function toggleAddress(orderId) {
 document.addEventListener('DOMContentLoaded', function () {
   
   // Return Order
-  const returnOrderBtn = document.getElementById('returnOrderBtn');
-  if (returnOrderBtn) {
-    returnOrderBtn.addEventListener('click', function () {
-      const orderId = this.getAttribute('data-order-id');
-      const returnReasonModal = document.getElementById('returnReasonModal');
-      const customReturnRadio = document.getElementById('customReturnReason');
-      const customReturnInput = document.getElementById('customReturnReasonInput');
+//   const returnOrderBtn = document.getElementById('returnOrderBtn');
 
-      returnReasonModal.style.display = 'block';
+// if (returnOrderBtn) {
+//   returnOrderBtn.addEventListener('click', function () {
+//     const orderId = this.getAttribute('data-order-id');
+//     const returnReasonModal = document.getElementById('returnReasonModal');
+//     const customReturnRadio = document.getElementById('customReturnReason');
+//     const customReturnInput = document.getElementById('customReturnReasonInput');
+  
+//     // Display the modal
+//     returnReasonModal.style.display = 'block';
 
-      document.querySelectorAll('input[name="returnReason"]').forEach(radio => {
-        radio.addEventListener('change', function () {
-          if (customReturnRadio.checked) {
-            customReturnInput.style.display = 'block';
-            customReturnInput.setAttribute('required', 'true');
-          } else {
-            customReturnInput.style.display = 'none';
-            customReturnInput.removeAttribute('required');
-            customReturnInput.value = '';
-          }
-        });
-      });
+//     // Handle reason selection logic
+//     document.querySelectorAll('input[name="returnReason"]').forEach(radio => {
+//       radio.addEventListener('change', function () {
+//         if (customReturnRadio.checked) {
+//           customReturnInput.style.display = 'block';
+//           customReturnInput.setAttribute('required', 'true');
+//         } else {
+//           customReturnInput.style.display = 'none';
+//           customReturnInput.removeAttribute('required');
+//           customReturnInput.value = '';
+//         }
+//       });
+//     });
 
-      document.getElementById('doneBtnReturn').addEventListener('click', function () {
-        const selectedReason = document.querySelector('input[name="returnReason"]:checked');
-        const customReasonValue = customReturnInput.value.trim();
+//     // Handle submission logic
+//     document.getElementById('doneBtnReturn').addEventListener('click', async function () {
+//       const selectedReason = document.querySelector('input[name="returnReason"]:checked');
+//       const customReasonValue = customReturnInput.value.trim();
 
-        let finalReason = selectedReason ? selectedReason.value : '';
+//       let finalReason = selectedReason ? selectedReason.value : '';
 
-        if (finalReason === 'custom' && customReasonValue) {
-          finalReason = customReasonValue;
+//       if (finalReason === 'custom' && customReasonValue) {
+//         finalReason = customReasonValue;
+//       }
+
+//       if (!finalReason) {
+//         Swal.fire('Error!', 'Please select or enter a return reason.', 'error');
+//         return;
+//       }
+
+//       const confirmResult = await Swal.fire({
+//         title: 'Are you sure?',
+//         text: 'Do you really want to request a return?',
+//         icon: 'warning',
+//         showCancelButton: true,
+//         confirmButtonText: 'Yes, Request Return!',
+//         cancelButtonText: 'No, keep it',
+//       });
+
+//       if (confirmResult.isConfirmed) {
+//         try {
+//           const response = await fetch(`/request-return/${orderId}`, {
+//             method: 'POST',
+//             headers: {
+//               'Content-Type': 'application/json'
+//             },
+//             body: JSON.stringify({
+//               orderId: orderId,
+//               returnReason: finalReason,
+//               requestStatus: 'requested' 
+//             })
+//           });
+
+//           const data = await response.json();
+//           if (data.success) {
+//             Swal.fire('Request Sent!', 'Your return request has been sent to the admin.', 'success');
+        
+//             const successMessage = document.createElement('div');
+//             successMessage.textContent = 'Return request sent! You will be informed within 2-3 days.';
+//             successMessage.style.color = 'orange';
+//             successMessage.style.fontWeight = 'bold';
+//             successMessage.style.textAlign = 'center';
+//             successMessage.style.marginTop = '20px';
+        
+//             const parentContainer = returnOrderBtn.parentElement;
+//             returnOrderBtn.remove();
+//             parentContainer.appendChild(successMessage);
+        
+//         } else {
+//             Swal.fire('Failed!', data.message || 'Something went wrong while sending your request.', 'error');
+//         }
+        
+        
+
+
+//         } catch (error) {
+//           console.error('Error:', error);
+//           Swal.fire('Error!', 'An error occurred while processing your request.', 'error');
+//         }
+//       }
+
+//       returnReasonModal.style.display = 'none';
+//     });
+//   });
+// }
+const returnOrderBtn = document.getElementById('returnOrderBtn');
+const doneBtnReturn = document.getElementById('doneBtnReturn');  // ✅ Reference for the Done button
+
+if (returnOrderBtn) {
+  returnOrderBtn.addEventListener('click', function () {
+    const orderId = this.getAttribute('data-order-id');
+    const returnReasonModal = document.getElementById('returnReasonModal');
+    const customReturnRadio = document.getElementById('customReturnReason');
+    const customReturnInput = document.getElementById('customReturnReasonInput');
+  
+    // Display the modal
+    returnReasonModal.style.display = 'block';
+
+    // Initially disable the "Done" button
+    doneBtnReturn.disabled = true;
+
+    // Handle reason selection logic
+    document.querySelectorAll('input[name="returnReason"]').forEach(radio => {
+      radio.addEventListener('change', function () {
+        if (customReturnRadio.checked) {
+          customReturnInput.style.display = 'block';
+          customReturnInput.setAttribute('required', 'true');
+        } else {
+          customReturnInput.style.display = 'none';
+          customReturnInput.removeAttribute('required');
+          customReturnInput.value = '';
         }
-
-        if (!finalReason) {
-          Swal.fire('Error!', 'Please select or enter a return reason.', 'error');
-          return;
-        }
-
-        Swal.fire({
-          title: 'Are you sure?',
-          text: 'Do you really want to return this order?',
-          icon: 'warning',
-          showCancelButton: true,
-          confirmButtonText: 'Yes, Return it!',
-          cancelButtonText: 'No, keep it',
-        }).then((result) => {
-          if (result.isConfirmed) {
-            fetch(`/return-order/${orderId}`, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                orderId: orderId,
-                returnReason: finalReason,
-              }),
-            })
-            .then((response) => response.json())
-            .then((data) => {
-              if (data.success) {
-                Swal.fire('Returned!', 'Your order has been returned successfully.', 'success');
-                document.getElementById('orderStatusContainer').innerHTML =
-                  '<h3 style="color: orange; text-align: center;">Order Returned!</h3>';
-                document.getElementById('returnOrderBtn').style.display = 'none';
-              } else {
-                Swal.fire('Failed!', 'Something went wrong while returning the order.', 'error');
-              }
-            })
-            .catch((error) => {
-              console.error('Error:', error);
-              Swal.fire('Error!', 'An error occurred while processing your request.', 'error');
-            });
-          }
-        });
-
-        returnReasonModal.style.display = 'none';
+        doneBtnReturn.disabled = false;
       });
     });
-  }
 
+  
+    doneBtnReturn.addEventListener('click', async function () {
+      const selectedReason = document.querySelector('input[name="returnReason"]:checked');
+      const customReasonValue = customReturnInput.value.trim();
+
+      let finalReason = selectedReason ? selectedReason.value : '';
+
+      if (finalReason === 'custom' && customReasonValue) {
+        finalReason = customReasonValue;
+      }
+
+      if (!finalReason) {
+        Swal.fire('Error!', 'Please select or enter a return reason.', 'error');
+        return;
+      }
+
+      const confirmResult = await Swal.fire({
+        title: 'Are you sure?',
+        text: 'Do you really want to request a return?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, Request Return!',
+        cancelButtonText: 'No, keep it',
+      });
+
+      if (confirmResult.isConfirmed) {
+        try {
+          const response = await fetch(`/request-return/${orderId}`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              orderId: orderId,
+              returnReason: finalReason,
+              requestStatus: 'requested'
+            })
+          });
+
+          const data = await response.json();
+          if (data.success) {
+            Swal.fire('Request Sent!', 'Your return request has been sent to the admin.', 'success');
+
+            const successMessage = document.createElement('div');
+            successMessage.textContent = 'Return request sent! You will be informed within 2-3 days.';
+            successMessage.style.color = 'orange';
+            successMessage.style.fontWeight = 'bold';
+            successMessage.style.textAlign = 'center';
+            successMessage.style.marginTop = '20px';
+
+            const parentContainer = returnOrderBtn.parentElement;
+            returnOrderBtn.remove();
+            parentContainer.appendChild(successMessage);
+
+          } else {
+            Swal.fire('Failed!', data.message || 'Something went wrong while sending your request.', 'error');
+          }
+
+        } catch (error) {
+          console.error('Error:', error);
+          Swal.fire('Error!', 'An error occurred while processing your request.', 'error');
+        }
+      }
+
+      returnReasonModal.style.display = 'none';
+    });
+  });
+}
+
+
+  
   // Cancel Order
   const cancelOrderBtn = document.getElementById('cancelOrderBtn');
   if (cancelOrderBtn) {

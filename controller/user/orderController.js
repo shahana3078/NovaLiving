@@ -30,6 +30,41 @@ const getOrder = async (req, res) => {
   }
 };
 
+// const orderDetails = async (req, res) => {
+//   try {
+//     const { orderId } = req.query;
+//     const userId = req.session.userId;
+
+//     const order = await Order.findOne({ _id: orderId, userId })
+//       .populate("items.productId")
+//       .populate({
+//         path: "addressId",
+//         select: "fullName mobile address city state pincode",
+//       })
+//       .lean();
+
+//     if (!order) {
+//       return res.redirect("/404");
+//     }
+
+//     let subtotal = 0;
+//     order.items.forEach((item) => {
+//       subtotal += item.productId.price * item.quantity;
+//     });
+
+//     const shippingCharge = order.shippingCharge || 50;
+//     const grandTotal = subtotal + shippingCharge;
+
+//     order.subtotal = subtotal;
+//     order.shippingCharge = shippingCharge;
+//     order.grandTotal = grandTotal;
+
+//     res.render("User/orderDetails", { order });
+//   } catch (error) {
+//     console.log("Error while fetching order details:", error);
+//     res.status(500).send("Internal Server Error");
+//   }
+// };
 const orderDetails = async (req, res) => {
   try {
     const { orderId } = req.query;
@@ -59,7 +94,10 @@ const orderDetails = async (req, res) => {
     order.shippingCharge = shippingCharge;
     order.grandTotal = grandTotal;
 
-    res.render("User/orderDetails", { order });
+    // ✅ Include returnRequest status
+    const returnRequestStatus = order.returnRequest?.status || 'none';
+
+    res.render("User/orderDetails", { order, returnRequestStatus });
   } catch (error) {
     console.log("Error while fetching order details:", error);
     res.status(500).send("Internal Server Error");
@@ -98,7 +136,7 @@ const returnOrder = async (req, res) => {
 
     const order = await Order.findByIdAndUpdate(orderId, {
       orderStatus: "returned",
-      returnReason: returnReason || "No reason provided",  // ✅ Corrected typo here
+      returnReason: returnReason || "No reason provided",
     });
 
     if (!order) {
@@ -114,9 +152,39 @@ const returnOrder = async (req, res) => {
   }
 };
 
+const requestReturn = async (req, res) => {
+  const { orderId, returnReason } = req.body;
+
+  try {
+    const order = await Order.findById(orderId);
+
+    if (!order) {
+      return res.status(404).json({ success: false, message: 'Order not found' });
+    }
+
+    order.returnRequest = {
+      status: 'requested', 
+      reason: returnReason,
+      date: new Date()
+    };
+
+    await order.save();
+    console.log('Updated Order:', order);
+
+    res.json({ success: true, message: 'Return request submitted successfully' });
+  } catch (error) {
+    console.error('Error submitting return request:', error);
+    res.status(500).json({ success: false, message: 'Failed to submit return request.' });
+  }
+};
+
+
+
+
 module.exports = {
   getOrder,
   orderDetails,
   cancelOrder,
-  returnOrder
+  returnOrder,
+  requestReturn
 };

@@ -53,6 +53,10 @@ function showOrderDetails(orderId) {
             ${order.orderStatus === 'cancelled' 
             ? `<p><strong style='color:red'>Cancellation Reason:</strong> ${order.cancelReason}</p>` 
             : ''}
+            
+            ${order.orderStatus === 'returned' 
+            ? `<p><strong style='color:red'>ReturnReason:</strong> ${order.returnRequest.reason}</p>` 
+            : ''}
           </div>
 
           <div style="flex: 1; min-width: 300px; padding-left: 20px;">
@@ -87,3 +91,81 @@ function showOrderDetails(orderId) {
       alert('An error occurred while fetching order details.');
     });
 }
+
+
+
+async function showReturnRequests() {
+  try {
+      const response = await axios.get('/admin/return-requests');
+      const returnRequests = response.data.requests;
+
+      const pendingRequests = returnRequests.filter(request =>
+        request.returnRequest && 
+        request.orderStatus !== 'returned' && 
+        request.returnRequest.status !== 'rejected'
+      );
+
+      const modalBody = document.getElementById('returnRequestsModalBody');
+
+      if (pendingRequests.length === 0) {
+          modalBody.innerHTML = `
+            <div class="text-center" style="padding: 20px;">
+              <strong>No Pending Return Requests</strong>
+            </div>`;
+      } else {
+          modalBody.innerHTML = pendingRequests.map(request => `
+            <div id="request-${request._id}" class="return-request-item" 
+                 style="border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; border-radius: 5px;">
+               <strong>Order ID:</strong> ${request._id}<br>
+               <strong>User:</strong> ${request.userId.name} (${request.userId.email})<br>
+               <strong>Reason:</strong> ${request.returnRequest.reason}<br>
+               <strong>Status:</strong> ${request.returnRequest.status}<br>
+
+               <div style="margin-top: 10px; display: flex; gap: 10px;">
+                   <button class="btn btn-success btn-sm" onclick="acceptReturn('${request._id}')">Accept</button>
+                   <button class="btn btn-danger btn-sm" onclick="rejectReturn('${request._id}')">Reject</button>
+               </div>
+            </div>
+         `).join('');
+      }
+
+      const returnModal = new bootstrap.Modal(document.getElementById('returnRequestsModal'));
+      returnModal.show();
+
+  } catch (error) {
+      console.error('Error fetching return requests:', error);
+      Swal.fire('Error!', 'Failed to load return requests.', 'error');
+  }
+}
+
+async function acceptReturn(orderId) {
+  try {
+    const response = await axios.post(`/return-order/${orderId}`);
+    if (response.data.success) {
+      Swal.fire('Success!', 'Return request accepted and order marked as returned.', 'success')
+      document.getElementById(`request-${orderId}`).remove();
+    } else {
+      Swal.fire('Error!', response.data.message, 'error');
+    }
+  } catch (error) {
+    console.error('Error accepting return request:', error);
+    Swal.fire('Error!', 'Failed to accept return request.', 'error');
+  }
+}
+
+
+async function rejectReturn(orderId) {
+  try {
+    const response = await axios.post(`/admin/reject-return/${orderId}`);
+    if (response.data.success) {
+      Swal.fire('Rejected!', 'Return request rejected.', 'info');
+      document.getElementById(`request-${orderId}`).remove();
+    } else {
+      Swal.fire('Error!', response.data.message, 'error');
+    }
+  } catch (error) {
+    console.error('Error rejecting return request:', error);
+    Swal.fire('Error!', 'Failed to reject return request.', 'error');
+  }
+}
+

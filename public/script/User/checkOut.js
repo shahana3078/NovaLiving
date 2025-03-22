@@ -90,13 +90,77 @@ function confirmPayment() {
 
 
 //place order
+// function placeOrder() {
+//   const data = {
+//     addressId
+//   }
+//   if(!addressId) {
+//     return showMessage('Please select a address', 'danger');
+//   }
+//   if (selectedMethod === 'razorpay') {
+//     fetch('/create-razorpay-order', {
+//         method: 'POST',
+//         headers: { 'Content-Type': 'application/json' },
+//         body: JSON.stringify({})
+//     })
+//     .then(response => response.json())
+//     .then(order => {
+//         const options = {
+//             key: 'rzp_test_29wLZVOKsQCqZx',
+//             amount: order.amount,
+//             currency: 'INR',
+//             order_id: order.id,
+//             name: "NovaLiving",
+//             description: "Order Payment",
+//             handler: function (response) {
+//                 fetch('/place-order', {
+//                     method: 'POST',
+//                     headers: { 'Content-Type': 'application/json' },
+//                     body: JSON.stringify({ 
+//                         paymentMethod: selectedMethod, 
+                        
+                 
+//                     })
+//                 })
+//                 console.log(alert(response.razorpay_payment_id))
+//                 alert(response.razorpay_order_id)
+//                 alert(response.razorpay_signature)
+//                 .then(response => response.json())
+//                 .then(data => {
+//                     if (data.success) {
+//                         document.getElementById('paymentOptions').style.display = 'none';
+//                         document.getElementById('selectedPayment').innerHTML = `<strong>${getPaymentMethodText(selectedMethod)}</strong>`;
+//                         document.getElementById('selectedPayment').style.display = 'block';
+//                     } else {
+//                         alert(data.message);
+//                     }
+//                 });
+//             }
+//         };
+
+//         const rzp1 = new Razorpay(options);
+//         rzp1.open();
+//     })
+//     .catch(error => console.error('Error:', error));
+// } 
+
+
+
+//   axios.post('/place-order', data)
+//     .then((response) => {
+//       window.location.href = '/order-confirmed'; 
+//     })
+//     .catch((error) => {
+//       console.error('Error placing order:', error);
+//       alert('An error occurred while placing your order. Please try again.');
+//     });
+// }
+
 function placeOrder() {
-  const data = {
-    addressId
+  if (!addressId) {
+    return showMessage('Please select an address', 'danger');
   }
-  if(!addressId) {
-    return showMessage('Please select a address', 'danger');
-  }
+
   if (selectedMethod === 'razorpay') {
     fetch('/create-razorpay-order', {
         method: 'POST',
@@ -117,24 +181,22 @@ function placeOrder() {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
-                        paymentMethod: selectedMethod, 
-                        
-                 
+                        addressId,
+                        paymentMethod: 'razorpay',
+                        razorpay_payment_id: response.razorpay_payment_id,
+                        razorpay_order_id: response.razorpay_order_id,
+                        razorpay_signature: response.razorpay_signature
                     })
                 })
-                console.log(alert(response.razorpay_payment_id))
-                alert(response.razorpay_order_id)
-                alert(response.razorpay_signature)
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        document.getElementById('paymentOptions').style.display = 'none';
-                        document.getElementById('selectedPayment').innerHTML = `<strong>${getPaymentMethodText(selectedMethod)}</strong>`;
-                        document.getElementById('selectedPayment').style.display = 'block';
+                        window.location.href = '/order-confirmed';  // ✅ Redirect after successful order
                     } else {
                         alert(data.message);
                     }
-                });
+                })
+                .catch(error => console.error('Error:', error));
             }
         };
 
@@ -142,23 +204,24 @@ function placeOrder() {
         rzp1.open();
     })
     .catch(error => console.error('Error:', error));
-} 
-
-
-
-  axios.post('/place-order', data)
-    .then((response) => {
-      window.location.href = '/order-confirmed'; 
-    })
-    .catch((error) => {
-      console.error('Error placing order:', error);
-      alert('An error occurred while placing your order. Please try again.');
-    });
+  } else {
+    // For COD or Wallet payment
+    axios.post('/place-order', { addressId, paymentMethod: selectedMethod })
+      .then(response => {
+        window.location.href = '/order-confirmed'; 
+      })
+      .catch(error => {
+        console.error('Error placing order:', error);
+        alert('An error occurred while placing your order. Please try again.');
+      });
+  }
 }
+
+
 
 function getPaymentMethodText(method) {
   switch (method) {
-      case 'cod': return "Pay on Delivery (Cash/Card)";
+      case 'cash on delivery': return "Pay on Delivery (Cash/Card)";
       case 'razorpay': return "Razorpay";
       case 'wallet': return "Wallet";
       default: return "Unknown Payment Method";

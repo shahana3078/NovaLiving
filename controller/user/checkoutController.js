@@ -3,6 +3,7 @@ const Cart = require("../../Models/cartModel");
 const Product = require("../../Models/productModel");
 const Address = require("../../Models/addressModel");
 const Order = require("../../Models/orderModel");
+const crypto = require("crypto");
 
 
 const getCheckout = async (req, res) => {
@@ -131,14 +132,66 @@ const confirmPaymentRazorPay = (req, res) => {
   res.status(400).json({ success: false, message: "Payment verification failed." });
 };
 
+// const placeOrder = async (req, res) => {
+//   try {
+//     const { addressId,paymentMethod,razorpay_payment_id, razorpay_order_id, razorpay_signature } = req.body;
+//     const userId = req.session.userId;
+//     const cart = await Cart.findOne({ userId }).populate("items.productId");
+//     if (!cart || cart.items.length === 0) {
+//       return res.status(400).send("Cart is empty");
+//     }
+//     let subtotal = 0;
+//     const orderItems = cart.items.map((item) => {
+//       subtotal += item.quantity * item.productId.price;
+//       return {
+//         productId: item.productId._id,
+//         name: item.productId.name,
+//         price: item.productId.price,
+//         quantity: item.quantity,
+  
+//       };
+//     });
+  
+
+    
+//     const shippingCharge = 50;
+//     const grandTotal = subtotal + shippingCharge;
+
+//     const order = new Order({
+//       userId,
+//       addressId: addressId,
+//       items: orderItems,
+//       subtotal,
+//       shippingCharge,
+//       grandTotal,
+//       paymentMethod,
+//       orderDate: Date.now(),
+//       status: "Pending",
+//     });
+
+
+//     if(paymentMethod=='razorpay')
+//     await order.save();
+//     await Cart.updateOne({ userId }, { $set: { items: [] } });
+
+//     res.json({ message: "Order placed successfully" });
+//   } catch (error) {
+//     console.error("Error placing order:", error);
+//     res.status(500).send("Internal server error");
+//   }
+// };
+
+
 const placeOrder = async (req, res) => {
   try {
-    const { addressId,paymentMethod,razorpay_payment_id, razorpay_order_id, razorpay_signature } = req.body;
+    const { addressId, paymentMethod, razorpay_payment_id, razorpay_order_id, razorpay_signature } = req.body;
     const userId = req.session.userId;
+
     const cart = await Cart.findOne({ userId }).populate("items.productId");
     if (!cart || cart.items.length === 0) {
-      return res.status(400).send("Cart is empty");
+      return res.status(400).json({ success: false, message: "Cart is empty" });
     }
+
     let subtotal = 0;
     const orderItems = cart.items.map((item) => {
       subtotal += item.quantity * item.productId.price;
@@ -147,18 +200,29 @@ const placeOrder = async (req, res) => {
         name: item.productId.name,
         price: item.productId.price,
         quantity: item.quantity,
-  
       };
     });
-  
 
-    
     const shippingCharge = 50;
     const grandTotal = subtotal + shippingCharge;
 
+    // Verify Razorpay Payment if selected
+    if (paymentMethod === 'razorpay') {
+      const body = razorpay_order_id + "|" + razorpay_payment_id;
+      const expectedSignature = crypto
+        .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
+        .update(body)
+        .digest("hex");
+
+      if (expectedSignature !== razorpay_signature) {
+        return res.status(400).json({ success: false, message: "Payment verification failed." });
+      }
+    }
+
+    // Save Order
     const order = new Order({
       userId,
-      addressId: addressId,
+      addressId,
       items: orderItems,
       subtotal,
       shippingCharge,
@@ -168,17 +232,16 @@ const placeOrder = async (req, res) => {
       status: "Pending",
     });
 
-
-    if(paymentMethod=='razorpay')
     await order.save();
     await Cart.updateOne({ userId }, { $set: { items: [] } });
 
-    res.json({ message: "Order placed successfully" });
+    res.json({ success: true, message: "Order placed successfully" });
   } catch (error) {
     console.error("Error placing order:", error);
-    res.status(500).send("Internal server error");
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
+
 
 const orderConfirmed = (req, res) => {
   res.render("User/orderConfirmation", {

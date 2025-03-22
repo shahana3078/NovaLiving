@@ -11,6 +11,7 @@ const profileController=require('../controller/user/profileController.js')
 const orderController=require('../controller/user/orderController.js')
 const wishlistController=require('../controller/user/wishlistController.js')
 const walletController=require('../controller/user/walletController')
+const checkoutController=require('../controller/user/checkoutController.js')
 
 const { requireLogin, userLogined,preventBackToOrder,noCache } = require("../middlewares/auth.js");
 router
@@ -89,10 +90,13 @@ router.get('/my-profile',profileController.getMyProfile)
 router.post('/update-profile',profileController.updateProfile)
 
 //orders
-router.get('/checkout', cartController.getCheckout)
-router.post('/place-order',cartController.placeOrder)
-router.get('/order-confirmed',cartController.orderConfirmed)
-router.get('/orders',orderController.getOrder )
+router.get('/checkout', checkoutController.getCheckout)
+router.post('/update-payment-method',checkoutController.updatePaymentMethod)
+router.post('/create-razorpay-order',checkoutController.razorPayCreateOrder)
+router.post('/confirm-razorpay-payment',checkoutController.confirmPaymentRazorPay)
+router.post('/place-order',checkoutController.placeOrder)
+router.get('/order-confirmed',checkoutController.orderConfirmed)
+router.get('/orders',orderController.getOrder)
 router.get('/order/details',orderController.orderDetails)
 router.post('/cancel-order/:orderId',orderController.cancelOrder)
 router.post('/return-order/:orderId',orderController.returnOrder)

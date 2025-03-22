@@ -44,16 +44,107 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
+
+//payment
+let selectedMethod = "cod";
+
+function showPaymentOptions() {
+    document.getElementById('selectedPayment').style.display = 'none';
+    document.getElementById('paymentOptions').style.display = 'block';
+}
+
+function selectPayment(method) {
+    selectedMethod = method;
+
+    document.querySelectorAll('.payment-option').forEach(option => {
+        const radioInput = option.querySelector(`input[id="${method}"]`);
+        if (radioInput) {
+            option.style.border = '2px solid #ff9900';
+        } else {
+            option.style.border = '1px solid #ddd';
+        }
+    });
+}
+
+function confirmPayment() {
+
+      fetch('/update-payment-method', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ paymentMethod: selectedMethod })
+      })
+      .then(response => response.json())
+      .then(data => {
+          if (data.success) {
+              document.getElementById('paymentOptions').style.display = 'none';
+              document.getElementById('selectedPayment').innerHTML = `<strong>${getPaymentMethodText(selectedMethod)}</strong>`;
+              document.getElementById('selectedPayment').style.display = 'block';
+          } else {
+              alert(data.message);
+          }
+      })
+      .catch(error => console.error('Error:', error));
+
+    }
+
+
+
+//place order
 function placeOrder() {
-
-  if(!addressId) {
-    return showMessage('Please select a address', 'danger');
-  }
-
-
   const data = {
     addressId
   }
+  if(!addressId) {
+    return showMessage('Please select a address', 'danger');
+  }
+  if (selectedMethod === 'razorpay') {
+    fetch('/create-razorpay-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({})
+    })
+    .then(response => response.json())
+    .then(order => {
+        const options = {
+            key: 'rzp_test_29wLZVOKsQCqZx',
+            amount: order.amount,
+            currency: 'INR',
+            order_id: order.id,
+            name: "NovaLiving",
+            description: "Order Payment",
+            handler: function (response) {
+                fetch('/place-order', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        paymentMethod: selectedMethod, 
+                        
+                 
+                    })
+                })
+                console.log(alert(response.razorpay_payment_id))
+                alert(response.razorpay_order_id)
+                alert(response.razorpay_signature)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('paymentOptions').style.display = 'none';
+                        document.getElementById('selectedPayment').innerHTML = `<strong>${getPaymentMethodText(selectedMethod)}</strong>`;
+                        document.getElementById('selectedPayment').style.display = 'block';
+                    } else {
+                        alert(data.message);
+                    }
+                });
+            }
+        };
+
+        const rzp1 = new Razorpay(options);
+        rzp1.open();
+    })
+    .catch(error => console.error('Error:', error));
+} 
+
+
 
   axios.post('/place-order', data)
     .then((response) => {
@@ -64,6 +155,19 @@ function placeOrder() {
       alert('An error occurred while placing your order. Please try again.');
     });
 }
+
+function getPaymentMethodText(method) {
+  switch (method) {
+      case 'cod': return "Pay on Delivery (Cash/Card)";
+      case 'razorpay': return "Razorpay";
+      case 'wallet': return "Wallet";
+      default: return "Unknown Payment Method";
+  }
+}
+
+
+
+
 
 function openEditModal(addressId) {
   fetch(`/edit-address/${addressId}`)
@@ -127,6 +231,9 @@ function showOrderDetails(orderId) {
       alert('An error occurred while fetching order details.');
     });
 }
+
+
+
 
 
 

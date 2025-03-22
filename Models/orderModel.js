@@ -69,7 +69,13 @@ const orderSchema = new mongoose.Schema({
    returnRequest: { 
     status: { type: String, enum: ['requested', 'approved', 'rejected'] },
     reason: { type: String } 
-}
+},
+paymentMethod: {
+  type: String,
+  enum: ["cash on delivery", "razorpay", "wallet", "payment failed"],
+  default: "cash on delivery",
+  required: true,
+ },
 });
 
 const Order = mongoose.model("Order", orderSchema);

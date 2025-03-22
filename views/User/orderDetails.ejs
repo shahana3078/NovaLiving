@@ -40,7 +40,7 @@
     
           <div style="flex: 1; text-align: center; margin-right: 20px;">
             <h3 style="font-size: 20px; color: #000000;">Payment Method</h3>
-            <p>Cash on Delivery</p>
+            <p><%= order.paymentMethod %></p>
           </div>
           
           <div style="flex: 1; text-align: right;">
@@ -57,7 +57,7 @@
             <h3 style="color: red; text-align: center;">Order Cancelled!</h3>
           <% } else if (order.orderStatus === 'returned') { %>
             <h3 style="color: orange; text-align: center;">Order Returned!</h3>
-          <% } else if (order.returnRequest.status === 'rejected') { %>
+          <% } else if (order.returnRequest && order.returnRequest.status === 'rejected') { %>
             <h3 style="color: orange; text-align: center;">your return request is rejected!</h3>
           <% }else { %>
             <div style="position: relative; width: 100%; height: 20px;">

@@ -247,9 +247,16 @@
     </div>
 
     <div class="payment-option">
-      <input type="radio" id="wallet" name="payment" onclick="selectPayment('wallet')">
+      <input type="radio" id="wallet" name="payment" onclick="selectPayment('wallet')"
+        <%= wallet && wallet.balance < totalPrice ? 'disabled' : '' %> >
       <label for="wallet">Wallet</label>
+      <div style="color: rgb(231, 130, 14)">Wallet balance: ₹<%= wallet ? wallet.balance.toFixed(2) : '0.00' %></div>
+    
+      <% if (wallet && wallet.balance < totalPrice) { %>
+        <div style="color: red; font-weight: bold;">Insufficient balance</div>
+      <% } %>
     </div>
+    
 
     <button onclick="confirmPayment()" style="margin-top: 15px; background-color: #ff9900; color: #fff; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
       Use this payment method

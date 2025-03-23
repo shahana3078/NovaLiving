@@ -155,6 +155,7 @@ document.addEventListener("DOMContentLoaded", function () {
         id: this.getAttribute("data-id"),
         name: this.getAttribute("data-name"),
         description: this.getAttribute("data-description"),
+        offer: JSON.parse(this.getAttribute("data-offer") || '{"discountPercentage":0,"isActive":false}'), 
       };
       openEditCategoryModal(category);
     });
@@ -167,9 +168,11 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("editCategoryName").value = category.name;
     document.getElementById("editCategoryDescription").value =
       category.description;
+      document.getElementById("editCategoryOffer").value = category.offer.discountPercentage || 0;
 
     hideValidationError("editCategoryName");
     hideValidationError("editCategoryDescription");
+    hideValidationError("editCategoryOffer");
 
     $("#editModal").modal("show");
   }
@@ -187,6 +190,9 @@ document.addEventListener("DOMContentLoaded", function () {
         .getElementById("editCategoryDescription")
         .value.trim();
 
+        const categoryOffer = parseFloat(document
+          .getElementById("editCategoryOffer")
+          .value) || 0;
       let isValid = true;
 
       if (!categoryName) {
@@ -199,6 +205,7 @@ document.addEventListener("DOMContentLoaded", function () {
         hideValidationError("editCategoryName");
       }
 
+
       if (!categoryDescription) {
         showValidationError(
           "editCategoryDescription",
@@ -209,6 +216,12 @@ document.addEventListener("DOMContentLoaded", function () {
         hideValidationError("editCategoryDescription");
       }
 
+      if (categoryOffer < 0 || categoryOffer > 100) {
+        showValidationError("editCategoryOffer", "Offer must be between 0 and 100.");
+        isValid = false;
+      } else {
+        hideValidationError("editCategoryOffer");
+      }
       if (!isValid) return;
 
       const updatedCategory = {

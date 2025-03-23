@@ -18,6 +18,7 @@ const getCategories = async (req, res) => {
 const updateCategory = async (req, res) => {
   const categoryId = req.params.id;
   const updatedData = req.body;
+  console.log('req.body',req.body)
 
   try {
     const existingCategory = await Category.findOne({
@@ -29,12 +30,22 @@ const updateCategory = async (req, res) => {
       return res.status(400).json({ message: `Category name "${updatedData.categoryName}" already exists.` });
     }
 
+    const highestOffer = await Product.find({ categoryId })
+      .sort({ "offer.discountPercentage": -1 }) // Sort by highest discount
+      .limit(1)
+      .select("offer");
+
+    // Get the offer details (default to 0% if no products found)
+    const categoryOffer = highestOffer.length > 0 ? highestOffer[0].offer : { discountPercentage: 0, isActive: false };
+
+  console.log('offr',categoryOffer)
     const updatedCategory = await Category.findByIdAndUpdate(
       categoryId,
       {
         $set: {
           categoryName: updatedData.categoryName,
           description: updatedData.description,
+          offer :categoryOffer
         },
       },
       { new: true }

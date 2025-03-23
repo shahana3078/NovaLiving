@@ -68,15 +68,13 @@ const getProductPage = async (req, res) => {
 };
 
 
-
-
-//UNLIST PRODUCT
+//EDIT PRODUCT
 const editProduct = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const { productName, productCategory, productPrice, productStock, productDescription, existingImages } = req.body;
-
+    const { productName, productCategory, productPrice, productStock,productDescription, existingImages,offerDiscount } = req.body;
+ 
     let images = existingImages ? JSON.parse(existingImages) : [];
 
   
@@ -93,6 +91,10 @@ const editProduct = async (req, res) => {
         price: productPrice,
         stock: productStock,
         category: productCategory,
+        offer: {
+          discountPercentage: Number(offerDiscount) || 0, 
+          isActive: Number(offerDiscount) > 0, 
+        },
         images: images, 
       },
       { new: true }

@@ -370,6 +370,8 @@
                     data-stock="<%= product.stock %>"
                     data-images="<%= product.images.join(',') %>"
                     data-category="<%= product.category %>"
+                    data-offer='<%= JSON.stringify(product.offer) %>'
+
                   >
                     Edit
                   </button>
@@ -444,6 +446,7 @@
                   <% categories.forEach(category => { %>
                   <option value="<%= category.categoryName %>">
                     <%= category.categoryName %>
+                   
                   </option>
                   <% }); %>
                 </select>
@@ -458,7 +461,7 @@
                   class="form-control"
                   required
                 />
-              </div>
+              </div> 
 
               <!-- Product Stock -->
               <div class="mb-3">
@@ -468,6 +471,18 @@
                   id="editProductStock"
                   class="form-control"
                   required
+                />
+              </div>
+
+              <div class="mb-3">
+                <label for="editProductOffer" class="form-label">Offer (%)</label>
+                <input
+                  type="number"
+                  id="editProductOffer"
+                  class="form-control"
+                  min="0"
+                  max="100"
+                  placeholder="Enter discount percentage"
                 />
               </div>
 

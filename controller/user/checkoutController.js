@@ -3,6 +3,7 @@ const Cart = require("../../Models/cartModel");
 const Product = require("../../Models/productModel");
 const Address = require("../../Models/addressModel");
 const Order = require("../../Models/orderModel");
+const Wallet=require('../../Models/walletModel')
 const crypto = require("crypto");
 
 
@@ -13,7 +14,8 @@ const getCheckout = async (req, res) => {
     const addresses = await Address.find();
 
     const cart = await Cart.findOne({ userId }).populate("items.productId");
-
+    const wallet=await Wallet.findOne({userId})
+ 
     let totalPrice = 0;
     let cartItems = [];
 
@@ -47,7 +49,10 @@ const getCheckout = async (req, res) => {
       addresses,
       cartItems,
       totalPrice,
-    });
+      wallet,
+    
+    
+            });
   } catch (err) {
     console.error("Error loading checkout page:", err);
     res.status(500).send("Server error while loading the checkout page.");
@@ -78,7 +83,8 @@ const updatePaymentMethod = async (req, res) => {
       res.status(500).json({ success: false, message: "Server error." });
   }
 };
-// Razorpay Order Creation
+
+
 const razorPayCreateOrder = async (req, res) => {
   const razorpay = new Razorpay({
       key_id: process.env.RAZORPAY_KEY_ID,
@@ -115,7 +121,6 @@ const razorPayCreateOrder = async (req, res) => {
   }
 };
 
-// Payment Verification
 const confirmPaymentRazorPay = (req, res) => {
   const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
   const body = razorpay_order_id + "|" + razorpay_payment_id;
@@ -131,55 +136,6 @@ const confirmPaymentRazorPay = (req, res) => {
 
   res.status(400).json({ success: false, message: "Payment verification failed." });
 };
-
-// const placeOrder = async (req, res) => {
-//   try {
-//     const { addressId,paymentMethod,razorpay_payment_id, razorpay_order_id, razorpay_signature } = req.body;
-//     const userId = req.session.userId;
-//     const cart = await Cart.findOne({ userId }).populate("items.productId");
-//     if (!cart || cart.items.length === 0) {
-//       return res.status(400).send("Cart is empty");
-//     }
-//     let subtotal = 0;
-//     const orderItems = cart.items.map((item) => {
-//       subtotal += item.quantity * item.productId.price;
-//       return {
-//         productId: item.productId._id,
-//         name: item.productId.name,
-//         price: item.productId.price,
-//         quantity: item.quantity,
-  
-//       };
-//     });
-  
-
-    
-//     const shippingCharge = 50;
-//     const grandTotal = subtotal + shippingCharge;
-
-//     const order = new Order({
-//       userId,
-//       addressId: addressId,
-//       items: orderItems,
-//       subtotal,
-//       shippingCharge,
-//       grandTotal,
-//       paymentMethod,
-//       orderDate: Date.now(),
-//       status: "Pending",
-//     });
-
-
-//     if(paymentMethod=='razorpay')
-//     await order.save();
-//     await Cart.updateOne({ userId }, { $set: { items: [] } });
-
-//     res.json({ message: "Order placed successfully" });
-//   } catch (error) {
-//     console.error("Error placing order:", error);
-//     res.status(500).send("Internal server error");
-//   }
-// };
 
 
 const placeOrder = async (req, res) => {
@@ -206,7 +162,24 @@ const placeOrder = async (req, res) => {
     const shippingCharge = 50;
     const grandTotal = subtotal + shippingCharge;
 
-    // Verify Razorpay Payment if selected
+
+    if (paymentMethod === 'wallet') {
+      const wallet = await Wallet.findOne({ userId });
+
+      if (!wallet || wallet.balance < grandTotal) {
+        return res.status(400).json({ success: false, message: "Insufficient wallet balance." });
+      }
+
+      // Deduct balance
+      wallet.balance -= grandTotal;
+      wallet.transactions.push({
+        amount: grandTotal,
+        type: "debit",
+        description: "Order Payment"
+      });
+
+      await wallet.save();
+    }
     if (paymentMethod === 'razorpay') {
       const body = razorpay_order_id + "|" + razorpay_payment_id;
       const expectedSignature = crypto

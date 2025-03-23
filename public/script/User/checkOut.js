@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 //payment
-let selectedMethod = "cod";
+let selectedMethod = "cash on delivery";
 
 function showPaymentOptions() {
     document.getElementById('selectedPayment').style.display = 'none';
@@ -54,8 +54,11 @@ function showPaymentOptions() {
 }
 
 function selectPayment(method) {
-    selectedMethod = method;
+ 
 
+    selectedMethod = method;
+ 
+   
     document.querySelectorAll('.payment-option').forEach(option => {
         const radioInput = option.querySelector(`input[id="${method}"]`);
         if (radioInput) {
@@ -90,71 +93,6 @@ function confirmPayment() {
 
 
 //place order
-// function placeOrder() {
-//   const data = {
-//     addressId
-//   }
-//   if(!addressId) {
-//     return showMessage('Please select a address', 'danger');
-//   }
-//   if (selectedMethod === 'razorpay') {
-//     fetch('/create-razorpay-order', {
-//         method: 'POST',
-//         headers: { 'Content-Type': 'application/json' },
-//         body: JSON.stringify({})
-//     })
-//     .then(response => response.json())
-//     .then(order => {
-//         const options = {
-//             key: 'rzp_test_29wLZVOKsQCqZx',
-//             amount: order.amount,
-//             currency: 'INR',
-//             order_id: order.id,
-//             name: "NovaLiving",
-//             description: "Order Payment",
-//             handler: function (response) {
-//                 fetch('/place-order', {
-//                     method: 'POST',
-//                     headers: { 'Content-Type': 'application/json' },
-//                     body: JSON.stringify({ 
-//                         paymentMethod: selectedMethod, 
-                        
-                 
-//                     })
-//                 })
-//                 console.log(alert(response.razorpay_payment_id))
-//                 alert(response.razorpay_order_id)
-//                 alert(response.razorpay_signature)
-//                 .then(response => response.json())
-//                 .then(data => {
-//                     if (data.success) {
-//                         document.getElementById('paymentOptions').style.display = 'none';
-//                         document.getElementById('selectedPayment').innerHTML = `<strong>${getPaymentMethodText(selectedMethod)}</strong>`;
-//                         document.getElementById('selectedPayment').style.display = 'block';
-//                     } else {
-//                         alert(data.message);
-//                     }
-//                 });
-//             }
-//         };
-
-//         const rzp1 = new Razorpay(options);
-//         rzp1.open();
-//     })
-//     .catch(error => console.error('Error:', error));
-// } 
-
-
-
-//   axios.post('/place-order', data)
-//     .then((response) => {
-//       window.location.href = '/order-confirmed'; 
-//     })
-//     .catch((error) => {
-//       console.error('Error placing order:', error);
-//       alert('An error occurred while placing your order. Please try again.');
-//     });
-// }
 
 function placeOrder() {
   if (!addressId) {
@@ -191,7 +129,7 @@ function placeOrder() {
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        window.location.href = '/order-confirmed';  // ✅ Redirect after successful order
+                        window.location.href = '/order-confirmed';
                     } else {
                         alert(data.message);
                     }
@@ -204,8 +142,7 @@ function placeOrder() {
         rzp1.open();
     })
     .catch(error => console.error('Error:', error));
-  } else {
-    // For COD or Wallet payment
+  }else {
     axios.post('/place-order', { addressId, paymentMethod: selectedMethod })
       .then(response => {
         window.location.href = '/order-confirmed'; 

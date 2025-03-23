@@ -104,7 +104,10 @@
                                     <button class="btn btn-warning btn-sm editBtn" 
                                         data-id="<%= cat._id %>" 
                                         data-name="<%= cat.categoryName %>"
-                                         data-description="<%= cat.description %>">
+                                         data-description="<%= cat.description %>"
+                                         data-offer="<%= cat.offer %>"
+                                         >
+                                         
                                          Edit
                                         </button>
 
@@ -157,6 +160,11 @@
                   <textarea class="form-control" id="editCategoryDescription" required></textarea>
                   <small class="text-danger" id="editCategoryDescriptionError" style="display: none;">Description cannot be empty or whitespace.</small>
                 </div>
+                <div class="form-group">
+                    <label for="editCategoryOffer">Offer</label>
+                    <input type="text" class="form-control" id="editCategoryOffer" required>
+                    <small class="text-danger" id="editCategoryOffer" style="display: none;">Category offer cannot be empty or whitespace.</small>
+                  </div>
                 <button type="submit" class="btn btn-success">Save Changes</button>
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
               </form>

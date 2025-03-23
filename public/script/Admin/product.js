@@ -29,6 +29,8 @@ document.querySelectorAll(".editBtn").forEach(button => {
     const productStock = this.dataset.stock;
     const productCategory = this.dataset.category;
     const productImages = this.dataset.images ? this.dataset.images.split(",") : [];
+    const productOffer = this.dataset.offer ? JSON.parse(this.dataset.offer) : { discountPercentage: 0 };
+    
 
     document.getElementById("editProductId").value = productId || "";
     document.getElementById("editProductName").value = productName || "";
@@ -36,6 +38,13 @@ document.querySelectorAll(".editBtn").forEach(button => {
     document.getElementById("editProductPrice").value = productPrice || "";
     document.getElementById("editProductStock").value = productStock || "";
     document.getElementById("editProductCategory").value = productCategory || "";
+    document.getElementById("editProductOffer").value = productOffer.discountPercentage ;
+   
+
+
+    console.log('product offer:',productOffer)
+    
+   
 
     const existingImagesContainer = document.getElementById("existingImagesContainer");
     existingImagesContainer.innerHTML = ""; 
@@ -105,6 +114,7 @@ document.querySelectorAll(".editBtn").forEach(button => {
     formData.append("productPrice", document.getElementById("editProductPrice").value);
     formData.append("productStock", document.getElementById("editProductStock").value);
     formData.append("productDescription", document.getElementById("editProductDescription").value);
+    formData.append("offerDiscount", document.getElementById("editProductOffer").value);
   
     const existingImages = Array.from(
       document.querySelectorAll("#existingImagesContainer img")

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin-Offer </title>
+      <!-- CSS Links -->
+      <link rel="stylesheet" href="/assets/vendors/css/vendor.bundle.base.css">
+      <link rel="stylesheet" href="/Admin/vendors/jvectormap/jquery-jvectormap.css">
+      <link rel="stylesheet" href="/Admin/assets/vendors/flag-icon-css/css/flag-icon.min.css">
+      <link rel="stylesheet" href="/Admin/assets/vendors/owl-carousel-2/owl.carousel.min.css">
+      <link rel="stylesheet" href="/Admin/assets/vendors/owl-carousel-2/owl.theme.default.min.css">
+      <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+      <!-- Custom Admin Layout Styles -->
+      <link rel="stylesheet" href="/Admin/css/admin.css">
+      <!-- Font Awesome CDN -->
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+      <link rel="shortcut icon" href="assets/images/favicon.png" />
+  
+</head>
+<style>
+    h1 { color: #f8f9fa; text-align: center; margin: 20px 0; font-size: 2.5rem; padding-top: 20px; }
+</style>
+<body>
+  <div class="container-scroller">
+    <%- include('./Partials/sideBar'); %>
+
+    <div class="container-fluid page-body-wrapper">
+      <%- include('./Partials/navBar'); %>
+
+      <div class="container mt-4">
+        <h1>Offer Management</h1>
+
+
+        <div class="col-12 grid-margin">
+          <div class="card">
+            <div class="card-body">
+              <button id="add-form-btn" type="button" class="btn btn-success btn-rounded btn-fw mb-2" data-toggle="modal" data-target="#offerModal">
+                + Add Offer
+            </button>
+            
+              <div class="table-responsive">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>SI.No</th>
+                      <th>Offer Title</th>
+                      <th>Offer Type</th>
+                      <th>Offer</th>
+                      <th>Discount</th>
+                      <th>Expires</th>
+                      <td>Action</td>
+                    </tr>
+                  </thead>
+                  <tbody id="t-body">
+
+                    <% offers.forEach((offer, ind) => { %>
+    
+                      <tr>
+                        <td class="si-no"><%= ind + 1 %></td>
+                        <td><%= offer.offerTitle %></td>
+                        <td><%= offer.offerType %></td>
+    
+                        <td>
+                          <%- offer.offerAvailable.map(item => item).join('<br>') %>
+                        </td>
+    
+                        <td><%= offer.discountercentage %>%</td>
+                        <td><%= new Date(offer.expDate).toLocaleDateString('en-GB') %></td>
+                        <td>
+                          <% if(offer.isDeleted){ %>
+                            <button id="action-btn" type="button" value="<%= offer._id %>" class="btn btn-outline-success">Activate</button>
+                            
+                          <% }else{ %>
+                            <button id="action-btn" type="button" value="<%= offer._id %>" class="btn btn-outline-danger ">Deactivate</button>
+                            <% } %>
+                        </td>
+                      </tr>
+    
+                    <% }) %>
+                    
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="offerModal" tabindex="-1" aria-labelledby="offerModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title" id="offerModalLabel">Add New Offer</h5>
+              <button type="button"  style="color: red;" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+          </div>
+          <div class="modal-body">
+              <form id="offerForm">
+                  <div class="mb-3">
+                      <label for="offerTitle" class="form-label">Offer Title</label>
+                      <input type="text" class="form-control" id="offerTitle" required>
+                  </div>
+                  <div class="mb-3">
+                      <label for="offerType" class="form-label">Offer Type</label>
+                      <select class="form-control" id="offerType" required>
+                          <option value="Category">Category</option>
+                          <option value="Product">Product</option>
+                      </select>
+                  </div>
+                  <div class="mb-3">
+                      <label for="offerValue" class="form-label">Offer</label>
+                      <input type="text" class="form-control" id="offerValue" required>
+                  </div>
+                  <div class="mb-3">
+                      <label for="discount" class="form-label">Discount</label>
+                      <input type="text" class="form-control" id="discount" required>
+                  </div>
+                  <div class="mb-3">
+                      <label for="expires" class="form-label">Expires</label>
+                      <input type="date" class="form-control" id="expires" required>
+                  </div>
+                  <button type="submit" class="btn btn-primary">Save Offer</button>
+              </form>
+          </div>
+      </div>
+  </div>
+</div>
+
+
+
+
+ 
+
+ <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+ <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+ <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script> 
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.7/axios.min.js" defer></script>
+ <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+ <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+ <script src="/script/Admin/offers.js"></script>
+ 
+ 
+</body>
+</html>
+

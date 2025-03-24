@@ -43,7 +43,6 @@ const updateCategory = async (req, res) => {
     : highestOfferProduct?.offer || { discountPercentage: 0, isActive: false };
   
 
-  // 🔹 **Ensure discount percentage is valid**
   if (categoryOffer.discountPercentage < 0 || categoryOffer.discountPercentage > 100) {
     categoryOffer = { discountPercentage: 0, isActive: false };
   }
@@ -52,10 +51,9 @@ const updateCategory = async (req, res) => {
       {
         $set: {
           categoryName: updatedData.categoryName,
-          description: updatedData.description,
           offer: {
-            discountPercentage: categoryOffer.discountPercentage, // ✅ Correct way
-            isActive: categoryOffer.isActive, // ✅ Correct way
+            discountPercentage: categoryOffer.discountPercentage, 
+            isActive: categoryOffer.isActive, 
           },
         },
       },
@@ -165,11 +163,37 @@ const undoDelete = async (req, res) => {
 };
 
 
+const toggleCategoryOffer = async (req, res) => {
+  try {
+    const { categoryId } = req.params;
+    const { isActive } = req.body;
+
+    const category = await Category.findById(categoryId);
+    if (!category) {
+      return res.status(404).json({ success: false, message: "Category not found" });
+    }
+
+    category.offer.isActive = isActive;
+    await category.save();
+
+    await Product.updateMany(
+      { categoryId: categoryId }, 
+      { $set: { "offer.isActive": isActive, "offer.discountPercentage": category.offer.discountPercentage } }
+    );
+    res.json({ success: true, message: "Category offer updated successfully" });
+  } catch (error) {
+    console.error("Error updating category offer:", error);
+    res.status(500).json({ success: false, message: "Error updating category offer" });
+  }
+};
+
+
 module.exports = {
   getCategories,
   addOrUpdateCategory,
   deleteCategory,
   undoDelete,
   updateCategory,
+  toggleCategoryOffer
 
 };

@@ -10,14 +10,12 @@ async function fetchCategories() {
 
 
 
-
 document.addEventListener("DOMContentLoaded", function () {
   document.querySelectorAll(".editBtn").forEach((button) => {
     button.addEventListener("click", function () {
       const category = {
         id: this.getAttribute("data-id"),
         name: this.getAttribute("data-name"),
-        description: this.getAttribute("data-description"),
         offer: JSON.parse(this.getAttribute("data-offer") || '{"discountPercentage":0,"isActive":false}'),  
       };
      
@@ -30,16 +28,16 @@ document.addEventListener("DOMContentLoaded", function () {
     editCategoryForm.setAttribute("data-id", category.id);
 
     document.getElementById("editCategoryName").value = category.name;
-    document.getElementById("editCategoryDescription").value =
-      category.description;
+
       document.getElementById("editCategoryOffer").value = category.offer.discountPercentage || 0;
 
     hideValidationError("editCategoryName");
-    hideValidationError("editCategoryDescription");
+
     hideValidationError("editCategoryOffer");
 
     $("#editModal").modal("show");
   }
+
 
   document
     .getElementById("editCategoryForm")
@@ -49,9 +47,6 @@ document.addEventListener("DOMContentLoaded", function () {
       const id = this.getAttribute("data-id");
       const categoryName = document
         .getElementById("editCategoryName")
-        .value.trim();
-      const categoryDescription = document
-        .getElementById("editCategoryDescription")
         .value.trim();
 
         const categoryOffer = parseFloat(document
@@ -70,16 +65,6 @@ document.addEventListener("DOMContentLoaded", function () {
       }
 
 
-      if (!categoryDescription) {
-        showValidationError(
-          "editCategoryDescription",
-          "Category description cannot be empty or whitespace."
-        );
-        isValid = false;
-      } else {
-        hideValidationError("editCategoryDescription");
-      }
-
       if (categoryOffer < 0 || categoryOffer > 100) {
         showValidationError("editCategoryOffer", "Offer must be between 0 and 100.");
         isValid = false;
@@ -90,7 +75,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       const updatedCategory = {
         categoryName: categoryName,
-        description: categoryDescription,
+       
         offer: {
           discountPercentage: categoryOffer,
           isActive: categoryOffer > 0
@@ -103,17 +88,16 @@ document.addEventListener("DOMContentLoaded", function () {
           updatedCategory
         );
 
-
+     
         const row = document.querySelector(`[data-id="${id}"]`);
         if (row) {
           row.querySelector(".categoryName").textContent =
             response.data.categoryName;
-          row.querySelector(".categoryDescription").textContent =
-            response.data.description;
+
           
         
         }
-        
+        location.reload()
 
         $("#editModal").modal("hide");
         showMessage("Category updated successfully", "success");
@@ -137,11 +121,30 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
+document.addEventListener("DOMContentLoaded", function () {
+  document.querySelectorAll(".toggle-offer").forEach((button) => {
+    button.addEventListener("click", function () {
+      let categoryId = this.getAttribute("data-id");
+      let newStatus = this.getAttribute("data-active") === "true";
+
+      axios.post(`/admin/toggle-category-offer/${categoryId}`, { isActive: newStatus })
+        .then(response => {
+          if (response.data.success) {
+            location.reload(); 
+          }
+        })
+        .catch(error => {
+          console.error("Error updating category offer:", error);
+        });
+    });
+  });
+});
+
+
 document.getElementById("categoryForm").addEventListener("submit", async function (e) {
   e.preventDefault();
 
   const categoryName = document.getElementById("categoryName").value.trim();
-  const categoryDescription = document.getElementById("categoryDescription").value.trim();
   let categoryOffer=document.getElementById('categoryOffer').value.trim()
   let isValid = true;
 
@@ -159,7 +162,7 @@ document.getElementById("categoryForm").addEventListener("submit", async functio
     hideValidationError("categoryDescription");
   }
 
-  categoryOffer = parseFloat(categoryOffer) || 0; // Ensure it's a number
+  categoryOffer = parseFloat(categoryOffer) || 0;
   if (categoryOffer < 0 || categoryOffer > 100) {
     showValidationError("categoryOffer", "Discount must be between 0 and 100.");
     isValid = false;
@@ -171,10 +174,9 @@ document.getElementById("categoryForm").addEventListener("submit", async functio
 
   const categoryData = {
     name: categoryName,
-    description: categoryDescription,
     offer: {
-      discountPercentage: categoryOffer,  // Send offer as an object
-      isActive: categoryOffer > 0,       // Set isActive true if offer > 0
+      discountPercentage: categoryOffer, 
+      isActive: categoryOffer > 0,       
     },
   };
   console.log('catgory data',categoryData)

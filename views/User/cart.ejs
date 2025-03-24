@@ -5,28 +5,34 @@
 * Template URI: https://untree.co/
 * License: https://creativecommons.org/licenses/by/3.0/
 */ -->
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="author" content="Untree.co">
-  <link rel="shortcut icon" href="favicon.png">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <meta name="author" content="Untree.co" />
+    <link rel="shortcut icon" href="favicon.png" />
 
-  <meta name="description" content="" />
-  <meta name="keywords" content="bootstrap, bootstrap4" />
+    <meta name="description" content="" />
+    <meta name="keywords" content="bootstrap, bootstrap4" />
 
-		<!-- Bootstrap CSS -->
-		<link href="css/bootstrap.min.css" rel="stylesheet">
-		<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-		<link href="css/tiny-slider.css" rel="stylesheet">
-		<link href="css/style.css" rel="stylesheet">
-		<title>Cart </title>
-	</head>
+    <!-- Bootstrap CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet" />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link href="css/tiny-slider.css" rel="stylesheet" />
+    <link href="css/style.css" rel="stylesheet" />
+    <title>Cart</title>
+  </head>
 
-	<body>
-<style>
-	.empty-cart-container {
+  <body>
+    <style>
+      .empty-cart-container {
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -37,37 +43,47 @@
         border-radius: 12px;
         padding: 40px;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    }
+      }
 
-    .cart-icon {
+      .cart-icon {
         font-size: 80px;
         color: #ff9800;
         animation: shake 1.5s infinite;
-    }
+      }
 
-    @keyframes shake {
-        0% { transform: translateX(0); }
-        25% { transform: translateX(-5px); }
-        50% { transform: translateX(5px); }
-        75% { transform: translateX(-5px); }
-        100% { transform: translateX(0); }
-    }
+      @keyframes shake {
+        0% {
+          transform: translateX(0);
+        }
+        25% {
+          transform: translateX(-5px);
+        }
+        50% {
+          transform: translateX(5px);
+        }
+        75% {
+          transform: translateX(-5px);
+        }
+        100% {
+          transform: translateX(0);
+        }
+      }
 
-    .empty-cart-container h2 {
+      .empty-cart-container h2 {
         color: #333;
         margin-top: 15px;
         font-weight: bold;
-    }
+      }
 
-    .empty-cart-container p {
+      .empty-cart-container p {
         color: #666;
         margin: 5px 0;
         font-size: 14px;
-    }
+      }
 
-    .btn-shop-now {
+      .btn-shop-now {
         margin-top: 20px;
-        background-color: #12100b;;
+        background-color: #12100b;
         color: #fff;
         padding: 10px 20px;
         border: none;
@@ -75,183 +91,240 @@
         text-decoration: none;
         transition: background-color 0.3s ease;
         cursor: pointer;
-    }
+      }
 
-    .btn-shop-now:hover {
+      .btn-shop-now:hover {
         background-color: #e68900;
-    }
-</style>
-		<!-- Start Header/Navigation -->
+      }
+    </style>
+    <!-- Start Header/Navigation -->
 
-		<%- include('partials/navBar') %>
+    <%- include('partials/navBar') %>
 
-		<!-- End Header/Navigation -->
+    <!-- End Header/Navigation -->
 
-		<!-- Start Hero Section -->
-			<div class="hero">
-				<div class="container">
-					<div class="row justify-content-between">
-						<div class="col-lg-5">
-							<div class="intro-excerpt">
-								<h1>Cart</h1>
-							</div>
-						</div>
-						<div class="col-lg-7">
-							
-						</div>
-					</div>
-				</div>
-			</div>
-		<!-- End Hero Section -->
+    <!-- Start Hero Section -->
+    <div class="hero">
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col-lg-5">
+            <div class="intro-excerpt">
+              <h1>Cart</h1>
+            </div>
+          </div>
+          <div class="col-lg-7"></div>
+        </div>
+      </div>
+    </div>
+    <!-- End Hero Section -->
 
-		
+    <div class="untree_co-section before-footer-section">
+      <div class="container">
+        <div class="row mb-5">
+          <!-- Left: Product Table -->
+          <% if (items.length > 0) { %>
+          <div class="col-md-9">
+            <form method="post">
+              <div class="site-blocks-table">
+                <table
+                  class="table"
+                  style="
+                    background-color: white;
+                    border-radius: 8px;
+                    overflow: hidden;
+                  "
+                >
+                  <thead>
+                    <tr style="background-color: #ddd; color: white">
+                      <th class="product-thumbnail">Image</th>
+                      <th class="product-name">Product</th>
+                      <th class="product-price">Price</th>
+                      <th class="product-quantity">Quantity</th>
+                      <th class="product-total">Total</th>
+                      <th class="product-remove">Remove</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% items.forEach(item => { %>
+                    <tr
+                      id="cart-item-<%= item.productId %>"
+                      style="border-bottom: 1px solid #ddd"
+                    >
+                      <!-- Product Image -->
+                      <td class="product-thumbnail">
+                        <img
+                          src="/uploads/images/<%= item.image %>"
+                          alt="<%= item.image %>"
+                          class="img-fluid"
+                          style="width: 100px; height: auto"
+                        />
+                      </td>
+                      <!-- Product Name -->
 
-		<div class="untree_co-section before-footer-section ">
-			<div class="container">
-				<div class="row mb-5">
-					<!-- Left: Product Table -->
-					<% if (items.length > 0) { %>
-					<div class="col-md-9">
-						<form method="post">
-							<div class="site-blocks-table">
-								<table class="table" style="background-color: white; border-radius: 8px; overflow: hidden;">
-									<thead>
-										<tr style="background-color: #ddd; color: white;">
-											<th class="product-thumbnail">Image</th>
-											<th class="product-name">Product</th>
-											<th class="product-price">Price</th>
-											<th class="product-quantity">Quantity</th>
-											<th class="product-total">Total</th>
-											<th class="product-remove">Remove</th>
-										</tr>
-									</thead>
-									<tbody>
-						
-										
-									
-											<% items.forEach(item => { %>
-													<tr id="cart-item-<%= item.productId %>" style="border-bottom: 1px solid #ddd;">
-															<!-- Product Image -->
-															<td class="product-thumbnail">
-																	<img src="/uploads/images/<%= item.image %>" alt="<%= item.image %>" class="img-fluid" style="width: 100px; height: auto;"/>
-															</td>
-															<!-- Product Name -->
+                      <td class="product-name">
+                        <h2
+                          class="h5 text-black"
+                          style="font-size: 14px; color: #333"
+                        >
+                          <a
+                            href="/product/details/<%= item.productId %>"
+                            style="text-decoration: underline; color: inherit"
+                          >
+                            <%= item.name %>
+                          </a>
+                        </h2>
+                      </td>
 
-															<td class="product-name">
-																<h2 class="h5 text-black" style="font-size: 14px; color: #333;">
-																		<a href="/product/details/<%= item.productId %>" style="text-decoration: underline; color: inherit;">
-																				<%= item.name %>
-																		</a>
-																</h2>
-														</td>
-														
-															<!-- Product Price -->
-															<td class="product-price" style="font-size: 14px; color: #333;">
-																	₹<%= item.price %>
-															</td>
-															<!-- Product Quantity -->
-															<td class="product-quantity">
-																<div class="input-group mb-3 d-flex align-items-center quantity-container" style="max-width: 120px;">
-																		<div class="input-group-prepend">
-																				<button
-																						class="btn btn-outline-secondary decrease"
-																						style="color: rgb(176, 9, 9);"
-																						type="button"
-																						onclick="updateQuantity('<%= item.productId %>', 'decrement')"
-																				>
-																						&minus;
-																				</button>
-																		</div>
-																		<input
-																				type="text"
-																				class="form-control text-center quantity-amount"
-																				data-product-id="<%= item.productId %>"
-																				value="<%= item.quantity %>"
-																				aria-label="Example text with button addon"
-																				aria-describedby="button-addon1"
-																				style="font-size: 14px;"
-																		/>
-																		<div class="input-group-append">
-																				<button
-																						class="btn btn-outline-secondary increase"
-																						type="button"
-																						onclick="updateQuantity('<%= item.productId %>', 'increment')"
-																				>
-																						&plus;
-																				</button>
-																		</div>
-																</div>
-														</td>
-														
-															<!-- Product Total -->
-															<td class="product-total" style="font-size: 14px; color: #333;">
-																	₹<%= item.total %>
-															</td>
-															
-															<td class="product-remove">
-				
-																<button type="button" class="remove-item-button btn btn-sm" onclick="removeProduct('<%=item.productId%>')">
-																		<i class="fa-solid fa-trash" style="color: rgb(204, 49, 49);"></i>
-																</button>
-														</td>
-												
-													</tr>
-											<% }) %>
+          
+                      <!-- Product Price -->
+											<td class="product-price" style="font-size: 14px; color: #333;">
+												<% if (item.originalPrice > item.price) { %>
+													<span style="text-decoration: line-through; color: gray;">₹<%= item.originalPrice.toFixed(2) %></span>
+													<span style="color: #d9534f;"> ₹<%= item.price.toFixed(2) %></span>
+												<% } else { %>
+													₹<%= item.originalPrice.toFixed(2) %>
+												<% } %>
+											</td>
 
-									<% } else { %>
-											<tr>
-												<div class="empty-cart-container">
-													<div class="cart-icon">
-															<i class="fa-solid fa-cart-arrow-down"></i>
-													</div>
-													<h2>Your Cart is Empty!</h2>
-													<p>Oops! Looks like you haven’t added anything yet 🛒</p>
-													<p>Start filling your cart with amazing products!</p>
-											
-													<a href="/shop" class="btn-shop-now">Shop Now</a>
-											</div>
-											</tr>
-										
-											
-									<% } %>
-									
-												
-									</tbody>
-								</table>
-							</div>
-						</form>
-					</div>
-		
-					<!-- Right: Checkout Box -->
-					<div class="col-md-3">
+                      <!-- Product Quantity -->
+                      <td class="product-quantity">
+                        <div
+                          class="input-group mb-3 d-flex align-items-center quantity-container"
+                          style="max-width: 120px"
+                        >
+                          <div class="input-group-prepend">
+                            <button
+                              class="btn btn-outline-secondary decrease"
+                              style="color: rgb(176, 9, 9)"
+                              type="button"
+                              onclick="updateQuantity('<%= item.productId %>', 'decrement')"
+                            >
+                              &minus;
+                            </button>
+                          </div>
+                          <input
+                            type="text"
+                            class="form-control text-center quantity-amount"
+                            data-product-id="<%= item.productId %>"
+                            value="<%= item.quantity %>"
+                            aria-label="Example text with button addon"
+                            aria-describedby="button-addon1"
+                            style="font-size: 14px"
+                          />
+                          <div class="input-group-append">
+                            <button
+                              class="btn btn-outline-secondary increase"
+                              type="button"
+                              onclick="updateQuantity('<%= item.productId %>', 'increment')"
+                            >
+                              &plus;
+                            </button>
+                          </div>
+                        </div>
+                      </td>
 
-						<% if (items.length>0) { %>
-							<div class="checkout-box" style="background-color: white; padding: 20px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
-								<h3 style="font-size: 16px; color: #333; margin-bottom: 15px;">Checkout</h3>
-								<hr style="margin-bottom: 15px;"/>
-								<div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-									<span style="font-size: 14px; color: #666;">Total Price:</span>
-									<span style="font-size: 14px; color: #333;">₹<%= totalPrice %></span>
-								</div>
-								<hr style="margin-bottom: 20px;"/>
-								<button onclick="proceedToCheckout()" style="width: 100%; padding: 12px; background-color: #3B5D50; color: #fff; border: none; border-radius: 5px; font-size: 16px; cursor: pointer;">
-									Proceed to Checkout →
-								</button>
-							</div>
-						<% } %>
-					</div>
-				</div>
-			</div>
-		</div>
-		<%- include('partials/footer') %>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
-		<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+                      <!-- Product Total -->
+                      <td
+                        class="product-total"
+                        style="font-size: 14px; color: #333"
+                      >
+                        ₹<%= item.total %>
+                      </td>
 
+                      <td class="product-remove">
+                        <button
+                          type="button"
+                          class="remove-item-button btn btn-sm"
+                          onclick="removeProduct('<%=item.productId%>')"
+                        >
+                          <i
+                            class="fa-solid fa-trash"
+                            style="color: rgb(204, 49, 49)"
+                          ></i>
+                        </button>
+                      </td>
+                    </tr>
+                    <% }) %> <% } else { %>
+                    <tr>
+                      <div class="empty-cart-container">
+                        <div class="cart-icon">
+                          <i class="fa-solid fa-cart-arrow-down"></i>
+                        </div>
+                        <h2>Your Cart is Empty!</h2>
+                        <p>
+                          Oops! Looks like you haven’t added anything yet 🛒
+                        </p>
+                        <p>Start filling your cart with amazing products!</p>
 
-		<script src="js/bootstrap.bundle.min.js"></script>
-		<script src="js/tiny-slider.js"></script>
-		<script src="js/custom.js"></script>
-		<script src="/script/User/cart.js"></script>
-	</body>
+                        <a href="/shop" class="btn-shop-now">Shop Now</a>
+                      </div>
+                    </tr>
 
+                    <% } %>
+                  </tbody>
+                </table>
+              </div>
+            </form>
+          </div>
+
+          <!-- Right: Checkout Box -->
+          <div class="col-md-3">
+            <% if (items.length>0) { %>
+            <div
+              class="checkout-box"
+              style="
+                background-color: white;
+                padding: 20px;
+                border: 1px solid #ddd;
+                border-radius: 8px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+              "
+            >
+              <h3 style="font-size: 16px; color: #333; margin-bottom: 15px">
+                Checkout
+              </h3>
+              <hr style="margin-bottom: 15px" />
+              <div
+                style="
+                  display: flex;
+                  justify-content: space-between;
+                  margin-bottom: 10px;
+                "
+              >
+                <span style="font-size: 14px; color: #666">Total Price:</span>
+                <span style="font-size: 14px; color: #333"
+                  >₹<%= totalPrice %></span
+                >
+              </div>
+              <hr style="margin-bottom: 20px" />
+              <button
+                onclick="proceedToCheckout()"
+                style="
+                  width: 100%;
+                  padding: 12px;
+                  background-color: #3b5d50;
+                  color: #fff;
+                  border: none;
+                  border-radius: 5px;
+                  font-size: 16px;
+                  cursor: pointer;
+                "
+              >
+                Proceed to Checkout →
+              </button>
+            </div>
+            <% } %>
+          </div>
+        </div>
+      </div>
+    </div>
+    <%- include('partials/footer') %>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    <script src="js/bootstrap.bundle.min.js"></script>
+    <script src="js/tiny-slider.js"></script>
+    <script src="js/custom.js"></script>
+    <script src="/script/User/cart.js"></script>
+  </body>
 </html>

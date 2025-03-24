@@ -71,11 +71,7 @@
                         <small class="text-danger" id="categoryNameError" style="display: none;">Category name cannot be empty or whitespace.</small>
                         <small class="text-danger" id="categoryExistsError" style="display: none;">Category name already exists.</small>
                     </div>
-                    <div class="form-group">
-                        <label for="categoryDescription">Category Description</label>
-                        <textarea class="form-control" id="categoryDescription" required></textarea>
-                        <small class="text-danger" id="categoryDescriptionError" style="display: none;">Category description cannot be empty or whitespace.</small>
-                    </div>
+                    
                     <div class="form-group">
                         <label for="categoryOffer">Offer (%)</label>
                         <input type="number" class="form-control" id="categoryOffer" required min="0" max="100">
@@ -96,7 +92,6 @@
                         <tr>
                             <th>S.No.</th>
                             <th>Category Name</th>
-                            <th>Description</th>
                             <th>offer</th>
                             <th>Actions</th>
 
@@ -107,8 +102,21 @@
                             <tr data-id="<%= cat._id %>">
                                 <td><%= index + 1 %></td>
                                 <td class="categoryName"><%= cat.categoryName %></td>
-                                <td class="categoryDescription wrap-text"><%= cat.description %></td>
-                                <td class="categoryOffer"><%= cat.offer.discountPercentage %>%</td>
+                               
+                                <td>  
+                                    <% if (cat.offer.discountPercentage > 0) { %>
+                                      <%= cat.offer.discountPercentage %>% 
+                                      <div>
+                                        <% if (cat.offer.isActive) { %>
+                                          <button type="button" class="btn btn-outline-success toggle-offer" data-id="<%= cat._id %>" data-active="false">Deactivate</button>
+                                        <% } else { %>
+                                          <button type="button" class="btn btn-outline-info toggle-offer" data-id="<%= cat._id %>" data-active="true">Activate</button>
+                                        <% } %>
+                                      </div>
+                                    <% } else { %>
+                                      No Offer
+                                    <% } %>
+                                  </td>
                                 <td>
                                     <button class="btn btn-warning btn-sm editBtn" 
                                         data-id="<%= cat._id %>" 
@@ -164,11 +172,7 @@
                   <input type="text" class="form-control" id="editCategoryName" required>
                   <small class="text-danger" id="editCategoryNameError" style="display: none;">Category name cannot be empty or whitespace.</small>
                 </div>
-                <div class="form-group">
-                  <label for="editCategoryDescription">Category Description</label>
-                  <textarea class="form-control" id="editCategoryDescription" required></textarea>
-                  <small class="text-danger" id="editCategoryDescriptionError" style="display: none;">Description cannot be empty or whitespace.</small>
-                </div>
+            
                 <div class="form-group">
                     <label for="editCategoryOffer">Offer</label>
                     <input type="text" class="form-control" id="editCategoryOffer" required>

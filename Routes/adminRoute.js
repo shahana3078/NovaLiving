@@ -8,6 +8,7 @@ const adminController = require("../controller/Admin/adminController.js");
 const categoryController=require('../controller/Admin/categoryController.js')
 const productController=require('../controller/Admin/productController.js')
 const orderController=require('../controller/Admin/orderController.js')
+const stockController=require('../controller/Admin/stockController.js')
 
 
 const path = require("path");
@@ -35,6 +36,7 @@ router.post("/categories/add", categoryController.addOrUpdateCategory);
 router.put("/categories/delete/:id", categoryController.deleteCategory);
 router.put("/categories/undo/:id", categoryController.undoDelete);
 router.put("/categories/update/:id", categoryController.updateCategory);
+router.post("/toggle-category-offer/:categoryId", categoryController.toggleCategoryOffer);
 
 
 
@@ -77,7 +79,8 @@ router.post(
 
 router.put("/products/delete/:id", productController.deleteProduct);
 router.put("/products/undo/:id",productController.undoProduct);
-router.post('/products/stock-update/:id',productController.stockUpdate)
+router.post("/toggle-offer/:id",productController.toggleOfferStatus);
+
 router.get('/orders',orderController.getOrder)
 router.post('/updateOrderStatus',orderController.updateOrderStatus)
 
@@ -85,6 +88,10 @@ router.get('/orderDetails',orderController.orderDetails)
 router.get('/return-requests', orderController.showReturnRequests);
 router.post('/accept-return/:orderId', orderController.acceptReturn);
 router.post('/reject-return/:orderId', orderController.rejectReturn);
+
+router.get('/stock',stockController.getStocks)
+router.post('/products/stock-update/:id',stockController.stockUpdate)
+
 
 
 

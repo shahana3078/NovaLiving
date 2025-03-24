@@ -257,10 +257,17 @@
        
         <p class="product-category"><%=product.categoryName %></p>
         <div class="product-price">
-          <span style="font-weight: 600; color: #4caf50"
-            >₹<%= product.price.toFixed(2) %></span
-          >
+          <% if (discountedPrice < product.price) { %>
+            <p class="text-danger">
+              <del>₹<%= product.price.toFixed(2) %></del>
+              <span style="font-weight: 600; color: #4caf50">₹<%= discountedPrice.toFixed(2) %></span>
+            </p>
+            <span class="badge bg-success"><%= product.offer.discountPercentage %>% Off</span>
+          <% } else { %>
+            <span style="font-weight: 600; color: #4caf50">₹<%= product.price.toFixed(2) %></span>
+          <% } %>
         </div>
+        
         <div class="product-rating">
           <%= '★'.repeat(product.rating) + '☆'.repeat(5 - product.rating) %>
         </div>
@@ -281,8 +288,8 @@
       <button class="add-to-cart" onclick="addToCart('<%= product._id %>')">
         <i class="fa-solid fa-cart-shopping"></i> Add to cart
       </button>
-      <button class="wishlist">
-    <i class="fa-regular fa-heart"></i> Wishlist
+      <button class="wishlist" onclick="addToWishlist('<%= product._id %>')">
+    <i class="fa-regular fa-heart" ></i> Wishlist
   </button>
 </div>
 
@@ -889,6 +896,7 @@
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
     <script src="/script/User/cart.js"></script>
+    <script src="/script/User/wishlist.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
 
 		<script src="/User/js/bootstrap.bundle.min.js"></script>

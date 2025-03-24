@@ -5,35 +5,78 @@ const Order = require("../../Models/orderModel");
 const Razorpay=require('Razorpay')
 
 
+// const getCart = async (req, res) => {
+//   try {
+//     const userId = req.session.userId;
+//     const cart = await Cart.findOne({
+//       userId,
+//     }).populate("items.productId");
+
+//     if (!cart) {
+//       return res.render("User/cart", { items: [], totalPrice: 0 });
+//     }
+
+//     res.render("User/cart", {
+//       items: cart.items.map((item) => ({
+        
+//         name: item.name,
+//         productId: item.productId._id,
+//         price: item.price,
+//         quantity: item.quantity,
+//         total: item.price * item.quantity,
+//         image: item.image,
+//       })),
+//       totalPrice: cart.totalPrice,
+//     });
+//   } catch (error) {
+//     console.error("Error fetching cart:", error);
+//     res.status(500).send("An error occurred while loading the cart.");
+//   }
+// };
+
+//ADD TO CART
+
 const getCart = async (req, res) => {
   try {
     const userId = req.session.userId;
-    const cart = await Cart.findOne({
-      userId,
-    }).populate("items.productId");
+    const cart = await Cart.findOne({ userId }).populate("items.productId");
 
-    if (!cart) {
+    if (!cart || cart.items.length === 0) {
       return res.render("User/cart", { items: [], totalPrice: 0 });
     }
 
-    res.render("User/cart", {
-      items: cart.items.map((item) => ({
-        name: item.name,
+    let totalPrice = 0;
+
+    const items = cart.items.map((item) => {
+      let originalPrice = item.productId.price; // Store original price
+      let productPrice = originalPrice; // Default price
+
+      // Apply discount if an active offer exists
+      if (item.productId.offer?.isActive && item.productId.offer.discountPercentage > 0) {
+        productPrice = originalPrice - (originalPrice * item.productId.offer.discountPercentage) / 100;
+      }
+
+      const totalItemPrice = productPrice * item.quantity;
+      totalPrice += totalItemPrice;
+
+      return {
+        name: item.productId.name,
         productId: item.productId._id,
-        price: item.price,
+        originalPrice, // Include original price
+        price: productPrice, // Discounted price if applicable
         quantity: item.quantity,
-        total: item.price * item.quantity,
-        image: item.image,
-      })),
-      totalPrice: cart.totalPrice,
+        total: totalItemPrice,
+        image: item.productId.images.length > 0 ? item.productId.images[0] : null,
+      };
     });
+
+    res.render("User/cart", { items, totalPrice });
   } catch (error) {
     console.error("Error fetching cart:", error);
     res.status(500).send("An error occurred while loading the cart.");
   }
 };
 
-//ADD TO CART
 
 const addCart = async (req, res) => {
   const { productId } = req.body;
@@ -59,6 +102,11 @@ const addCart = async (req, res) => {
       (item) => item.productId.toString() === productId
     );
 
+    let productPrice = product.price;
+    if (product.offer?.isActive && product.offer.discountPercentage > 0) {
+      productPrice = product.price - (product.price * product.offer.discountPercentage) / 100;
+    }
+
     if (existingItem) {
       if (existingItem.quantity >= 5) {
         return res.status(400).json({
@@ -70,7 +118,7 @@ const addCart = async (req, res) => {
       cart.items.push({
         productId: product._id,
         name: product.name,
-        price: product.price,
+        price: discountPrice,
         image: product.images[0],
         quantity: 1,
       });
@@ -80,6 +128,11 @@ const addCart = async (req, res) => {
       (total, item) => total + item.price * item.quantity,
       0
     );
+
+    if (isNaN(cart.totalPrice)) {
+      cart.totalPrice = 0;
+    }
+
 
     await cart.save();
 

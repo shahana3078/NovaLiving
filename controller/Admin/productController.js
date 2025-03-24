@@ -5,7 +5,7 @@ const Category = require("../../Models/categoryModel");
 
 const getProducts = async (req, res) => {
   try {
-    const products = await Product.find();
+    const products = await Product.find().populate('categoryId')
     
     const categories = await Category.find({ isDeleted: false });
 
@@ -81,7 +81,7 @@ const editProduct = async (req, res) => {
 
   try {
     const { productName, productCategory, productPrice, productStock,productDescription, existingImages,offerDiscount } = req.body;
- 
+  console.log(productCategory)
     let images = existingImages ? JSON.parse(existingImages) : [];
 
   
@@ -167,18 +167,20 @@ const undoProduct = async (req, res) => {
   }
 };
 
-const stockUpdate= async(req,res)=>{
-  const { stock } = req.body;
-  const productId = req.params.id;
-
+const toggleOfferStatus = async (req, res) => {
   try {
-    await Product.findByIdAndUpdate(productId, { stock });
-    res.json({ success: true, message: 'Stock updated successfully' });
+      const { isActive } = req.body;
+      const productId = req.params.id;
+
+      await Product.findByIdAndUpdate(productId, { "offer.isActive": isActive });
+
+      res.status(200).json({ success: true, message: "Offer status updated." });
   } catch (error) {
-    console.error('Error updating stock:', error);
-    res.status(500).json({ success: false, message: 'Failed to update stock' });
+      console.error("Error updating offer:", error);
+      res.status(500).json({ success: false, message: "Server error." });
   }
-}
+};
+
 
 
 
@@ -191,6 +193,6 @@ module.exports={
   getProductPage,
   editProduct,
   deleteProduct,
-  undoProduct,
-  stockUpdate
+  undoProduct, 
+  toggleOfferStatus
 }

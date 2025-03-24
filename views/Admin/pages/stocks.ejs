@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin - Stock Management</title>
+
+    <!-- CSS Links -->
+    <link
+      rel="stylesheet"
+      href="/Admin/assets/vendors/css/vendor.bundle.base.css"
+    />
+    <link
+      rel="stylesheet"
+      href="/Admin/vendors/jvectormap/jquery-jvectormap.css"
+    />
+    <link
+      rel="stylesheet"
+      href="/Admin/assets/vendors/flag-icon-css/css/flag-icon.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="/Admin/assets/vendors/owl-carousel-2/owl.carousel.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="/Admin/assets/vendors/owl-carousel-2/owl.theme.default.min.css"
+    />
+    <link rel="stylesheet" href="/Admin/css/admin.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+    />
+    <link rel="shortcut icon" href="/Admin/assets/images/favicon.png" />
+    <link
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/5.1.3/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0-alpha1/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Bootstrap CSS -->
+
+    <style>
+     
+      h1 {
+        color: #f8f9fa;
+        text-align: center;
+        margin: 20px 0;
+        font-size: 2.5rem;
+        padding-top: 20px;
+      }
+
+      .btn-primary {
+        background-color: #007bff;
+        border: none;
+      }
+
+      .btn-success {
+        background-color: #28a745;
+        border: none;
+      }
+
+      .btn-danger {
+        background-color: #dc3545;
+        border: none;
+      }
+
+      .btn-warning {
+        background-color: #ffc107;
+        border: none;
+      }
+
+    
+      .table th,
+      .table td {
+        white-space: normal;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .table td {
+        max-width: 200px;
+      }
+
+     
+    </style>
+  </head>
+
+  <body>
+    <div class="container-scroller">
+      <%- include('./Partials/sideBar'); %>
+
+      <div class="container-fluid page-body-wrapper">
+        <%- include('./Partials/navBar'); %>
+
+        <div class="container mt-4">
+          <h1>Stock Management</h1>
+    
+
+          <!-- Product List Table -->
+          <table class="table table-dark table-hover">
+            <thead>
+              <tr>
+                <th>S.No.</th>
+                <th>Product Name</th>
+                <th>Stock</th>
+                <th>Category</th>  
+         
+              </tr>
+            </thead>
+            <tbody id="productList">
+              <% products.forEach((product, index)=> { %>
+              <tr data-id="<%= product._id %>">
+                <td><%= index + 1 %></td>
+                <td><%= product.name %></td>
+                <td>
+                    <div style="display: flex; align-items: center;">
+                      <button type="button" id="decrementStock" 
+                              style="width: 30px; height: 30px; background-color: #d9534f; color: #fff; border: none; border-radius: 4px; cursor: pointer;">-</button>
+                  
+                      <span id="productStock" style="margin: 0 10px; font-weight: bold;"><%= product.stock %></span>
+                  
+                      <button type="button" id="incrementStock" 
+                              style="width: 30px; height: 30px; background-color: #5bc0de; color: #fff; border: none; border-radius: 4px; cursor: pointer;">+</button>
+                    </div>
+                  </td>
+                <td><%= product.categoryId ? product.categoryId.categoryName : "No Category" %></td>
+
+                
+              </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit Product Modal -->
+
+    <div
+      class="modal fade"
+      id="editProductModal"
+      tabindex="-1"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Edit stock</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="editProductForm">
+              
+              <input type="hidden" id="editProductId" name="editProductId" />
+
+
+             
+           
+
+              <!-- Product Stock -->
+              <div class="mb-3">
+                <label for="productStock" class="form-label">Stock</label>
+                <input
+                  type="number"
+                  id="editProductStock"
+                  class="form-control"
+                  required
+                />
+              </div>
+         
+
+              <button type="submit" class="btn btn-primary">
+                Save Changes
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+
+    <!-- Include necessary JS libraries -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="/Admin/assets/vendors/js/vendor.bundle.base.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0-alpha1/js/bootstrap.min.js"></script>
+    <!-- endinject -->
+    <!-- Plugin js for this page -->
+    <script src="/Admin/assets/vendors/chart.js/Chart.min.js"></script>
+    <script src="/Admin/assets/vendors/progressbar.js/progressbar.min.js"></script>
+    <script src="/Admin/assets/vendors/jvectormap/jquery-jvectormap.min.js"></script>
+    <script src="/Admin/assets/vendors/jvectormap/jquery-jvectormap-world-mill-en.js"></script>
+    <script src="/Admin/assets/vendors/owl-carousel-2/owl.carousel.min.js"></script>
+    <!-- End plugin js for this page -->
+    <!-- inject:js -->
+    <script src="/Admin/assets/js/off-canvas.js"></script>
+    <script src="/Admin/assets/js/hoverable-collapse.js"></script>
+    <script src="/Admin/assets/js/misc.js"></script>
+    <script src="/Admin/assets/js/settings.js"></script>
+    <script src="/Admin/assets/js/todolist.js"></script>
+    <!-- endinject -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+    <!-- custom Js -->
+    <script src="/script/Admin/product.js"></script>
+
+    <!-- jQuery and Bootstrap JavaScript (include at the end of the body) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  </body>
+</html>

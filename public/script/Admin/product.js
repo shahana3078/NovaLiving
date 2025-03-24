@@ -415,6 +415,26 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
+//toggle offer
+document.addEventListener("DOMContentLoaded", function () {
+  document.querySelectorAll(".toggle-offer").forEach((button) => {
+    button.addEventListener("click", function () {
+      let productId = this.getAttribute("data-id");
+      let newStatus = this.getAttribute("data-active") === "true";
+
+      axios.post(`/admin/toggle-offer/${productId}`, { isActive: newStatus })
+        .then(response => {
+          if (response.data.success) {
+            location.reload(); 
+          }
+        })
+        .catch(error => {
+          console.error("Error updating offer:", error);
+        });
+    });
+  });
+});
+
 
 //list unlist
 async function deleteProduct(id) {

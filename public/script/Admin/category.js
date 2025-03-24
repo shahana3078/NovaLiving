@@ -1,3 +1,4 @@
+
 async function fetchCategories() {
   try {
     const response = await axios.get("/categories");
@@ -7,11 +8,141 @@ async function fetchCategories() {
   }
 }
 
+
+
+
+document.addEventListener("DOMContentLoaded", function () {
+  document.querySelectorAll(".editBtn").forEach((button) => {
+    button.addEventListener("click", function () {
+      const category = {
+        id: this.getAttribute("data-id"),
+        name: this.getAttribute("data-name"),
+        description: this.getAttribute("data-description"),
+        offer: JSON.parse(this.getAttribute("data-offer") || '{"discountPercentage":0,"isActive":false}'),  
+      };
+     
+      openEditCategoryModal(category);
+    });
+  });
+
+  function openEditCategoryModal(category) {
+    const editCategoryForm = document.getElementById("editCategoryForm");
+    editCategoryForm.setAttribute("data-id", category.id);
+
+    document.getElementById("editCategoryName").value = category.name;
+    document.getElementById("editCategoryDescription").value =
+      category.description;
+      document.getElementById("editCategoryOffer").value = category.offer.discountPercentage || 0;
+
+    hideValidationError("editCategoryName");
+    hideValidationError("editCategoryDescription");
+    hideValidationError("editCategoryOffer");
+
+    $("#editModal").modal("show");
+  }
+
+  document
+    .getElementById("editCategoryForm")
+    .addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const id = this.getAttribute("data-id");
+      const categoryName = document
+        .getElementById("editCategoryName")
+        .value.trim();
+      const categoryDescription = document
+        .getElementById("editCategoryDescription")
+        .value.trim();
+
+        const categoryOffer = parseFloat(document
+          .getElementById("editCategoryOffer")
+          .value) || 0;
+      let isValid = true;
+
+      if (!categoryName) {
+        showValidationError(
+          "editCategoryName",
+          "Category name cannot be empty or whitespace."
+        );
+        isValid = false;
+      } else {
+        hideValidationError("editCategoryName");
+      }
+
+
+      if (!categoryDescription) {
+        showValidationError(
+          "editCategoryDescription",
+          "Category description cannot be empty or whitespace."
+        );
+        isValid = false;
+      } else {
+        hideValidationError("editCategoryDescription");
+      }
+
+      if (categoryOffer < 0 || categoryOffer > 100) {
+        showValidationError("editCategoryOffer", "Offer must be between 0 and 100.");
+        isValid = false;
+      } else {
+        hideValidationError("editCategoryOffer");
+      }
+      if (!isValid) return;
+
+      const updatedCategory = {
+        categoryName: categoryName,
+        description: categoryDescription,
+        offer: {
+          discountPercentage: categoryOffer,
+          isActive: categoryOffer > 0
+        }
+      };
+
+      try {
+        const response = await axios.put(
+          `/admin/categories/update/${id}`,
+          updatedCategory
+        );
+
+
+        const row = document.querySelector(`[data-id="${id}"]`);
+        if (row) {
+          row.querySelector(".categoryName").textContent =
+            response.data.categoryName;
+          row.querySelector(".categoryDescription").textContent =
+            response.data.description;
+          
+        
+        }
+        
+
+        $("#editModal").modal("hide");
+        showMessage("Category updated successfully", "success");
+      } catch (error) {
+        console.error("Error updating category:", error);
+
+        const errorMessage =
+          error.response?.data?.message || "Failed to update category.";
+
+        showMessage(errorMessage, "danger");
+
+    
+        if (error.response?.status === 400) {
+          showValidationError(
+            "editCategoryName",
+            "Category name already exists. Please choose another."
+          );
+        }
+      }
+    });
+});
+
+
 document.getElementById("categoryForm").addEventListener("submit", async function (e) {
   e.preventDefault();
 
   const categoryName = document.getElementById("categoryName").value.trim();
   const categoryDescription = document.getElementById("categoryDescription").value.trim();
+  let categoryOffer=document.getElementById('categoryOffer').value.trim()
   let isValid = true;
 
   if (!categoryName) {
@@ -28,12 +159,25 @@ document.getElementById("categoryForm").addEventListener("submit", async functio
     hideValidationError("categoryDescription");
   }
 
+  categoryOffer = parseFloat(categoryOffer) || 0; // Ensure it's a number
+  if (categoryOffer < 0 || categoryOffer > 100) {
+    showValidationError("categoryOffer", "Discount must be between 0 and 100.");
+    isValid = false;
+  } else {
+    hideValidationError("categoryOffer");
+  }
+
   if (!isValid) return;
 
   const categoryData = {
     name: categoryName,
     description: categoryDescription,
+    offer: {
+      discountPercentage: categoryOffer,  // Send offer as an object
+      isActive: categoryOffer > 0,       // Set isActive true if offer > 0
+    },
   };
+  console.log('catgory data',categoryData)
 
   try {
     const response = await axios.post("/admin/categories/add", categoryData);
@@ -148,121 +292,5 @@ function hideValidationError(inputId) {
   }
 }
 
-document.addEventListener("DOMContentLoaded", function () {
-  document.querySelectorAll(".editBtn").forEach((button) => {
-    button.addEventListener("click", function () {
-      const category = {
-        id: this.getAttribute("data-id"),
-        name: this.getAttribute("data-name"),
-        description: this.getAttribute("data-description"),
-        offer: JSON.parse(this.getAttribute("data-offer") || '{"discountPercentage":0,"isActive":false}'), 
-      };
-      openEditCategoryModal(category);
-    });
-  });
 
-  function openEditCategoryModal(category) {
-    const editCategoryForm = document.getElementById("editCategoryForm");
-    editCategoryForm.setAttribute("data-id", category.id);
-
-    document.getElementById("editCategoryName").value = category.name;
-    document.getElementById("editCategoryDescription").value =
-      category.description;
-      document.getElementById("editCategoryOffer").value = category.offer.discountPercentage || 0;
-
-    hideValidationError("editCategoryName");
-    hideValidationError("editCategoryDescription");
-    hideValidationError("editCategoryOffer");
-
-    $("#editModal").modal("show");
-  }
-
-  document
-    .getElementById("editCategoryForm")
-    .addEventListener("submit", async function (e) {
-      e.preventDefault();
-
-      const id = this.getAttribute("data-id");
-      const categoryName = document
-        .getElementById("editCategoryName")
-        .value.trim();
-      const categoryDescription = document
-        .getElementById("editCategoryDescription")
-        .value.trim();
-
-        const categoryOffer = parseFloat(document
-          .getElementById("editCategoryOffer")
-          .value) || 0;
-      let isValid = true;
-
-      if (!categoryName) {
-        showValidationError(
-          "editCategoryName",
-          "Category name cannot be empty or whitespace."
-        );
-        isValid = false;
-      } else {
-        hideValidationError("editCategoryName");
-      }
-
-
-      if (!categoryDescription) {
-        showValidationError(
-          "editCategoryDescription",
-          "Category description cannot be empty or whitespace."
-        );
-        isValid = false;
-      } else {
-        hideValidationError("editCategoryDescription");
-      }
-
-      if (categoryOffer < 0 || categoryOffer > 100) {
-        showValidationError("editCategoryOffer", "Offer must be between 0 and 100.");
-        isValid = false;
-      } else {
-        hideValidationError("editCategoryOffer");
-      }
-      if (!isValid) return;
-
-      const updatedCategory = {
-        categoryName: categoryName,
-        description: categoryDescription,
-      };
-
-      try {
-        const response = await axios.put(
-          `/admin/categories/update/${id}`,
-          updatedCategory
-        );
-
-        console.log(response.data);
-
-        const row = document.querySelector(`[data-id="${id}"]`);
-        if (row) {
-          row.querySelector(".categoryName").textContent =
-            response.data.categoryName;
-          row.querySelector(".categoryDescription").textContent =
-            response.data.description;
-        }
-
-        $("#editModal").modal("hide");
-        showMessage("Category updated successfully", "success");
-      } catch (error) {
-        console.error("Error updating category:", error);
-
-        const errorMessage =
-          error.response?.data?.message || "Failed to update category.";
-
-        showMessage(errorMessage, "danger");
-
-    
-        if (error.response?.status === 400) {
-          showValidationError(
-            "editCategoryName",
-            "Category name already exists. Please choose another."
-          );
-        }
-      }
-    });
-});
 

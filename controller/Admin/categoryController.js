@@ -30,22 +30,33 @@ const updateCategory = async (req, res) => {
       return res.status(400).json({ message: `Category name "${updatedData.categoryName}" already exists.` });
     }
 
-    const highestOffer = await Product.find({ categoryId })
-      .sort({ "offer.discountPercentage": -1 }) // Sort by highest discount
-      .limit(1)
-      .select("offer");
+    const highestOfferProduct = await Product.findOne({ categoryId })
+    .sort({ "offer.discountPercentage": -1 })
+    .select("offer")
+    .lean(); 
 
-    // Get the offer details (default to 0% if no products found)
-    const categoryOffer = highestOffer.length > 0 ? highestOffer[0].offer : { discountPercentage: 0, isActive: false };
+    let categoryOffer = updatedData.offer
+    ? {
+        discountPercentage: Math.max(0, Math.min(100, updatedData.offer.discountPercentage || 0)), // Ensure between 0-100
+        isActive: updatedData.offer.discountPercentage > 0
+      }
+    : highestOfferProduct?.offer || { discountPercentage: 0, isActive: false };
+  
 
-  console.log('offr',categoryOffer)
+  // 🔹 **Ensure discount percentage is valid**
+  if (categoryOffer.discountPercentage < 0 || categoryOffer.discountPercentage > 100) {
+    categoryOffer = { discountPercentage: 0, isActive: false };
+  }
     const updatedCategory = await Category.findByIdAndUpdate(
       categoryId,
       {
         $set: {
           categoryName: updatedData.categoryName,
           description: updatedData.description,
-          offer :categoryOffer
+          offer: {
+            discountPercentage: categoryOffer.discountPercentage, // ✅ Correct way
+            isActive: categoryOffer.isActive, // ✅ Correct way
+          },
         },
       },
       { new: true }
@@ -67,7 +78,7 @@ const addOrUpdateCategory = async (req, res) => {
   console.log(req.body);
 
   try {
-    const { name, description } = req.body;
+    const { name, description,offer } = req.body;
 
     const existingCategory = await Category.findOne({ categoryName: name });
 
@@ -80,6 +91,11 @@ const addOrUpdateCategory = async (req, res) => {
     const newCategory = new Category({
       categoryName: name,
       description: description,
+      offer: {
+        discountPercentage: offer.discountPercentage || 0,
+        isActive: offer.isActive || false,
+      },
+      
     });
 
     await newCategory.save();

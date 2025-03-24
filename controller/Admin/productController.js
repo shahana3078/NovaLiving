@@ -18,7 +18,8 @@ const getProducts = async (req, res) => {
 
 const addProduct = async (req, res) => {
   try {
-    const { productName, productDescription, productPrice, productStock, productCategory } = req.body;
+    const { productName, productDescription, productPrice, productStock, productCategory,productOffer } = req.body;
+    console.log(req.body)
     const uploadImages = req.files.map((val) => val.filename);
 
     const existingProduct = await Product.findOne({ name: productName }); 
@@ -32,6 +33,8 @@ const addProduct = async (req, res) => {
       });
     }
 
+    const discountValue = Number(productOffer) || 0;
+
     const newProduct = new Product({
       name: productName,
       category: productCategory,
@@ -40,6 +43,10 @@ const addProduct = async (req, res) => {
       stock: productStock,
       description: productDescription,
       images: uploadImages,
+      offer:{
+        discountPercentage: discountValue, 
+          isActive: discountValue > 0 , 
+      }
     });
 
     await newProduct.save();

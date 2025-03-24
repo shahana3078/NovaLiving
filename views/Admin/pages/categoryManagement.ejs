@@ -76,6 +76,12 @@
                         <textarea class="form-control" id="categoryDescription" required></textarea>
                         <small class="text-danger" id="categoryDescriptionError" style="display: none;">Category description cannot be empty or whitespace.</small>
                     </div>
+                    <div class="form-group">
+                        <label for="categoryOffer">Offer (%)</label>
+                        <input type="number" class="form-control" id="categoryOffer" required min="0" max="100">
+                        <small class="text-danger" id="categoryOfferError" style="display: none;">Offer must be between 0 and 100.</small>
+                    </div>
+                    
                     <button type="submit" class="btn btn-success">Add Category</button>
                     <button type="button" id="hideAddForm" class="btn btn-danger" data-dismiss="modal">Cancel</button>
                 </form>
@@ -91,7 +97,9 @@
                             <th>S.No.</th>
                             <th>Category Name</th>
                             <th>Description</th>
+                            <th>offer</th>
                             <th>Actions</th>
+
                         </tr>
                     </thead>
                     <tbody id="categoryList">
@@ -100,12 +108,13 @@
                                 <td><%= index + 1 %></td>
                                 <td class="categoryName"><%= cat.categoryName %></td>
                                 <td class="categoryDescription wrap-text"><%= cat.description %></td>
+                                <td class="categoryOffer"><%= cat.offer.discountPercentage %>%</td>
                                 <td>
                                     <button class="btn btn-warning btn-sm editBtn" 
                                         data-id="<%= cat._id %>" 
                                         data-name="<%= cat.categoryName %>"
                                          data-description="<%= cat.description %>"
-                                         data-offer="<%= cat.offer %>"
+                                         data-offer="<%= JSON.stringify(cat.offer) %>"
                                          >
                                          
                                          Edit

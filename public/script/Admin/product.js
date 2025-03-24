@@ -303,6 +303,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const productName = document.getElementById("productName");
     const productDescription = document.getElementById("productDescription");
+    const productOffer=document.getElementById('productOffer')
     const productPrice = document.getElementById("productPrice");
     const productStock = document.getElementById("productStock");
     const productCategory = document.getElementById("productCategory");
@@ -362,6 +363,7 @@ document.addEventListener("DOMContentLoaded", function () {
     formData.append("productPrice", productPrice.value);
     formData.append("productStock", productStock.value);
     formData.append("productCategory", productCategory.value);
+    formData.append('productOffer',productOffer.value);
 
 
     croppedImages.forEach((croppedImage, index) => {

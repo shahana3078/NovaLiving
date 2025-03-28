@@ -278,7 +278,7 @@
 
   <% if (cartItems.length > 0) { %>
     <% cartItems.forEach(item => { %>
-      <h2 style="font-size: 15px; margin-bottom: 15px;  color: #ab6e11;">Delivery by: <%= item.deliveryDate %></h2>
+      <h2 style="font-size: 15px; margin-bottom: 15px; color: #ab6e11;">Delivery by: <%= item.deliveryDate %></h2>
       
       <div style="border: 1px solid #ddd; border-radius: 8px; padding: 10px; margin-bottom: 15px; display: flex; align-items: center; background-color: #f9f9f9;">
         
@@ -288,19 +288,31 @@
         <div style="flex: 1;">
           <h4 style="margin: 0 0 5px; font-size: 16px; color: #333;"><%= item.name %></h4>
           <h6 style="font-size: x-small;"> <%= item.description %></h6>
-          <p style="margin: 0; font-size: 14px; color: #777;">MRP: ₹<%= item.price %></p>
-          <p style="display: flex; justify-content: end;" >Qty: <%=item.quantity%></p>
+          
+          <!-- Show discounted price and original price -->
+          <% if (item.discountPercentage > 0) { %>
+            <p style="margin: 0; font-size: 14px; color: #777;">
+              MRP: <span style="text-decoration: line-through; color: gray;">₹<%= item.originalPrice %></span>
+              &nbsp;
+              <span style="color: #B12704;">₹<%= item.offerPrice %></span>
+              <span style="color: green;">(<%= item.discountPercentage %>% OFF)</span>
+            </p>
+          <% } else { %>
+            <p style="margin: 0; font-size: 14px; color: #777;">MRP: ₹<%= item.originalPrice %></p>
+          <% } %>
+  
+          <p style="display: flex; justify-content: end;">Qty: <%=item.quantity%></p>
         </div>
       </div>
     <% }) %>
-
+  
     <div style="text-align: right; margin-top: 20px;">
       <strong style="font-size: 18px; color:#B12704;">Order Total: ₹<%= totalPrice %></strong>
     </div>
   <% } else { %>
     <p style="font-size: 16px; color: #777; text-align: center;">No items in the cart to review.</p>
   <% } %>
-
+  
 </div>
 
 

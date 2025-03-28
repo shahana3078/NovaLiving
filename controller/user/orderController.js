@@ -15,11 +15,26 @@ const getOrder = async (req, res) => {
 
       .lean();
 
-    orders.forEach((order) => {
-      let subtotal = 0;
-      order.items.forEach((item) => {
-        subtotal += item.productId.price * item.quantity;
-      });
+      orders.forEach((order) => {
+        let subtotal = 0;
+  
+        order.items.forEach((item) => {
+          let originalPrice = item.productId.price;
+          let discountPercentage = 0;
+          let offerPrice = originalPrice;
+  
+          if (item.productId.offer?.isActive && item.productId.offer.discountPercentage > 0) {
+            discountPercentage = item.productId.offer.discountPercentage;
+            offerPrice = originalPrice - (originalPrice * discountPercentage) / 100;
+          }
+  
+          item.originalPrice = originalPrice;
+          item.offerPrice = offerPrice;
+          item.discountPercentage = discountPercentage;
+  
+          subtotal += offerPrice * item.quantity;
+        });
+  
       const shippingCharge = 50;
       order.grandTotal = subtotal + shippingCharge;
     });
@@ -51,8 +66,22 @@ const orderDetails = async (req, res) => {
 
     let subtotal = 0;
     order.items.forEach((item) => {
-      subtotal += item.productId.price * item.quantity;
+      let originalPrice = item.productId.price;
+      let discountPercentage = 0;
+      let offerPrice = originalPrice;
+
+      if (item.productId.offer?.isActive && item.productId.offer.discountPercentage > 0) {
+        discountPercentage = item.productId.offer.discountPercentage;
+        offerPrice = originalPrice - (originalPrice * discountPercentage) / 100;
+      }
+
+      item.originalPrice = originalPrice;
+      item.offerPrice = offerPrice;
+      item.discountPercentage = discountPercentage;
+
+      subtotal += offerPrice * item.quantity;
     });
+
 
     const shippingCharge = order.shippingCharge || 50;
     const grandTotal = subtotal + shippingCharge;

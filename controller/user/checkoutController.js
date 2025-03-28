@@ -21,7 +21,17 @@ const getCheckout = async (req, res) => {
 
     if (cart) {
       cartItems = cart.items.map((item) => {
-        totalPrice += item.quantity * item.productId.price;
+
+        let originalPrice=item.productId.price;
+        let discountPercentage=0
+        let offerPrice=originalPrice;
+        
+
+        if (item.productId.offer?.isActive && item.productId.offer.discountPercentage > 0) {
+          discountPercentage = item.productId.offer.discountPercentage;
+          offerPrice = originalPrice - (originalPrice * discountPercentage) / 100;
+        }
+        totalPrice += item.quantity * offerPrice;
 
         const date = item.date ? new Date(item.date) : new Date();
 
@@ -34,10 +44,12 @@ const getCheckout = async (req, res) => {
         });
         return {
           name: item.productId.name,
-          price: item.productId.price,
+          originalPrice:originalPrice,
+          offerPrice:offerPrice,
           quantity: item.quantity,
           image: item.image,
           description: item.productId.description,
+          discountPercentage: discountPercentage,
           deliveryDate: deliveryDate,
          
           
@@ -150,15 +162,28 @@ const placeOrder = async (req, res) => {
 
     let subtotal = 0;
     const orderItems = cart.items.map((item) => {
-      subtotal += item.quantity * item.productId.price;
+      let originalPrice = item.productId.price;
+      let discountPercentage = 0;
+      let offerPrice = originalPrice;
+    
+      if (item.productId.offer?.isActive && item.productId.offer.discountPercentage > 0) {
+        discountPercentage = item.productId.offer.discountPercentage;
+        offerPrice = originalPrice - (originalPrice * discountPercentage) / 100;
+      }
+    
+      subtotal += item.quantity * offerPrice;
+    
       return {
         productId: item.productId._id,
         name: item.productId.name,
-        price: item.productId.price,
+        price: offerPrice,
+        originalPrice: originalPrice,
+        offerPrice: offerPrice,
+        discountPercentage: discountPercentage,
         quantity: item.quantity,
       };
     });
-
+    
     const shippingCharge = 50;
     const grandTotal = subtotal + shippingCharge;
 
@@ -170,7 +195,6 @@ const placeOrder = async (req, res) => {
         return res.status(400).json({ success: false, message: "Insufficient wallet balance." });
       }
 
-      // Deduct balance
       wallet.balance -= grandTotal;
       wallet.transactions.push({
         amount: grandTotal,
@@ -192,7 +216,6 @@ const placeOrder = async (req, res) => {
       }
     }
 
-    // Save Order
     const order = new Order({
       userId,
       addressId,

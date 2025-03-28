@@ -118,7 +118,7 @@ const addCart = async (req, res) => {
       cart.items.push({
         productId: product._id,
         name: product.name,
-        price: discountPrice,
+        price: productPrice,
         image: product.images[0],
         quantity: 1,
       });

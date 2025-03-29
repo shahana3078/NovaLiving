@@ -46,7 +46,6 @@ const getSignup = (req, res) => {
 const postSignup = async (req, res) => {
   const { full_name, email, password,ref } = req.body;
   const referredBy =ref || null; 
-  console.log('refered by',req.query.ref)
 
   try {
     const existingUser = await User.findOne({ email });
@@ -65,7 +64,7 @@ const postSignup = async (req, res) => {
 
     const hashedPassword = await hashPassword(password);
     const otp = generateOtp();
-    console.log("Generated OTP:", otp);
+    console.log( otp);
    
 
     const newReferralCode = Math.random().toString(36).substring(2, 8);
@@ -75,16 +74,15 @@ const postSignup = async (req, res) => {
       full_name,
       email,
       password: hashedPassword,
-      referralCode: newReferralCode, // Unique referral code
+      referralCode: newReferralCode, 
       referredBy,
       otp,
       otpExpires: Date.now() + 5 * 60 * 1000,   
     });
     console.log(otp);
-    console.log("Referred by:", referredBy);
+
     await newUser.save();
 
-   // If the user was referred by someone, credit ₹200 to the referrer's wallet
  
    if (referredBy) {
     const referrer = await User.findById(referredBy);
@@ -130,6 +128,8 @@ const postSignup = async (req, res) => {
     res.status(500).send("Error during signup");
   }
 };
+
+
 
 //OTP verification page
 

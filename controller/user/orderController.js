@@ -116,6 +116,39 @@ const cancelOrder = async (req, res) => {
         .status(404)
         .json({ success: false, message: "Order not found" });
     }
+  
+        // Update order status
+        order.orderStatus = "cancelled";
+        order.cancelReason = cancelReason || "No reason provided";
+        await order.save();
+    
+        // Process refund if payment method is Razorpay
+        if (order.paymentMethod === "razorpay") {
+          let wallet = await Wallet.findOne({ userId: order.userId });
+    
+          if (!wallet) {
+            wallet = new Wallet({ userId: order.userId, balance: 0, transactions: [] });
+          }
+    
+          // Check if refund already exists to avoid duplicate credits
+          const alreadyCredited = wallet.transactions.some(
+            (t) => t.description === `Refund for cancelled order #${order._id}`
+          );
+    
+          if (!alreadyCredited) {
+            wallet.balance += order.grandTotal;
+    
+            wallet.transactions.push({
+              amount: order.grandTotal,
+              type: "credit",
+              description: `Refund for cancelled order #${order._id}`,
+            });
+    
+            await wallet.save();
+          }
+        }
+
+
 
     res.json({ success: true, message: "Order cancelled successfully" });
   } catch (error) {
@@ -133,14 +166,41 @@ const returnOrder = async (req, res) => {
       orderStatus: "returned",
       returnReason: returnReason || "No reason provided",
     });
-
-
-
     if (!order) {
       return res
         .status(404)
         .json({ success: false, message: "Order not found" });
     }
+
+    order.orderStatus = "returned";
+    order.returnReason = returnReason || "No reason provided";
+    await order.save();
+
+    if (order.paymentMethod === "razorpay") {
+      let wallet = await Wallet.findOne({ userId: order.userId });
+
+      if (!wallet) {
+        wallet = new Wallet({ userId: order.userId, balance: 0, transactions: [] });
+      }
+
+
+      const alreadyCredited = wallet.transactions.some(
+        (t) => t.description === `Refund for returned order #${order._id}`
+      );
+
+      if (!alreadyCredited) {
+        wallet.balance += order.grandTotal;
+
+        wallet.transactions.push({
+          amount: order.grandTotal,
+          type: "credit",
+          description: `Refund for returned order #${order._id}`,
+        });
+
+        await wallet.save();
+      }
+    }
+
 
     res.json({ success: true, message: "Order returned successfully" });
   } catch (error) {

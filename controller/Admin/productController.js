@@ -5,11 +5,19 @@ const Category = require("../../Models/categoryModel");
 
 const getProducts = async (req, res) => {
   try {
-    const products = await Product.find().populate('categoryId')
+    const products = await Product.find().populate({
+       path: 'categoryId',
+      select: 'categoryName'
+    })
     
     const categories = await Category.find({ isDeleted: false });
+    const updatedProducts = products.map((product) => ({
+      ...product.toObject(),
+      categoryName: product.categoryId ? product.categoryId.categoryName : "No Category",
+    }));
 
-    res.render("Admin/pages/products", { categories, products });
+
+    res.render("Admin/pages/products", { categories, products:updatedProducts });
   } catch (error) {
     console.error("Error fetching products:", error);
     res.status(500).send("Server error");

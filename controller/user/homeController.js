@@ -41,6 +41,46 @@ const getShop = async (req, res) => {
 
     const categories = await Category.find({ isDeleted: false });
     
+    //offer logic
+
+    // products.forEach((product) => {
+    //   if (product.offer?.isActive && product.offer.discountPercentage > 0) {
+    //     product.discountedPrice =
+    //       product.price -
+    //       (product.price * product.offer.discountPercentage) / 100;
+    //   } else {
+    //     product.discountedPrice = product.price;
+    //   }
+    // });
+
+    // Offer logic for category and product
+    products.forEach((product) => {
+      let productDiscount = 0;
+      let categoryDiscount = 0;
+    
+      // Check if product has an active offer
+      if (product.offer?.isActive && product.offer.discountPercentage > 0) {
+        productDiscount = product.offer.discountPercentage;
+      }
+    
+      // Check if category has an active offer
+      if (product.categoryId?.offer?.isActive && product.categoryId.offer.discountPercentage > 0) {
+        categoryDiscount = product.categoryId.offer.discountPercentage;
+      }
+    
+      // Apply the highest discount between product and category
+      const finalDiscount = Math.max(productDiscount, categoryDiscount);
+    
+      if (finalDiscount > 0) {
+        product.discountedPrice = product.price - (product.price * finalDiscount) / 100;
+        product.appliedDiscount = finalDiscount; // Store applied discount for UI
+      } else {
+        product.discountedPrice = product.price;
+      }
+    });
+    
+
+    
     const totalProducts = products.length;
     const totalPages = Math.ceil(totalProducts / itemsPerPage);
     const paginatedProducts = products.slice(
@@ -48,17 +88,6 @@ const getShop = async (req, res) => {
       page * itemsPerPage
     );
 
-    //offer logic
-
-    products.forEach((product) => {
-      if (product.offer?.isActive && product.offer.discountPercentage > 0) {
-        product.discountedPrice =
-          product.price -
-          (product.price * product.offer.discountPercentage) / 100;
-      } else {
-        product.discountedPrice = product.price;
-      }
-    });
 
     res.render("User/shop", {
       products: paginatedProducts,

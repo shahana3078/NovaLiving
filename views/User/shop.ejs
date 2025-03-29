@@ -220,20 +220,20 @@
                 />
                 <h3 class="product-title"><%= val.name %></h3>
               </a>
-                <% if (val.discountedPrice < val.price) { %>
-                  <div>
-                    <strong class="product-price">₹<%= val.discountedPrice.toFixed(2) %></strong>
-                  </div>
-                  <div>
-                    <p class="text-danger"> <del>₹<%= val.price %></del> </p>
-                  </div>
-                  
-                  <span class="badge bg-success"> <%= val.offer.discountPercentage %>% Off</span>
-                <% } else { %>
-                  <strong class="product-price">₹<%= val.price %></strong>
-                <% } %>
-
+  
+<% if (val.discountedPrice < val.price) { %>
            
+  <div>
+    <strong class="product-price">₹<%= val.discountedPrice.toFixed(2) %></strong>
+  </div>
+  <div>
+    <p class="text-danger"> <del>₹<%= val.price %></del> </p>
+  </div>
+  <span class="badge bg-success"> <%= val.appliedDiscount %>% Off</span>
+<% } else { %>
+  <strong class="product-price">₹<%= val.price %></strong>
+<% } %>
+
 
               <!-- Stock Status -->
               <div>

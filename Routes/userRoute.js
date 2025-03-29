@@ -12,6 +12,7 @@ const orderController=require('../controller/user/orderController.js')
 const wishlistController=require('../controller/user/wishlistController.js')
 const walletController=require('../controller/user/walletController')
 const checkoutController=require('../controller/user/checkoutController.js')
+const referalController=require('../controller/user/referalController.js')
 
 const { requireLogin, userLogined,preventBackToOrder,noCache } = require("../middlewares/auth.js");
 router
@@ -92,7 +93,7 @@ router.post('/update-profile',profileController.updateProfile)
 //orders
 router.get('/checkout', checkoutController.getCheckout)
 router.post('/update-payment-method',checkoutController.updatePaymentMethod)
-router.post('/create-razorpay-order',checkoutController.razorPayCreateOrder)
+router.post('/apply-coupon',checkoutController.applyCoupon)
 router.post('/confirm-razorpay-payment',checkoutController.confirmPaymentRazorPay)
 router.post('/place-order',checkoutController.placeOrder)
 router.get('/order-confirmed',checkoutController.orderConfirmed)
@@ -112,5 +113,8 @@ router.post('/wishlist/remove',wishlistController.removeProduct)
 //wallet
 
 router.get('/wallet',walletController.getWallet)
+
+//referral
+router.get('/referral',referalController.getReferal)
 
 module.exports = router;

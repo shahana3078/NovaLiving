@@ -154,6 +154,46 @@ function placeOrder() {
   }
 }
 
+async function applyCoupon() {
+  const couponCode = document.getElementById("couponCode").value.trim();
+  
+  if (!couponCode) {
+    alert("Please enter a coupon code.");
+    return;
+  }
+
+  try {
+    console.log("Sending coupon request:", couponCode);
+
+    const response = await fetch("/apply-coupon", { 
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ couponCode }),
+    });
+
+    const data = await response.json();
+    console.log("Server response:", data);
+
+    if (data.success) {
+      document.getElementById("discountMessage").style.display = "block";
+      document.getElementById("discountAmount").innerText = data.discountAmount;
+      document.getElementById("totalAmount").innerText = data.newTotal;
+      alert("Coupon applied successfully!");
+    } else {
+      alert(data.message);
+    }
+  } catch (error) {
+    console.error("Error applying coupon:", error);
+    alert("Failed to apply coupon. Please try again.");
+  }
+}
+
+
+function toggleApplyButton() {
+  const couponCode = document.getElementById("couponCode").value;
+  document.getElementById("applyCouponBtn").disabled = couponCode.trim() === "";
+}
+
 
 
 function getPaymentMethodText(method) {

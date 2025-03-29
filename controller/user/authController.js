@@ -4,6 +4,7 @@ const OTP = require("../../Models/OTPSchema");
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
 const passport = require("passport");
+const Wallet=require('../../Models/walletModel')
 
 const transporter = nodemailer.createTransport({
   service: "Gmail",
@@ -37,12 +38,15 @@ const hashPassword = async (password) => {
 //SIGNUP
 
 const getSignup = (req, res) => {
+  const referralCode = req.query.ref || "";
   res.set("Cache-Control", "no-store");
-  res.render("User/signup", { error: null, full_name: "", email: "" });
+  res.render("User/signup", { error: null, full_name: "", email: "" ,ref: referralCode});
 };
 
 const postSignup = async (req, res) => {
-  const { full_name, email, password } = req.body;
+  const { full_name, email, password,ref } = req.body;
+  const referredBy =ref || null; 
+  console.log('refered by',req.query.ref)
 
   try {
     const existingUser = await User.findOne({ email });
@@ -61,19 +65,64 @@ const postSignup = async (req, res) => {
 
     const hashedPassword = await hashPassword(password);
     const otp = generateOtp();
+    console.log("Generated OTP:", otp);
    
 
+    const newReferralCode = Math.random().toString(36).substring(2, 8);
+
+   
     const newUser = new User({
       full_name,
       email,
       password: hashedPassword,
+      referralCode: newReferralCode, // Unique referral code
+      referredBy,
       otp,
       otpExpires: Date.now() + 5 * 60 * 1000,   
     });
     console.log(otp);
-
+    console.log("Referred by:", referredBy);
     await newUser.save();
 
+   // If the user was referred by someone, credit ₹200 to the referrer's wallet
+ 
+   if (referredBy) {
+    const referrer = await User.findById(referredBy);
+
+    if (referrer) {
+      let wallet = await Wallet.findOne({ userId: referredBy });
+
+      if (!wallet) {
+        wallet = new Wallet({
+          userId: referredBy,
+          balance: 0,
+          transactions: [],
+        });
+      }
+
+      const alreadyCredited = wallet.transactions.some(
+        (t) => t.description === `Referral bonus for user ${newUser._id}`
+      );
+
+      if (!alreadyCredited) {
+        wallet.balance += 200;
+
+        wallet.transactions.push({
+          amount: 200,
+          type: "credit",
+          description: `Referral bonus for user ${newUser._id}`,
+          date: new Date(),
+        });
+
+        await wallet.save();
+        console.log(`₹200 credited to referrer: ${referredBy}`);
+      }
+    } else {
+      console.log("Referrer not found!");
+    }
+  }
+
+  
     await sendOtpEmail(email, otp);
     res.render("User/verify-otp", { email });
   } catch (error) {

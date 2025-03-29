@@ -13,7 +13,7 @@ const UserSchema = new mongoose.Schema({
         match: [/.+\@.+\..+/, 'Please fill a valid email address']
     },
     phoneNumber: {
-        type: String, // Optional phone number
+        type: String, 
         required: false,
     },
     password: {
@@ -51,6 +51,8 @@ const UserSchema = new mongoose.Schema({
         type: Date,
         default: Date.now 
     },
+    referralCode: String,  // Unique referral code
+  referredBy: String, 
 
 });
 

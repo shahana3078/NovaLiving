@@ -9,6 +9,7 @@ const categoryController=require('../controller/Admin/categoryController.js')
 const productController=require('../controller/Admin/productController.js')
 const orderController=require('../controller/Admin/orderController.js')
 const stockController=require('../controller/Admin/stockController.js')
+const couponController=require('../controller/Admin/couponController.js')
 
 
 const path = require("path");
@@ -91,6 +92,10 @@ router.post('/reject-return/:orderId', orderController.rejectReturn);
 
 router.get('/stock',stockController.getStocks)
 router.post('/products/stock-update/:id',stockController.stockUpdate)
+
+router.get('/coupon',couponController.getCoupon)
+router.post("/add-coupon", couponController.addCoupon);
+router.delete("/delete-coupon/:id", couponController.deleteCoupon)
 
 
 

@@ -1,5 +1,5 @@
 const Order = require("../../Models/orderModel");
-const Wallet=require('../../Models/walletModel')
+const Wallet = require("../../Models/walletModel");
 
 const getOrder = async (req, res) => {
   try {
@@ -15,26 +15,30 @@ const getOrder = async (req, res) => {
 
       .lean();
 
-      orders.forEach((order) => {
-        let subtotal = 0;
-  
-        order.items.forEach((item) => {
-          let originalPrice = item.productId.price;
-          let discountPercentage = 0;
-          let offerPrice = originalPrice;
-  
-          if (item.productId.offer?.isActive && item.productId.offer.discountPercentage > 0) {
-            discountPercentage = item.productId.offer.discountPercentage;
-            offerPrice = originalPrice - (originalPrice * discountPercentage) / 100;
-          }
-  
-          item.originalPrice = originalPrice;
-          item.offerPrice = offerPrice;
-          item.discountPercentage = discountPercentage;
-  
-          subtotal += offerPrice * item.quantity;
-        });
-  
+    orders.forEach((order) => {
+      let subtotal = 0;
+
+      order.items.forEach((item) => {
+        let originalPrice = item.productId.price;
+        let discountPercentage = 0;
+        let offerPrice = originalPrice;
+
+        if (
+          item.productId.offer?.isActive &&
+          item.productId.offer.discountPercentage > 0
+        ) {
+          discountPercentage = item.productId.offer.discountPercentage;
+          offerPrice =
+            originalPrice - (originalPrice * discountPercentage) / 100;
+        }
+
+        item.originalPrice = originalPrice;
+        item.offerPrice = offerPrice;
+        item.discountPercentage = discountPercentage;
+
+        subtotal += offerPrice * item.quantity;
+      });
+
       const shippingCharge = 50;
       order.grandTotal = subtotal + shippingCharge;
     });
@@ -45,7 +49,6 @@ const getOrder = async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 };
-
 
 const orderDetails = async (req, res) => {
   try {
@@ -70,7 +73,10 @@ const orderDetails = async (req, res) => {
       let discountPercentage = 0;
       let offerPrice = originalPrice;
 
-      if (item.productId.offer?.isActive && item.productId.offer.discountPercentage > 0) {
+      if (
+        item.productId.offer?.isActive &&
+        item.productId.offer.discountPercentage > 0
+      ) {
         discountPercentage = item.productId.offer.discountPercentage;
         offerPrice = originalPrice - (originalPrice * discountPercentage) / 100;
       }
@@ -82,7 +88,6 @@ const orderDetails = async (req, res) => {
       subtotal += offerPrice * item.quantity;
     });
 
-
     const shippingCharge = order.shippingCharge || 50;
     const grandTotal = subtotal + shippingCharge;
 
@@ -90,7 +95,7 @@ const orderDetails = async (req, res) => {
     order.shippingCharge = shippingCharge;
     order.grandTotal = grandTotal;
 
-    const returnRequestStatus = order.returnRequest?.status || 'none';
+    const returnRequestStatus = order.returnRequest?.status || "none";
 
     res.render("User/orderDetails", { order, returnRequestStatus });
   } catch (error) {
@@ -99,6 +104,7 @@ const orderDetails = async (req, res) => {
   }
 };
 
+//cancel order
 const cancelOrder = async (req, res) => {
   try {
     const { orderId } = req.params;
@@ -116,39 +122,38 @@ const cancelOrder = async (req, res) => {
         .status(404)
         .json({ success: false, message: "Order not found" });
     }
-  
-        // Update order status
-        order.orderStatus = "cancelled";
-        order.cancelReason = cancelReason || "No reason provided";
-        await order.save();
-    
-        // Process refund if payment method is Razorpay
-        if (order.paymentMethod === "razorpay") {
-          let wallet = await Wallet.findOne({ userId: order.userId });
-    
-          if (!wallet) {
-            wallet = new Wallet({ userId: order.userId, balance: 0, transactions: [] });
-          }
-    
-          // Check if refund already exists to avoid duplicate credits
-          const alreadyCredited = wallet.transactions.some(
-            (t) => t.description === `Refund for cancelled order #${order._id}`
-          );
-    
-          if (!alreadyCredited) {
-            wallet.balance += order.grandTotal;
-    
-            wallet.transactions.push({
-              amount: order.grandTotal,
-              type: "credit",
-              description: `Refund for cancelled order #${order._id}`,
-            });
-    
-            await wallet.save();
-          }
-        }
 
+    order.orderStatus = "cancelled";
+    order.cancelReason = cancelReason || "No reason provided";
+    await order.save();
 
+    if (order.paymentMethod === "razorpay") {
+      let wallet = await Wallet.findOne({ userId: order.userId });
+
+      if (!wallet) {
+        wallet = new Wallet({
+          userId: order.userId,
+          balance: 0,
+          transactions: [],
+        });
+      }
+
+      const alreadyCredited = wallet.transactions.some(
+        (t) => t.description === `Refund for cancelled order #${order._id}`
+      );
+
+      if (!alreadyCredited) {
+        wallet.balance += order.grandTotal;
+
+        wallet.transactions.push({
+          amount: order.grandTotal,
+          type: "credit",
+          description: `Refund for cancelled order #${order._id}`,
+        });
+
+        await wallet.save();
+      }
+    }
 
     res.json({ success: true, message: "Order cancelled successfully" });
   } catch (error) {
@@ -156,6 +161,8 @@ const cancelOrder = async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
+//return order
 
 const returnOrder = async (req, res) => {
   try {
@@ -180,9 +187,12 @@ const returnOrder = async (req, res) => {
       let wallet = await Wallet.findOne({ userId: order.userId });
 
       if (!wallet) {
-        wallet = new Wallet({ userId: order.userId, balance: 0, transactions: [] });
+        wallet = new Wallet({
+          userId: order.userId,
+          balance: 0,
+          transactions: [],
+        });
       }
-
 
       const alreadyCredited = wallet.transactions.some(
         (t) => t.description === `Refund for returned order #${order._id}`
@@ -201,7 +211,6 @@ const returnOrder = async (req, res) => {
       }
     }
 
-
     res.json({ success: true, message: "Order returned successfully" });
   } catch (error) {
     console.error("Error returning order:", error);
@@ -212,37 +221,39 @@ const returnOrder = async (req, res) => {
 const requestReturn = async (req, res) => {
   const { orderId, returnReason } = req.body;
 
-  try { 
+  try {
     const order = await Order.findById(orderId);
 
     if (!order) {
-      return res.status(404).json({ success: false, message: 'Order not found' });
+      return res
+        .status(404)
+        .json({ success: false, message: "Order not found" });
     }
 
     order.returnRequest = {
-      status: 'requested', 
+      status: "requested",
       reason: returnReason,
-      date: new Date()
+      date: new Date(),
     };
 
     await order.save();
-    
-   
 
-    res.json({ success: true, message: 'Return request submitted successfully' });
+    res.json({
+      success: true,
+      message: "Return request submitted successfully",
+    });
   } catch (error) {
-    console.error('Error submitting return request:', error);
-    res.status(500).json({ success: false, message: 'Failed to submit return request.' });
+    console.error("Error submitting return request:", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to submit return request." });
   }
 };
-
-
-
 
 module.exports = {
   getOrder,
   orderDetails,
   cancelOrder,
   returnOrder,
-  requestReturn
+  requestReturn,
 };

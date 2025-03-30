@@ -10,6 +10,7 @@ const productController=require('../controller/Admin/productController.js')
 const orderController=require('../controller/Admin/orderController.js')
 const stockController=require('../controller/Admin/stockController.js')
 const couponController=require('../controller/Admin/couponController.js')
+const salesReport=require('../controller/Admin/salesreportController.js')
 
 
 const path = require("path");
@@ -21,7 +22,7 @@ router.post("/login", authController.postLogin);
 
 router.post("/logout", adminController.logoutAdmin);
 
-router.get("/dashboard", noCache, adminAuth, adminController.getDashboard);
+// router.get("/dashboard", noCache, adminAuth, adminController.getDashboard);
 
 // USER LISTING
 
@@ -96,6 +97,9 @@ router.post('/products/stock-update/:id',stockController.stockUpdate)
 router.get('/coupon',couponController.getCoupon)
 router.post("/add-coupon", couponController.addCoupon);
 router.delete("/delete-coupon/:id", couponController.deleteCoupon)
+
+router.get('/dashboard',salesReport.getSalesReport)
+router.get('/sales-report/download',salesReport.downloadSalesReport)
 
 
 

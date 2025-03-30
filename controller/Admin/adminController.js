@@ -26,10 +26,15 @@ const postLogin = (req, res) => {
 };
 
 //DASHBOARD
+// const getDashboard = async (req, res) => {
+//   res.render("Admin/pages/dashboard", {
+//     salesData: { totalSales: 0, totalOrders: 0, totalDiscount: 0 },
+//     filter: "daily",
+//     startDate: "",
+//     endDate: ""
+//   });
+// };
 
-const getDashboard = async (req, res) => {
-  res.render("Admin/pages/dashboard");
-};
 
 //USER LIST
 
@@ -97,7 +102,7 @@ const logoutAdmin = async (req, res) => {
 module.exports = {
   getLogin,
   postLogin,
-  getDashboard,
+  // getDashboard,
   getUsers,
   searchUsers,
   deleteUser,

@@ -37,62 +37,53 @@
         <%- include('./Partials/navBar'); %>
   
         <div class="container mt-4">
-    
+          <h1>Sales Report</h1>
   
-          <div class="container mt-4">
-            <h1 class="text-light text-center py-3 border-bottom border-secondary">Sales Report</h1>
-            <p>Filter Value: <%= filter %></p>
-            <form action="/admin/dashboard" method="GET" class="row g-3 bg-dark text-light p-4 rounded shadow">
-              <input type="hidden" name="filter" value="<%= typeof filter !== 'undefined' ? filter : 'daily' %>">
-              <div class="col-md-4">
+          <form id="salesReportForm" action="/admin/dashboard" method="GET" class="row g-3 bg-dark text-light p-4 rounded shadow">
+            <div class="col-md-4">
                 <label for="filter" class="form-label fw-bold">Select Date Range:</label>
                 <select name="filter" id="filter" class="form-select">
-                  <option value="daily" <%= filter === 'daily' ? 'selected' : '' %>>Daily</option>>
-                  <option value="weekly" <%= filter === 'weekly' ? 'selected' : '' %>>Weekly</option>
-                  <option value="yearly" <%= filter === 'yearly' ? 'selected' : '' %>>Yearly</option>
-                  <option value="custom" <%= filter === 'custom' ? 'selected' : '' %>>Custom</option>
+                    <option value="daily" <%= filter === 'daily' ? 'selected' : '' %>>Daily</option>
+                    <option value="weekly" <%= filter === 'weekly' ? 'selected' : '' %>>Weekly</option>
+                    <option value="yearly" <%= filter === 'yearly' ? 'selected' : '' %>>Yearly</option>
+                    <option value="custom" <%= filter === 'custom' ? 'selected' : '' %>>Custom</option>
                 </select>
-              </div>
+            </div>
         
-              <div class="col-md-3">
+            <div class="col-md-3">
                 <label for="startDate" class="form-label fw-bold">Start Date:</label>
-                <input type="date" name="startDate" id="startDate" class="form-control bg-secondary text-light border-0" 
-                  value="<%= startDate %>" style="<%= filter === 'custom' ? '' : 'display:none;' %>">
-              </div>
+                <input type="date" name="startDate" id="startDate" class="form-control bg-secondary text-light border-0" value="<%= startDate %>">
+            </div>
         
-              <div class="col-md-3">
+            <div class="col-md-3">
                 <label for="endDate" class="form-label fw-bold">End Date:</label>
-                <input type="date" name="endDate" id="endDate" class="form-control bg-secondary text-light border-0" 
-                  value="<%= endDate %>" style="<%= filter === 'custom' ? '' : 'display:none;' %>">
-              </div>
+                <input type="date" name="endDate" id="endDate" class="form-control bg-secondary text-light border-0" value="<%= endDate %>">
+            </div>
         
-              <div class="col-md-2 d-flex align-items-end">
+            <div class="col-md-2 d-flex align-items-end">
                 <button type="submit" class="btn btn-light w-100 fw-bold">Apply Filter</button>
-              </div>
-            </form>
-        </div>
+            </div>
+        </form>
+        
         
         <!-- Sales Report Table -->
-        <div class="card shadow mt-4">
-          <div class="card-body">
-            <table class="table table-bordered text-center">
-              <thead class="table-dark">
-                <tr>
+        <table class="table table-bordered text-center">
+          <thead class="table-dark">
+              <tr>
                   <th>Total Sales</th>
                   <th>Total Orders</th>
                   <th>Total Discount</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td class="fw-bold text-success">₹<%= salesData.totalSales %></td>
-                  <td class="fw-bold"><%= salesData.totalOrders %></td>
-                  <td class="fw-bold text-danger">₹<%= salesData.totalDiscount %></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
+              </tr>
+          </thead>
+          <tbody>
+              <tr>
+                  <td id="totalSales" class="fw-bold text-success">₹<%= salesData.totalSales %></td>
+                  <td id="totalOrders" class="fw-bold"><%= salesData.totalOrders %></td>
+                  <td id="totalDiscount" class="fw-bold text-danger">₹<%= salesData.totalDiscount %></td>
+              </tr>
+          </tbody>
+      </table>
+      
         
           <div class="mt-4">
             <a href="/admin/sales-report/download?format=pdf" class="btn btn-danger">Download PDF</a>
@@ -102,26 +93,49 @@
       </div>
     </div>
   
-    <script>
-     document.addEventListener("DOMContentLoaded", function() {
-    const filterDropdown = document.getElementById("filter");
-    const startDateInput = document.getElementById("startDate");
-    const endDateInput = document.getElementById("endDate");
-
-    function toggleDateFields() {
-      if (filterDropdown.value === "custom") {
-        startDateInput.style.display = "block";
-        endDateInput.style.display = "block";
-      } else {
-        startDateInput.style.display = "none";
-        endDateInput.style.display = "none";
+\
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+      const filterDropdown = document.getElementById("filter");
+      const startDateInput = document.getElementById("startDate");
+      const endDateInput = document.getElementById("endDate");
+      const filterForm = document.querySelector("#salesReportForm");
+  
+      function toggleDateFields() {
+          if (filterDropdown.value === "custom") {
+              startDateInput.style.display = "block";
+              endDateInput.style.display = "block";
+          } else {
+              startDateInput.style.display = "none";
+              endDateInput.style.display = "none";
+          }
       }
-    }
-
-    filterDropdown.addEventListener("change", toggleDateFields);
-    toggleDateFields(); // Call on page load
+  
+      filterDropdown.addEventListener("change", toggleDateFields);
+      toggleDateFields(); // Ensure correct visibility on page load
+  
+      // AJAX form submission
+      filterForm.addEventListener("submit", function (event) {
+          event.preventDefault();
+  
+          const formData = new FormData(filterForm);
+          const queryString = new URLSearchParams(formData).toString();
+  
+          fetch(`/admin/dashboard?${queryString}`, { method: "GET", headers: { "X-Requested-With": "XMLHttpRequest" } })
+              .then(response => response.json())
+              .then(data => {
+                  document.getElementById("totalSales").innerText = `₹${data.totalSales}`;
+                  document.getElementById("totalOrders").innerText = data.totalOrders;
+                  document.getElementById("totalDiscount").innerText = `₹${data.totalDiscount}`;
+              })
+              .catch(error => console.error("Error fetching data:", error));
+      });
   });
-    </script>
+  </script>
+  
+
+
+
   
   </body>
   

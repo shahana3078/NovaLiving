@@ -4,48 +4,102 @@ const PDFDocument = require("pdfkit");
 const ExcelJS = require("exceljs");
 
 
+// const getSalesReport = async (req, res) => {
+//   try {
+//     let { filter = 'daily', startDate, endDate } = req.query;
+//     let matchQuery = {};
+
+//     console.log("Filter received:", filter);
+//     console.log("Start Date:", startDate, "End Date:", endDate);
+
+//     const today = new Date();
+//     const startOfDay = new Date();
+//     startOfDay.setHours(0, 0, 0, 0);
+//     const endOfDay = new Date();
+//     endOfDay.setHours(23, 59, 59, 999);
+
+//     if (filter === 'daily') {
+//       matchQuery.orderDate = {
+//         $gte: startOfDay,
+//         $lt: endOfDay,
+//       };
+//     } else if (filter === 'weekly') {
+//       const weekStart = new Date();
+//       weekStart.setDate(today.getDate() - today.getDay()); // Start of the week (Sunday)
+//       weekStart.setHours(0, 0, 0, 0);
+//       matchQuery.orderDate = {
+//         $gte: weekStart,
+//         $lt: endOfDay,
+//       };
+//     } else if (filter === 'yearly') {
+//       const yearStart = new Date(today.getFullYear(), 0, 1);
+//       const yearEnd = new Date(today.getFullYear() + 1, 0, 1);
+//       matchQuery.orderDate = {
+//         $gte: yearStart,
+//         $lt: yearEnd,
+//       };
+//     } else if (filter === 'custom' && startDate && endDate) {
+//       matchQuery.orderDate = {
+//         $gte: new Date(startDate),
+//         $lt: new Date(new Date(endDate).setHours(23, 59, 59, 999)), // Ensure end date includes full day
+//       };
+//     }
+
+//     console.log("Match Query:", matchQuery);
+
+//     const salesData = await Order.aggregate([
+//       { $match: matchQuery },
+//       {
+//         $group: {
+//           _id: null,
+//           totalSales: { $sum: "$grandTotal" },
+//           totalOrders: { $sum: 1 },
+//           totalDiscount: { $sum: "$discount" },
+//         },
+//       },
+//     ]);
+
+//     const reportData = salesData.length ? salesData[0] : { totalSales: 0, totalOrders: 0, totalDiscount: 0 };
+
+//     res.render('Admin/pages/dashboard', {
+//       salesData: reportData,
+//       filter: filter || 'daily', // Ensure filter is always defined
+//       startDate: startDate || '', 
+//       endDate: endDate || ''
+//     });
+
+//   } catch (error) {
+//     console.error('Error fetching sales report:', error);
+//     res.status(500).send('Internal Server Error');
+//   }
+// };
+
 const getSalesReport = async (req, res) => {
   try {
     let { filter = 'daily', startDate, endDate } = req.query;
     let matchQuery = {};
 
-    console.log("Filter received:", filter);
-    console.log("Start Date:", startDate, "End Date:", endDate);
-
     const today = new Date();
-    const startOfDay = new Date();
-    startOfDay.setHours(0, 0, 0, 0);
-    const endOfDay = new Date();
-    endOfDay.setHours(23, 59, 59, 999);
+    const startOfDay = new Date(today.setHours(0, 0, 0, 0));
+    const endOfDay = new Date(today.setHours(23, 59, 59, 999));
 
     if (filter === 'daily') {
-      matchQuery.orderDate = {
-        $gte: startOfDay,
-        $lt: endOfDay,
-      };
+      matchQuery.orderDate = { $gte: startOfDay, $lt: endOfDay };
     } else if (filter === 'weekly') {
-      const weekStart = new Date();
-      weekStart.setDate(today.getDate() - today.getDay()); // Start of the week (Sunday)
+      const weekStart = new Date(today);
+      weekStart.setDate(today.getDate() - today.getDay());
       weekStart.setHours(0, 0, 0, 0);
-      matchQuery.orderDate = {
-        $gte: weekStart,
-        $lt: endOfDay,
-      };
+      matchQuery.orderDate = { $gte: weekStart, $lt: endOfDay };
     } else if (filter === 'yearly') {
       const yearStart = new Date(today.getFullYear(), 0, 1);
       const yearEnd = new Date(today.getFullYear() + 1, 0, 1);
-      matchQuery.orderDate = {
-        $gte: yearStart,
-        $lt: yearEnd,
-      };
+      matchQuery.orderDate = { $gte: yearStart, $lt: yearEnd };
     } else if (filter === 'custom' && startDate && endDate) {
       matchQuery.orderDate = {
         $gte: new Date(startDate),
-        $lt: new Date(new Date(endDate).setHours(23, 59, 59, 999)), // Ensure end date includes full day
+        $lt: new Date(new Date(endDate).setHours(23, 59, 59, 999))
       };
     }
-
-    console.log("Match Query:", matchQuery);
 
     const salesData = await Order.aggregate([
       { $match: matchQuery },
@@ -61,10 +115,15 @@ const getSalesReport = async (req, res) => {
 
     const reportData = salesData.length ? salesData[0] : { totalSales: 0, totalOrders: 0, totalDiscount: 0 };
 
+    // Check if it's an AJAX request
+    if (req.xhr) {
+      return res.json(reportData);
+    }
+
     res.render('Admin/pages/dashboard', {
       salesData: reportData,
-      filter: filter || 'daily', // Ensure filter is always defined
-      startDate: startDate || '', 
+      filter,
+      startDate: startDate || '',
       endDate: endDate || ''
     });
 
@@ -73,7 +132,6 @@ const getSalesReport = async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 };
-
 
 
 const generatePDF = (salesData, res) => {

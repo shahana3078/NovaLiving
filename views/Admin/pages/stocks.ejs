@@ -191,6 +191,45 @@
     </div>
     </div>
 
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll("tr[data-id]").forEach(row => {
+        const productId = row.getAttribute("data-id");
+        const decrementBtn = row.querySelector("#decrementStock");
+        const incrementBtn = row.querySelector("#incrementStock");
+        const stockSpan = row.querySelector("#productStock");
+
+        decrementBtn.addEventListener("click", () => updateStock(productId, stockSpan, -1));
+        incrementBtn.addEventListener("click", () => updateStock(productId, stockSpan, 1));
+    });
+});
+
+async function updateStock(productId, stockSpan, change) {
+    let currentStock = parseInt(stockSpan.innerText);
+    let newStock = currentStock + change;
+
+    if (newStock < 0) return; // Prevent negative stock
+
+    try {
+        const response = await fetch(`/admin/update-stock/${productId}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ stock: newStock }) // Ensure correct JSON format
+        });
+
+        const data = await response.json(); // Ensure response is properly parsed
+        if (data.success) {
+            stockSpan.innerText = newStock; // Update UI
+        } else {
+            alert("Failed to update stock: " + data.message);
+        }
+    } catch (error) {
+        console.error("Error updating stock:", error);
+    }
+}
+    </script>
     <!-- Include necessary JS libraries -->
     <link
       rel="stylesheet"

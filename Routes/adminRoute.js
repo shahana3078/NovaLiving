@@ -92,7 +92,7 @@ router.post('/accept-return/:orderId', orderController.acceptReturn);
 router.post('/reject-return/:orderId', orderController.rejectReturn);
 
 router.get('/stock',stockController.getStocks)
-router.post('/products/stock-update/:id',stockController.stockUpdate)
+router.put('/update-stock/:id',stockController.stockUpdate)
 
 router.get('/coupon',couponController.getCoupon)
 router.post("/add-coupon", couponController.addCoupon);

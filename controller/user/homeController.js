@@ -11,6 +11,7 @@ const getShop = async (req, res) => {
     const categoryFilter = req.query.category || null;
     const maxPrice = parseInt(req.query.price) || 70000;
     const sortBy = req.query.sortBy || "featured";
+    const searchQuery = req.query.query ? req.query.query.trim() : null;
     let filterQuery = {
       isDeleted: false,
       price: { $lte: maxPrice },
@@ -20,6 +21,9 @@ const getShop = async (req, res) => {
       filterQuery.categoryId = categoryFilter;
     }
 
+    if (searchQuery) {
+      filterQuery.name = { $regex: searchQuery, $options: "i" }; // Case-insensitive search
+    }
     let sortProduct = {};
     if (sortBy === "priceLowHigh") {
       sortProduct.price = 1;
@@ -31,6 +35,8 @@ const getShop = async (req, res) => {
       sortProduct.name = -1;
     }
 
+    
+
     const products = await Product.find(filterQuery)
       .populate({
         path: "categoryId",
@@ -40,40 +46,24 @@ const getShop = async (req, res) => {
       .sort(sortProduct);
 
     const categories = await Category.find({ isDeleted: false });
-    
-    //offer logic
-
-    // products.forEach((product) => {
-    //   if (product.offer?.isActive && product.offer.discountPercentage > 0) {
-    //     product.discountedPrice =
-    //       product.price -
-    //       (product.price * product.offer.discountPercentage) / 100;
-    //   } else {
-    //     product.discountedPrice = product.price;
-    //   }
-    // });
-
-    // Offer logic for category and product
+ 
     products.forEach((product) => {
       let productDiscount = 0;
       let categoryDiscount = 0;
     
-      // Check if product has an active offer
       if (product.offer?.isActive && product.offer.discountPercentage > 0) {
         productDiscount = product.offer.discountPercentage;
       }
     
-      // Check if category has an active offer
       if (product.categoryId?.offer?.isActive && product.categoryId.offer.discountPercentage > 0) {
         categoryDiscount = product.categoryId.offer.discountPercentage;
       }
     
-      // Apply the highest discount between product and category
       const finalDiscount = Math.max(productDiscount, categoryDiscount);
     
       if (finalDiscount > 0) {
         product.discountedPrice = product.price - (product.price * finalDiscount) / 100;
-        product.appliedDiscount = finalDiscount; // Store applied discount for UI
+        product.appliedDiscount = finalDiscount; 
       } else {
         product.discountedPrice = product.price;
       }
@@ -97,12 +87,17 @@ const getShop = async (req, res) => {
       maxPrice,
       currentPage: page,
       totalPages,
+      searchQuery,
+      noResults: totalProducts === 0, 
     });
   } catch (error) {
     console.log("Error retrieving products", error);
     res.status(500).send("Error loading shop page.");
   }
 };
+
+
+
 
 //PRODUCT DETAILS
 
@@ -154,7 +149,14 @@ const productDetails = async (req, res) => {
   }
 };
 
+
+
+
+
+
+
 module.exports = {
   getShop,
   productDetails,
+
 };

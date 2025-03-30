@@ -70,6 +70,7 @@ router.get("/logout", (req, res) => {
 
 router.route("/shop").get(requireLogin, homeController.getShop);
 
+
 router.get("/product/details/:id", requireLogin,homeController.productDetails);
 
 //address route

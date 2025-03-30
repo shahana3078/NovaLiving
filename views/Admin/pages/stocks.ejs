@@ -208,7 +208,7 @@ async function updateStock(productId, stockSpan, change) {
     let currentStock = parseInt(stockSpan.innerText);
     let newStock = currentStock + change;
 
-    if (newStock < 0) return; // Prevent negative stock
+    if (newStock < 0) return;
 
     try {
         const response = await fetch(`/admin/update-stock/${productId}`, {
@@ -216,12 +216,12 @@ async function updateStock(productId, stockSpan, change) {
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ stock: newStock }) // Ensure correct JSON format
+            body: JSON.stringify({ stock: newStock }) 
         });
 
-        const data = await response.json(); // Ensure response is properly parsed
+        const data = await response.json(); 
         if (data.success) {
-            stockSpan.innerText = newStock; // Update UI
+            stockSpan.innerText = newStock; 
         } else {
             alert("Failed to update stock: " + data.message);
         }

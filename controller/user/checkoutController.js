@@ -1,4 +1,4 @@
-const Razorpay=require('Razorpay')
+const Razorpay = require('razorpay');
 const Cart = require("../../Models/cartModel");
 const Product = require("../../Models/productModel");
 const Address = require("../../Models/addressModel");
@@ -233,15 +233,14 @@ const placeOrder = async (req, res) => {
     let grandTotal = subtotal + shippingCharge;
     let discountAmount = 0;
 
-    // **Apply Coupon Discount (Fixed Amount)**
     if (couponCode) {
       const coupon = await Coupon.findOne({ code: couponCode, isActive: true });
 
       if (coupon) {
-        discountAmount = coupon.discountValue; // Fixed amount discount
+        discountAmount = coupon.discountValue;
 
         if (discountAmount > grandTotal) {
-          discountAmount = grandTotal; // Ensure discount doesn't exceed total amount
+          discountAmount = grandTotal;
         }
 
         grandTotal -= discountAmount;

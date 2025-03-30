@@ -94,6 +94,7 @@ router.post('/update-profile',profileController.updateProfile)
 //orders
 router.get('/checkout', checkoutController.getCheckout)
 router.post('/update-payment-method',checkoutController.updatePaymentMethod)
+router.post('/create-razorpay-order',checkoutController.razorPayCreateOrder)
 router.post('/apply-coupon',checkoutController.applyCoupon)
 router.post('/confirm-razorpay-payment',checkoutController.confirmPaymentRazorPay)
 router.post('/place-order',checkoutController.placeOrder)

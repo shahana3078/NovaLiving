@@ -258,29 +258,7 @@
       <% if (wallet && wallet.balance < totalPrice) { %>
         <div style="color: red; font-weight: bold;">Insufficient balance</div>
       <% } %>
-    </div>
-  
-    <div id="couponContainer" style="width: 80%; max-width: 800px; margin: 50px auto; padding: 20px; background-color: #fff; border: 1px solid #ddd; border-radius: 10px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); text-align: left;">
-  
-      <h2 style="font-size: 22px; color: #333; margin-bottom: 15px;">Apply Coupon</h2>
-      
-      <div style="display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 15px;">
-        <input type="text" id="couponCode" placeholder="Enter coupon code" 
-               style="flex: 1; padding: 10px; font-size: 16px; border: 1px solid #ccc; border-radius: 5px; text-align: center;"
-               oninput="toggleApplyButton()">
-        
-        <button id="applyCouponBtn" onclick="applyCoupon()" 
-                style="padding: 10px 20px; background-color: #28a745; color: #fff; font-size: 16px; border: none; border-radius: 5px; cursor: pointer; transition: 0.3s ease;"
-                disabled>
-          Apply
-        </button>
-      </div>
-      
-      <p id="discountMessage" style="color: green; font-size: 16px; font-weight: bold; display: none; margin-top: 15px;">
-        Coupon Applied! Discount: ₹<span id="discountAmount">0</span>
-      </p>
-    </div>
-    
+    </div>    
     
     <button onclick="confirmPayment()" style="margin-top: 15px; background-color: #ff9900; color: #fff; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
       Use this payment method
@@ -288,15 +266,55 @@
   </div>
 
 </div>
-
-
-<!-- coupon -->
-
-
-
-
   </div>
 </div>
+
+
+  <!-- Coupon Section -->
+  <div id="couponContainer" style="width: 80%; max-width: 800px; margin: 50px auto; padding: 20px; background-color: white; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0px 0px 8px rgba(0,0,0,0.1); text-align: left;">
+    <h2 style="font-size: 20px; margin-bottom: 15px;">Coupons</h2>
+
+    <div style="display: flex; position: relative;">
+        <input type="text" id="couponCodeInput" placeholder="Enter or select a coupon" 
+            oninput="handleCouponChange()"
+            style="flex-grow: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 100%;">
+
+        <button onclick="toggleDropdown()" 
+            style="padding: 8px; border: 1px solid #ddd; background: #28a745; color: white; border-radius: 4px; cursor: pointer; margin-left: 5px;">
+            ▼
+        </button>
+
+        <div id="couponDropdown" 
+            style="display: none; position: absolute; background: white; border: 1px solid #ddd; border-radius: 4px; 
+                   width: 100%; top: 40px; left: 0; z-index: 10; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); 
+                   max-height: 200px; overflow-y: auto;">
+            
+            <% if (coupons.length > 0 ) { %>
+                <% coupons.forEach(coupon => { %>
+                    <div class="coupon-option" onclick="selectCoupon('<%= coupon.couponCode %>')"
+                         style="padding: 8px; cursor: pointer; border-bottom: 1px solid #ddd;">
+                        <%= coupon.couponCode %> - ₹<%= coupon.discountPrice %> off (Min: ₹<%= coupon.minimumPrice %>)
+                    </div>
+                <% }) %>
+            <% } else { %>
+                <div style="padding: 8px; color: red;">No available coupons</div>
+            <% } %>
+
+        </div>
+    </div>
+
+    <!-- Apply Button -->
+    <button id="applyButton" onclick="applyCoupon()" 
+        style="margin-top: 10px; padding: 8px 12px; background-color: #28a745; color: white; border: none; 
+               border-radius: 4px; cursor: pointer;">Apply</button>
+
+    <div id="appliedCoupon" style="margin-top: 10px; display: none;">
+        <strong>Applied Coupon:</strong> <span id="appliedCouponCode"></span>
+        <button onclick="removeCoupon()" style="margin-left: 10px; padding: 4px 8px; background-color: red; 
+                       color: white; border: none; border-radius: 4px; cursor: pointer;">Remove</button>
+    </div>
+</div>
+
 
 
 
@@ -347,64 +365,44 @@
 
 
 <!-- Order summary sticky -->
-<div style="position: fixed; right: 20px; top: 300px; width: 250px; padding: 50px 20px 20px 20px; background-color: white; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0px 0px 8px rgba(0,0,0,0.1);">
+<div style="position: fixed; right: 20px; top: 300px; width: 250px; padding: 20px; background-color: white; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0px 0px 8px rgba(0,0,0,0.1);">
   <h4 style="font-size: 18px; color: #333; margin-bottom: 15px;">Order Summary</h4>
   
   <div style="display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 10px;">
     <span style="color: #333;">Delivery Charge</span>
     <span style="color: #B12704;">₹50</span>
-  </div>
-
-  <!-- Coupon Discount Row (Initially Hidden) -->
-  <div id="discountRow" style="display: none; justify-content: space-between; font-size: 14px; margin-bottom: 10px;">
-    <span style="color: green;">Coupon Discount</span>
-    <span style="color: green;">₹<span id="discountAmount">0</span></span>
   </div>
   
   <div style="display: flex; justify-content: space-between; font-size: 16px; margin-bottom: 20px;">
     <strong style="color: #333;">Total Price</strong>
-    <strong style="color: #B12704;">₹<%= totalPrice + 50 %></strong>
+    <strong id="totalPriceFixed" style="color: #B12704;">₹<%= totalPrice + 50 %></strong>
   </div>
-  
-  
-  <button onclick="placeOrder()" style="width: 100%; height: 28px; padding: 1px; background-color: #FFD814; border: none; border-radius: 4px; font-size: 16px; font-weight: bold; color: #111; cursor: pointer;">
+
+  <button onclick="placeOrder()" style="width: 100%; height: 28px; background-color: #FFD814; border: none; border-radius: 4px; font-size: 16px; font-weight: bold; color: #111; cursor: pointer;">
     Place Your Order
   </button>
 </div>
 
 
-
 <!-- Order summary -->
-<div style="width: 80%; max-width: 800px; margin: 50px auto; padding: 20px; background-color: white; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0px 0px 8px rgba(0,0,0,0.1); text-align: left;">
-  
- 
+<div style="width: 80%; max-width: 800px; margin: 50px auto; padding: 20px; background-color: white; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0px 0px 8px rgba(0,0,0,0.1);">
   <h4 style="font-size: 18px; color: #333; margin-bottom: 15px;">Order Summary</h4>
-  
 
   <div style="display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 10px;">
     <span style="color: #333;">Delivery Charge</span>
     <span style="color: #B12704;">₹50</span>
   </div>
 
-    <!-- Coupon Discount Row (Initially Hidden) -->
-    <div id="discountRow" style="display: none; justify-content: space-between; font-size: 14px; margin-bottom: 10px;">
-      <span style="color: green;">Coupon Discount</span>
-      <span style="color: green;">₹<span id="discountAmount">0</span></span>
-    </div>
+  <div style="display: flex; justify-content: space-between; font-size: 16px; margin-bottom: 20px;">
+    <strong style="color: #333;">Total Price</strong>
+    <strong id="totalPriceBlock" style="color: #B12704;">₹<%= totalPrice + 50 %></strong>
+  </div>
 
-  <!-- Update the ID to dynamically switch when a coupon is applied -->
-<div style="display: flex; justify-content: space-between; font-size: 16px; margin-bottom: 20px;">
-  <strong style="color: #333;">Total Price</strong>
-  <strong style="color: #B12704;">₹<%= totalPrice + 50 %></strong>
-</div>
-
-
-  
-  
-  <button onclick="placeOrder()" id="placeOrderBtn" style="width: 100%; height: 41px; padding: 1px; background-color: #FFD814; border: none; border-radius: 4px; font-size: 16px; font-weight: bold; color: #111; cursor: pointer;">
+  <button onclick="placeOrder()" style="width: 100%; height: 41px; background-color: #FFD814; border: none; border-radius: 4px; font-size: 16px; font-weight: bold; color: #111; cursor: pointer;">
     Place Your Order
   </button>
 </div>
+
 </div>
 
 

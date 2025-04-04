@@ -91,14 +91,124 @@ function confirmPayment() {
     }
 
 
+//coupon
+
+function updateCouponInput() {
+  document.getElementById('couponCodeInput').value = document.getElementById('couponDropdown').value;
+}
+
+window.onload = loadCoupons;
+
+function toggleDropdown() {
+  const dropdown = document.getElementById('couponDropdown');
+  dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+}
+
+function selectCoupon(couponCode) {
+  document.getElementById('couponCodeInput').value = couponCode;
+  document.getElementById('couponDropdown').style.display = 'none';
+  document.getElementById('applyButton').style.display = 'inline-block';
+}
+
+document.addEventListener('click', function(event) {
+  const dropdown = document.getElementById('couponDropdown');
+  const inputField = document.getElementById('couponCodeInput');
+  const dropdownButton = document.querySelector('button[onclick="toggleDropdown()"]');
+
+  if (event.target !== inputField && event.target !== dropdownButton && !dropdown.contains(event.target)) {
+      dropdown.style.display = 'none';
+  }
+});
+
+function updateTotalPrice(newTotal) {
+  document.getElementById('totalPriceFixed').innerText = `₹${newTotal}`;
+  document.getElementById('totalPriceBlock').innerText = `₹${newTotal}`;
+}
+
+function showErrorMessage(message) {
+  let errorElement = document.getElementById('couponError');
+  if (!errorElement) {
+      errorElement = document.createElement('div');
+      errorElement.id = 'couponError';
+      errorElement.style.color = 'red';
+      errorElement.style.marginTop = '10px';
+      errorElement.style.fontSize = '14px';
+      document.getElementById('couponContainer').appendChild(errorElement);
+  }
+  errorElement.innerText = message;
+
+  // Automatically hide after 5 seconds
+  setTimeout(() => {
+    if (errorElement) errorElement.remove();
+  }, 5000);
+}
+
+async function applyCoupon() {
+  const couponCode = document.getElementById('couponCodeInput').value;
+  if (!couponCode) {
+      alert('Please enter or select a coupon');
+      return;
+  }
+
+  try {
+      const totalPriceElement = document.getElementById('totalPriceBlock');
+      let totalPrice = parseFloat(totalPriceElement.innerText.replace('₹', ''));
+
+      if (!totalPriceElement.hasAttribute("data-original-price")) {
+          totalPriceElement.setAttribute("data-original-price", totalPrice);
+          document.getElementById('totalPriceFixed').setAttribute("data-original-price", totalPrice);
+      }
+
+      const response = await axios.post('/apply-coupon', { couponCode, totalPrice });
+
+      if (response.data.success) {
+          const newTotalPrice = response.data.newTotalPrice;
+
+          document.getElementById('appliedCoupon').style.display = 'block';
+          document.getElementById('appliedCouponCode').innerText = couponCode;
+          document.getElementById('applyButton').style.display = 'none';
+
+          updateTotalPrice(newTotalPrice);
+      } else {
+          showErrorMessage(response.data.message);
+      }
+  } catch (error) {
+      if (error.response && error.response.data) {
+          showErrorMessage(error.response.data.message);
+      } else {
+          console.error('Error applying coupon:', error);
+          showErrorMessage("An unexpected error occurred. Please try again.");
+      }
+  }
+}
+
+function handleCouponChange() {
+  document.getElementById('applyButton').style.display = 'inline-block';
+}
+
+
+function removeCoupon() {
+  document.getElementById('appliedCoupon').style.display = 'none';
+  document.getElementById('appliedCouponCode').innerText = '';
+  document.getElementById('couponCodeInput').value = "";
+  document.getElementById('applyButton').style.display = 'inline-block'; 
+
+  const totalPriceElement = document.getElementById('totalPrice');
+  const originalTotal = parseFloat(totalPriceElement.getAttribute("data-original-price"));
+  
+  totalPriceElement.innerText = `₹${originalTotal}`;
+}
+
 
 //place order
 
 function placeOrder() {
   if (!addressId) {
-    return showMessage('Please select an address', 'danger');
-  }
+    alert("Please select an address before placing your order.");
+    return;
+}
 
+  const appliedCouponCode = document.getElementById("appliedCouponCode").innerText || null;
   if (selectedMethod === 'razorpay') {
     fetch('/create-razorpay-order', {
         method: 'POST',
@@ -143,7 +253,7 @@ function placeOrder() {
     })
     .catch(error => console.error('Error:', error));
   }else {
-    axios.post('/place-order', { addressId, paymentMethod: selectedMethod })
+    axios.post('/place-order', { addressId, paymentMethod: selectedMethod , couponCode: appliedCouponCode })
       .then(response => {
         window.location.href = '/order-confirmed'; 
       })
@@ -154,47 +264,6 @@ function placeOrder() {
   }
 }
 
-async function applyCoupon() {
-  const couponCode = document.getElementById("couponCode").value.trim();
-  
-  if (!couponCode) {
-    alert("Please enter a coupon code.");
-    return;
-  }
-
-  try {
-    console.log("Sending coupon request:", couponCode);
-
-    const response = await fetch("/apply-coupon", { 
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ couponCode }),
-    });
-
-    const data = await response.json();
-    console.log("Server response:", data);
-
-    if (data.success) {
-      document.getElementById("discountMessage").style.display = "block";
-      document.getElementById("discountAmount").innerText = data.discountAmount;
-      document.getElementById("totalAmount").innerText = data.newTotal;
-      alert("Coupon applied successfully!");
-    } else {
-      alert(data.message);
-    }
-  } catch (error) {
-    console.error("Error applying coupon:", error);
-    alert("Failed to apply coupon. Please try again.");
-  }
-}
-
-
-function toggleApplyButton() {
-  const couponCode = document.getElementById("couponCode").value;
-  document.getElementById("applyCouponBtn").disabled = couponCode.trim() === "";
-}
-
-
 
 function getPaymentMethodText(method) {
   switch (method) {
@@ -204,10 +273,6 @@ function getPaymentMethodText(method) {
       default: return "Unknown Payment Method";
   }
 }
-
-
-
-
 
 function openEditModal(addressId) {
   fetch(`/edit-address/${addressId}`)
@@ -279,6 +344,30 @@ function showOrderDetails(orderId) {
 
 
 
+
+
+
+function showErrorMessage(message) {
+  let errorElement = document.getElementById('couponError');
+
+  if (!errorElement) {
+      errorElement = document.createElement('div');
+      errorElement.id = 'couponError';
+      errorElement.style.color = 'red';
+      errorElement.style.marginTop = '10px';
+      errorElement.style.fontSize = '14px';
+      document.getElementById('couponContainer').appendChild(errorElement);
+  }
+
+  errorElement.innerText = message;
+
+  // Remove error message after 5 seconds
+  setTimeout(() => {
+      if (errorElement) {
+          errorElement.remove();
+      }
+  }, 2000);
+}
 
 
 function showMessage(message, type) {

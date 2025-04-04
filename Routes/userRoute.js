@@ -91,11 +91,13 @@ router.get('/profile',profileController.getUserProfile)
 router.get('/my-profile',profileController.getMyProfile)
 router.post('/update-profile',profileController.updateProfile)
 
+
+
+
 //orders
 router.get('/checkout', checkoutController.getCheckout)
 router.post('/update-payment-method',checkoutController.updatePaymentMethod)
 router.post('/create-razorpay-order',checkoutController.razorPayCreateOrder)
-router.post('/apply-coupon',checkoutController.applyCoupon)
 router.post('/confirm-razorpay-payment',checkoutController.confirmPaymentRazorPay)
 router.post('/place-order',checkoutController.placeOrder)
 router.get('/order-confirmed',checkoutController.orderConfirmed)
@@ -105,6 +107,9 @@ router.post('/cancel-order/:orderId',orderController.cancelOrder)
 router.post('/return-order/:orderId',orderController.returnOrder)
 router.post('/request-return/:orderId', orderController.requestReturn);
 
+//coupon
+router.get('/get-coupons',checkoutController.getCoupon)
+router.post('/apply-coupon',checkoutController.applyCoupon)
 
 //wishlist
 

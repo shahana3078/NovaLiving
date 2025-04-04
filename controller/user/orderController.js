@@ -51,6 +51,7 @@ const getOrder = async (req, res) => {
 };
 
 const orderDetails = async (req, res) => {
+
   try {
     const { orderId } = req.query;
     const userId = req.session.userId;
@@ -104,7 +105,9 @@ const orderDetails = async (req, res) => {
   }
 };
 
-//cancel order
+// cancel order
+
+
 const cancelOrder = async (req, res) => {
   try {
     const { orderId } = req.params;
@@ -257,3 +260,4 @@ module.exports = {
   returnOrder,
   requestReturn,
 };
+

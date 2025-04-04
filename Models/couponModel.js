@@ -34,7 +34,7 @@ const CouponSchema = new mongoose.Schema({
   },
   updatedAt: {
     type: Date
-  }
+  },
 });
 
 const Coupon = mongoose.model("Coupon", CouponSchema);

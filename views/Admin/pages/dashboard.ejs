@@ -18,127 +18,152 @@
     <link rel="stylesheet" href="/Admin/css/admin.css">
     <!-- End layout styles -->
     <link rel="shortcut icon" href="assets/images/favicon.png" />
-    <style>
-       h1 { color: #f8f9fa; text-align: center; margin: 20px 0; font-size: 2.5rem; padding-top: 20px; }
-    </style>
-  </head>
+    
 
-  <head>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <style>
+        .stats-card {
+          transition: transform 0.3s ease, box-shadow 0.3s ease;
+          border-radius: 1rem;
+        }
+      
+        .stats-card:hover {
+          transform: scale(1.05);
+          box-shadow: 0 0.8rem 1.5rem rgba(0, 0, 0, 0.3);
+        }
+        .table td, .table th {
+  font-size: 16px;
+  vertical-align: middle;
+}
+
+/* Add zoom effect on hover */
+.custom-hover tbody tr:hover {
+  transform: scale(1.02);
+  transition: transform 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+/* Optional: Make table head sticky if long scroll */
+.table thead th {
+  position: sticky;
+  top: 0;
+  background-color: #343a40;
+  z-index: 2;
+}
+      </style>
+      
   </head>
   
-  <body class="bg-dark">
-  
-    <div class="container-scroller">
-      <%- include('./Partials/sideBar'); %>
-  
-      <div class="container-fluid page-body-wrapper">
-        <%- include('./Partials/navBar'); %>
-  
-        <div class="container mt-4">
-          <h1>Sales Report</h1>
-  
-          <form id="salesReportForm" action="/admin/dashboard" method="GET" class="row g-3 bg-dark text-light p-4 rounded shadow">
-            <div class="col-md-4">
-                <label for="filter" class="form-label fw-bold">Select Date Range:</label>
-                <select name="filter" id="filter" class="form-select">
-                    <option value="daily" <%= filter === 'daily' ? 'selected' : '' %>>Daily</option>
-                    <option value="weekly" <%= filter === 'weekly' ? 'selected' : '' %>>Weekly</option>
-                    <option value="yearly" <%= filter === 'yearly' ? 'selected' : '' %>>Yearly</option>
-                    <option value="custom" <%= filter === 'custom' ? 'selected' : '' %>>Custom</option>
-                </select>
+      <body class="bg-dark">
+        <div class="container-scroller">
+            <%- include('./Partials/sideBar'); %>
+            <div class="container-fluid page-body-wrapper">
+                <%- include('./Partials/navBar'); %>
+                <div class="container mt-4">
+                    <h1 class="text-white" style="color: #f8f9fa; text-align: center; margin: 20px 0; font-size: 2.5rem; padding-top: 20px;" >Sales Report</h1>
+                    <p class="text-white">View total sales, orders, and discounts.</p>
+                    <div class="d-flex align-items-center gap-3 bg-dark p-3 rounded">
+                      <label class="text-white mb-0">Filter By:</label>
+                      <select class="form-control w-auto" id="filterType" onchange="toggleDateRange()">
+                          <option value="all">All</option>
+                          <option value="daily">Daily</option>
+                          <option value="weekly">Weekly</option>
+                          <option value="monthly">Monthly</option>
+                          <option value="yearly">Yearly</option>
+                          <option value="custom">Custom Date Range</option>
+                      </select>
+              
+                      <div id="customDateRange" class="d-flex gap-2 d-none">
+                          <label class="text-white mb-0">From:</label>
+                          <input type="date" id="startDate" class="form-control w-auto">
+                          <label class="text-white mb-0">To:</label>
+                          <input type="date" id="endDate" class="form-control w-auto">
+                      </div>
+              
+                      <button class="btn btn-primary" onclick="fetchReport()">Submit</button>
+                  </div>
+            
+
+                  <div class="row mt-4">
+                    <div class="col-md-3">
+                      <div class="card text-white text-center p-3 stats-card bg-primary">
+                        <h5>Total Sales Amount</h5>
+                        <h3 id="totalSales">₹0.00</h3>
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="card text-white text-center p-3 stats-card bg-danger">
+                        <h5>Total Coupon Discount</h5>
+                        <h3 id="totalCouponDiscount">₹0.00</h3>
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="card text-white text-center p-3 stats-card bg-warning">
+                        <h5>Total Offer Discount</h5>
+                        <h3 id="totalOfferDiscount">₹0.00</h3>
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="card text-white text-center p-3 stats-card bg-success">
+                        <h5>Total Order Count</h5>
+                        <h3 id="totalOrders">0</h3>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="mt-4">
+                    <div style="overflow-x: auto;">
+                      <table class="table table-dark table-hover custom-hover" style="min-width: 1000px;">
+                        <thead>
+                          <tr>
+                            <th>Order ID</th>
+                            <th>Name</th>
+                            <th>Order Date</th>
+                            <th>Items</th>
+                            <th>Total Amount</th>
+                            <th>Offer Discount</th>
+                            <th>Coupon Discount</th>
+                            <th>Payment method</th>
+                          </tr>
+                        </thead>
+                        <tbody id="salesTable">
+                          <!-- Order rows will be added here dynamically -->
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                  
+                    <button class="btn btn-primary " onclick="downloadPDF()">PDF <i class="fas fa-download"></i></button>
+                    <button class="btn btn-success " onclick="downloadExcel()">Excel <i class="fas fa-download"></i></button>
+                </div>
             </div>
-        
-            <div class="col-md-3">
-                <label for="startDate" class="form-label fw-bold">Start Date:</label>
-                <input type="date" name="startDate" id="startDate" class="form-control bg-secondary text-light border-0" value="<%= startDate %>">
-            </div>
-        
-            <div class="col-md-3">
-                <label for="endDate" class="form-label fw-bold">End Date:</label>
-                <input type="date" name="endDate" id="endDate" class="form-control bg-secondary text-light border-0" value="<%= endDate %>">
-            </div>
-        
-            <div class="col-md-2 d-flex align-items-end">
-                <button type="submit" class="btn btn-light w-100 fw-bold">Apply Filter</button>
-            </div>
-        </form>
-        
-        
-        <!-- Sales Report Table -->
-        <table class="table table-bordered text-center">
-          <thead class="table-dark">
-              <tr>
-                  <th>Total Sales</th>
-                  <th>Total Orders</th>
-                  <th>Total Discount</th>
-              </tr>
-          </thead>
-          <tbody>
-              <tr>
-                  <td id="totalSales" class="fw-bold text-success">₹<%= salesData.totalSales %></td>
-                  <td id="totalOrders" class="fw-bold"><%= salesData.totalOrders %></td>
-                  <td id="totalDiscount" class="fw-bold text-danger">₹<%= salesData.totalDiscount %></td>
-              </tr>
-          </tbody>
-      </table>
-      
-        
-          <div class="mt-4">
-            <a href="/admin/sales-report/download?format=pdf" class="btn btn-danger">Download PDF</a>
-            <a href="/admin/sales-report/download?format=excel" class="btn btn-success">Download Excel</a>
-          </div>
         </div>
-      </div>
-    </div>
+          
+  
 
+  
     
-  
-\
-<script>
-  document.addEventListener("DOMContentLoaded", function () {
-      const filterDropdown = document.getElementById("filter");
-      const startDateInput = document.getElementById("startDate");
-      const endDateInput = document.getElementById("endDate");
-      const filterForm = document.querySelector("#salesReportForm");
-  
-      function toggleDateFields() {
-          if (filterDropdown.value === "custom") {
-              startDateInput.style.display = "block";
-              endDateInput.style.display = "block";
-          } else {
-              startDateInput.style.display = "none";
-              endDateInput.style.display = "none";
-          }
-      }
-  
-      filterDropdown.addEventListener("change", toggleDateFields);
-      toggleDateFields(); // Ensure correct visibility on page load
-  
-      // AJAX form submission
-      filterForm.addEventListener("submit", function (event) {
-          event.preventDefault();
-  
-          const formData = new FormData(filterForm);
-          const queryString = new URLSearchParams(formData).toString();
-  
-          fetch(`/admin/dashboard?${queryString}`, { method: "GET", headers: { "X-Requested-With": "XMLHttpRequest" } })
-              .then(response => response.json())
-              .then(data => {
-                  document.getElementById("totalSales").innerText = `₹${data.totalSales}`;
-                  document.getElementById("totalOrders").innerText = data.totalOrders;
-                  document.getElementById("totalDiscount").innerText = `₹${data.totalDiscount}`;
-              })
-              .catch(error => console.error("Error fetching data:", error));
-      });
-  });
-  </script>
-  
 
 
+    <!-- Include necessary JS libraries -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<!-- Popper.js -->
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<!-- Bootstrap JS -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
-  
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+
+<!-- Include Bootstrap JS -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+<script src="/script/Admin/dashboard.js"></script>
+
+
   </body>
   
 

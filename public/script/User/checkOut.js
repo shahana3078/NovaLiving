@@ -188,16 +188,27 @@ function handleCouponChange() {
 
 
 function removeCoupon() {
+  // Hide applied coupon section
   document.getElementById('appliedCoupon').style.display = 'none';
   document.getElementById('appliedCouponCode').innerText = '';
   document.getElementById('couponCodeInput').value = "";
   document.getElementById('applyButton').style.display = 'inline-block'; 
 
-  const totalPriceElement = document.getElementById('totalPrice');
-  const originalTotal = parseFloat(totalPriceElement.getAttribute("data-original-price"));
-  
-  totalPriceElement.innerText = `₹${originalTotal}`;
+  // Reset total price in both summary sections
+  const fixedPriceEl = document.getElementById('totalPriceFixed');
+  const blockPriceEl = document.getElementById('totalPriceBlock');
+
+  const originalFixedPrice = parseFloat(fixedPriceEl.getAttribute("data-original-price"));
+  const originalBlockPrice = parseFloat(blockPriceEl.getAttribute("data-original-price"));
+
+  fixedPriceEl.innerText = `₹${originalFixedPrice.toFixed(2)}`;
+  blockPriceEl.innerText = `₹${originalBlockPrice.toFixed(2)}`;
+
+  // Optional: Remove hidden inputs
+  document.getElementById('couponId')?.remove();
+  document.getElementById('couponDiscountValue')?.remove();
 }
+
 
 
 //place order

@@ -38,7 +38,7 @@ const productSchema = new mongoose.Schema({
          type: Boolean, 
          default: false
          } ,
-         offer: {
+    offer: {
             discountPercentage: { type: Number, default: 0 }, 
             isActive: { type: Boolean, default: true} 
         }

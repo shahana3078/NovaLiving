@@ -98,8 +98,9 @@ router.get('/coupon',couponController.getCoupon)
 router.post("/add-coupon", couponController.addCoupon);
 router.delete("/delete-coupon/:id", couponController.deleteCoupon)
 
-router.get('/dashboard',salesReport.getSalesReport)
-router.get('/sales-report/download',salesReport.downloadSalesReport)
+router.get('/dashboard',salesReport.getDashboard)
+router.post('/sales-report',salesReport.getSalesReport)
+router.post('/sales-report/download',salesReport.downloadSalesReport)
 
 
 

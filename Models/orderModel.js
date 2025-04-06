@@ -11,6 +11,11 @@ const orderSchema = new mongoose.Schema({
     ref: "Address",
     required: true,
   },
+  couponId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Coupon",
+    default: null,
+  },
   items: [
     {
       productId: {
@@ -70,13 +75,15 @@ const orderSchema = new mongoose.Schema({
     status: { type: String, enum: ['requested', 'approved', 'rejected'] },
     reason: { type: String } 
 },
+
 paymentMethod: {
   type: String,
   enum: ['cash on delivery', "razorpay", "wallet", "payment failed"],
   default: "cash on delivery",
   required: true,
  },
-});
+},
+{ timestamps: true });
 
 const Order = mongoose.model("Order", orderSchema);
 

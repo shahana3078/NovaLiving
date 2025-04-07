@@ -137,7 +137,6 @@ function showErrorMessage(message) {
   }
   errorElement.innerText = message;
 
-  // Automatically hide after 5 seconds
   setTimeout(() => {
     if (errorElement) errorElement.remove();
   }, 5000);
@@ -188,13 +187,11 @@ function handleCouponChange() {
 
 
 function removeCoupon() {
-  // Hide applied coupon section
   document.getElementById('appliedCoupon').style.display = 'none';
   document.getElementById('appliedCouponCode').innerText = '';
   document.getElementById('couponCodeInput').value = "";
   document.getElementById('applyButton').style.display = 'inline-block'; 
 
-  // Reset total price in both summary sections
   const fixedPriceEl = document.getElementById('totalPriceFixed');
   const blockPriceEl = document.getElementById('totalPriceBlock');
 
@@ -204,7 +201,6 @@ function removeCoupon() {
   fixedPriceEl.innerText = `₹${originalFixedPrice.toFixed(2)}`;
   blockPriceEl.innerText = `₹${originalBlockPrice.toFixed(2)}`;
 
-  // Optional: Remove hidden inputs
   document.getElementById('couponId')?.remove();
   document.getElementById('couponDiscountValue')?.remove();
 }
@@ -224,7 +220,7 @@ function placeOrder() {
     fetch('/create-razorpay-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({})
+        body: JSON.stringify({ couponCode: appliedCouponCode })
     })
     .then(response => response.json())
     .then(order => {
@@ -244,7 +240,8 @@ function placeOrder() {
                         paymentMethod: 'razorpay',
                         razorpay_payment_id: response.razorpay_payment_id,
                         razorpay_order_id: response.razorpay_order_id,
-                        razorpay_signature: response.razorpay_signature
+                        razorpay_signature: response.razorpay_signature,
+                        couponCode: appliedCouponCode
                     })
                 })
                 .then(response => response.json())

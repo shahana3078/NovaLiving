@@ -1,11 +1,11 @@
-const User = require('../../Models/userSchema'); // Ensure the correct user model is imported
+const User = require('../../Models/userSchema');
 
 const getReferal = async (req, res) => {
   try {
-    const userId = req.session.userId; // Get logged-in user ID
+    const userId = req.session.userId;
 
     if (!userId) {
-      return res.redirect('/login'); // Redirect if not logged in
+      return res.redirect('/login'); 
     }
 
     const user = await User.findById(userId);
@@ -13,10 +13,10 @@ const getReferal = async (req, res) => {
       return res.status(404).send("User not found");
     }
 
-    const referralLink = `${req.protocol}://${req.get("host")}/signup?ref=${user._id}`; // Unique signup link
-    console.log("Generated Referral Link:", referralLink); // Debugging
+    const referralLink = `${req.protocol}://${req.get("host")}/signup?ref=${user._id}`; 
+    console.log(referralLink); 
 
-    res.render('User/referal', { referralLink }); // Pass the link to the referral page
+    res.render('User/referal', { referralLink });
   } catch (error) {
     console.error("Error loading referral page:", error);
     res.status(500).send("Server Error");

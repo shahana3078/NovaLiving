@@ -174,6 +174,7 @@ const razorPayCreateOrder = async (req, res) => {
   });
 
   const userId = req.session.userId;
+  const { couponCode } = req.body;
 
   try {
     const cart = await Cart.findOne({ userId }).populate("items.productId");
@@ -200,8 +201,25 @@ const razorPayCreateOrder = async (req, res) => {
     const shipping = 50;
     let totalPrice = Math.floor(subtotal + shipping);
 
+    let discountAmount = 0;
+    if (couponCode) {
+      const coupon = await Coupon.findOne({ couponCode, isDeleted: false });
+      if (coupon) {
+        discountAmount = coupon.discountPrice;
+        if (discountAmount > totalPrice) {
+          discountAmount = totalPrice;
+        }
+        totalPrice -= discountAmount;
+      } else {
+        return res
+          .status(400)
+          .json({ success: false, message: "Invalid or expired coupon code." });
+      }
+    }
+
+
     const options = {
-      amount: totalPrice * 100, 
+      amount: Math.floor(totalPrice * 100), 
       currency: "INR",
       receipt: `order_rcptid_${Date.now()}`,
     };

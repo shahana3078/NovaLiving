@@ -12,117 +12,6 @@ const getDashboard = async (req, res) => {
 };
 
 
-
-
-// const getSalesReport= async(req,res)=>{
-//   try {
-//     const { filterType, startDate, endDate } = req.body;
-
-//     let matchQuery = {};
-
-//     const today = new Date();
-//     let start, end;
-
-//     switch (filterType) {
-//       case "daily":
-//         start = new Date(today.setHours(0, 0, 0, 0));
-//         end = new Date(today.setHours(23, 59, 59, 999));
-//         break;
-
-//       case "weekly":
-//         start = new Date(today.setDate(today.getDate() - 7));
-//         end = new Date();
-//         break;
-
-//       case "monthly":
-//         start = new Date(today.getFullYear(), today.getMonth(), 1);
-//         end = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-//         break;
-
-//       case "yearly":
-//         start = new Date(today.getFullYear(), 0, 1);
-//         end = new Date(today.getFullYear(), 11, 31);
-//         break;
-
-//       case "custom":
-//         start = new Date(startDate);
-//         end = new Date(endDate);
-//         end.setHours(23, 59, 59, 999);
-//         break;
-
-//       case "all":
-//       default:
-//         start = null;
-//         end = null;
-//         break;
-//     }
-
-//     if (start && end) {
-//       matchQuery.createdAt = { $gte: start, $lte: end };
-//     }
-//     matchQuery.orderStatus = "delivered";
-
-//     const orders = await Order.find(matchQuery)
-//     .populate("userId")
-//     .populate("couponId")
-//     .populate("items.productId")
-//     .sort({ createdAt: -1 });
-
-//     let totalSales = 0;
-//     let totalOrders = orders.length;
-//     let totalCouponDiscount = 0;
-//     let totalOfferDiscount = 0;
-    
-//     const orderList = orders.map(order => {
-//       const couponDiscount = order.couponDiscount || 0;
-//       const grandTotal = order.grandTotal || 0;
-//       const shippingCharge = order.shippingCharge || 0;
-//       const paymentMethod = order.paymentMethod || "N/A";
-//       let offerDiscount = 0; 
-    
-//       order.items.forEach(item => {
-//         const product = item.productId;
-//         if (product?.offer?.isActive && product?.offer?.discountPercentage > 0) {
-//           const discountAmount = (item.price * product.offer.discountPercentage) / 100;
-//           offerDiscount += discountAmount * item.quantity;
-//         }
-//       });
-    
-//       totalSales += grandTotal;
-//       totalCouponDiscount += couponDiscount;
-//       totalOfferDiscount += offerDiscount;
-    
-//       return {
-//         id: order._id,
-//         name: order.userId?.full_name || 'Unknown',
-//         date: order.createdAt.toDateString(),
-//         items: order.items.length,
-//         grandTotal,
-//         shippingCharge,
-//         paymentMethod,
-//         couponDiscount,
-//         offerDiscount: parseFloat(offerDiscount.toFixed(2))
-//       };
-//     });
-             
-    
-
-//     res.json({
-//       success: true,
-//       data: {
-//         totalSales,
-//         totalOrders,
-//         totalCouponDiscount,
-//         totalOfferDiscount,
-//         orders: orderList
-//       }
-//     });
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ success: false, message: "Server error" });
-//   }
-// }
-
 const getFilteredOrders = async (startDate, endDate, filterType) => {
   let matchQuery = {};
   const today = new Date();
@@ -166,6 +55,7 @@ const getFilteredOrders = async (startDate, endDate, filterType) => {
   const orders = await Order.find(matchQuery)
     .populate("userId")
     .populate("items.productId")
+    .populate('couponId')
     .sort({ createdAt: -1 });
 
   let totalSales = 0;
@@ -179,7 +69,7 @@ const getFilteredOrders = async (startDate, endDate, filterType) => {
     const shippingCharge = order.shippingCharge || 0;
     const paymentMethod = order.paymentMethod || "N/A";
     let offerDiscount = 0;
-
+  
     order.items.forEach(item => {
       const product = item.productId;
       if (product?.offer?.isActive && product?.offer?.discountPercentage > 0) {
@@ -187,11 +77,11 @@ const getFilteredOrders = async (startDate, endDate, filterType) => {
         offerDiscount += discountAmount * item.quantity;
       }
     });
-
-    totalSales += grandTotal;
+  
+    totalSales += grandTotal + couponDiscount; 
     totalCouponDiscount += couponDiscount;
     totalOfferDiscount += offerDiscount;
-
+  
     return {
       id: order._id,
       name: order.userId?.full_name || 'Unknown',
@@ -204,6 +94,7 @@ const getFilteredOrders = async (startDate, endDate, filterType) => {
       offerDiscount: parseFloat(offerDiscount.toFixed(2))
     };
   });
+  
 
   return {
     orders: orderList,

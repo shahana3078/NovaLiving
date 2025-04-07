@@ -267,19 +267,23 @@ const placeOrder = async (req, res) => {
 
     const shippingCharge = 50;
     let grandTotal = subtotal + shippingCharge;
+
+
+    let couponUsed = false;
     let discountAmount = 0;
 
+    
     if (couponCode) {
       const coupon = await Coupon.findOne({ couponCode, isDeleted: false });
-
+    
       if (coupon) {
-        console.log("coupon", coupon);
+        couponUsed = true;
         discountAmount = coupon.discountPrice;
-
+    
         if (discountAmount > grandTotal) {
           discountAmount = grandTotal;
         }
-
+    
         grandTotal -= discountAmount;
       } else {
         return res
@@ -287,6 +291,7 @@ const placeOrder = async (req, res) => {
           .json({ success: false, message: "Invalid or expired coupon code." });
       }
     }
+    
 
     if (paymentMethod === "wallet") {
       const wallet = await Wallet.findOne({ userId });
@@ -330,6 +335,8 @@ const placeOrder = async (req, res) => {
       discountAmount,
       grandTotal,
       couponCode,
+      couponUsed,             // <-- NEW
+    couponDiscount: discountAmount,
       paymentMethod,
       orderDate: Date.now(),
       status: "Pending",

@@ -64,9 +64,9 @@ const getFilteredOrders = async (startDate, endDate, filterType) => {
   let totalOfferDiscount = 0;
 
   const orderList = orders.map(order => {
-    const couponDiscount = order.couponDiscount || 0;
-    const grandTotal = order.grandTotal || 0;
-    const shippingCharge = order.shippingCharge || 0;
+    const couponDiscount = Math.round(order.couponDiscount || 0);
+    const grandTotal =Math.round( order.grandTotal || 0);
+    const shippingCharge =Math.round( order.shippingCharge || 0);
     const paymentMethod = order.paymentMethod || "N/A";
     let offerDiscount = 0;
   
@@ -77,6 +77,8 @@ const getFilteredOrders = async (startDate, endDate, filterType) => {
         offerDiscount += discountAmount * item.quantity;
       }
     });
+
+    offerDiscount = Math.round(offerDiscount);
   
     totalSales += grandTotal + couponDiscount; 
     totalCouponDiscount += couponDiscount;
@@ -94,7 +96,9 @@ const getFilteredOrders = async (startDate, endDate, filterType) => {
       offerDiscount: parseFloat(offerDiscount.toFixed(2))
     };
   });
-  
+  totalSales = Math.round(totalSales);
+  totalCouponDiscount = Math.round(totalCouponDiscount);
+  totalOfferDiscount = Math.round(totalOfferDiscount);
 
   return {
     orders: orderList,
@@ -103,6 +107,8 @@ const getFilteredOrders = async (startDate, endDate, filterType) => {
     totalCouponDiscount,
     totalOfferDiscount
   };
+
+  
 };
 
 
@@ -160,8 +166,8 @@ const downloadSalesReport = async (req, res) => {
       const cleanedAmount = String(amount).replace(/[^\d.-]/g, '');
       const number = Number(cleanedAmount);
       return isNaN(number)
-        ? '₹0.00'
-        : `₹${number.toLocaleString("en-IN", {
+        ? '0.00'
+        : `${number.toLocaleString("en-IN", {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,
           })}`;
@@ -225,7 +231,7 @@ const downloadSalesReport = async (req, res) => {
         ];
 
         values.forEach((value, i) => {
-          value = String(value).replace(/[^\x00-\x7F₹₹.,0-9-]/g, '');
+          value = String(value).replace(/[^\x00-\x7F.,0-9-]/g, '');
 
           doc.rect(x, y, columnWidths[i], rowHeight)
             .strokeColor("#cccccc")

@@ -62,11 +62,13 @@ const getShop = async (req, res) => {
       const finalDiscount = Math.max(productDiscount, categoryDiscount);
     
       if (finalDiscount > 0) {
-        product.discountedPrice = product.price - (product.price * finalDiscount) / 100;
-        product.appliedDiscount = finalDiscount; 
+        const discountAmount = (product.price * finalDiscount) / 100;
+        product.discountedPrice = Math.round(product.price - discountAmount);
+        product.appliedDiscount = finalDiscount;
       } else {
-        product.discountedPrice = product.price;
+        product.discountedPrice = Math.round(product.price);
       }
+      
     });
     
 

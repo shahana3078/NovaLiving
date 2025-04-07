@@ -32,15 +32,15 @@ const getOrder = async (req, res) => {
             originalPrice - (originalPrice * discountPercentage) / 100;
         }
 
-        item.originalPrice = originalPrice;
-        item.offerPrice = offerPrice;
+        item.originalPrice = Math.round(originalPrice);
+        item.offerPrice =Math.round(offerPrice);
         item.discountPercentage = discountPercentage;
 
         subtotal += offerPrice * item.quantity;
       });
 
       const shippingCharge = 50;
-      order.grandTotal = subtotal + shippingCharge;
+      order.grandTotal = Math.round(subtotal + shippingCharge);
     });
 
     res.render("User/order", { orders });
@@ -68,26 +68,6 @@ const orderDetails = async (req, res) => {
       return res.redirect("/404");
     }
 
-    
-    // order.items.forEach((item) => {
-    //   let originalPrice = item.productId.price;
-    //   let discountPercentage = 0;
-    //   let offerPrice = originalPrice;
-
-    //   if (
-    //     item.productId.offer?.isActive &&
-    //     item.productId.offer.discountPercentage > 0
-    //   ) {
-    //     discountPercentage = item.productId.offer.discountPercentage;
-    //     offerPrice = originalPrice - (originalPrice * discountPercentage) / 100;
-    //   }
-
-    //   item.originalPrice = originalPrice;
-    //   item.offerPrice = offerPrice;
-    //   item.discountPercentage = discountPercentage;
-
-    //   subtotal += offerPrice * item.quantity;
-    // });
 
   let subtotal = 0;
 
@@ -104,8 +84,8 @@ order.items.forEach((item) => {
     offerPrice = originalPrice - (originalPrice * discountPercentage) / 100;
   }
 
-  item.originalPrice = originalPrice;
-  item.offerPrice = offerPrice;
+  item.originalPrice = Math.round(originalPrice);
+  item.offerPrice =Math.round( offerPrice);
   item.discountPercentage = discountPercentage;
 
   subtotal += offerPrice * item.quantity;
@@ -113,7 +93,7 @@ order.items.forEach((item) => {
 
 
     const shippingCharge = order.shippingCharge || 50;
-    const grandTotal = subtotal + shippingCharge;
+    const grandTotal = Math.round(subtotal + shippingCharge);
 
 
 

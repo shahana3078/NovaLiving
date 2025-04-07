@@ -5,36 +5,6 @@ const Order = require("../../Models/orderModel");
 const Razorpay=require('Razorpay')
 
 
-// const getCart = async (req, res) => {
-//   try {
-//     const userId = req.session.userId;
-//     const cart = await Cart.findOne({
-//       userId,
-//     }).populate("items.productId");
-
-//     if (!cart) {
-//       return res.render("User/cart", { items: [], totalPrice: 0 });
-//     }
-
-//     res.render("User/cart", {
-//       items: cart.items.map((item) => ({
-        
-//         name: item.name,
-//         productId: item.productId._id,
-//         price: item.price,
-//         quantity: item.quantity,
-//         total: item.price * item.quantity,
-//         image: item.image,
-//       })),
-//       totalPrice: cart.totalPrice,
-//     });
-//   } catch (error) {
-//     console.error("Error fetching cart:", error);
-//     res.status(500).send("An error occurred while loading the cart.");
-//   }
-// };
-
-//ADD TO CART
 
 const getCart = async (req, res) => {
   try {
@@ -48,27 +18,29 @@ const getCart = async (req, res) => {
     let totalPrice = 0;
 
     const items = cart.items.map((item) => {
-      let originalPrice = item.productId.price; // Store original price
-      let productPrice = originalPrice; // Default price
+      let originalPrice = item.productId.price; 
+      let productPrice = originalPrice; 
 
-      // Apply discount if an active offer exists
       if (item.productId.offer?.isActive && item.productId.offer.discountPercentage > 0) {
         productPrice = originalPrice - (originalPrice * item.productId.offer.discountPercentage) / 100;
       }
 
-      const totalItemPrice = productPrice * item.quantity;
+      productPrice = Math.round(productPrice);
+      const totalItemPrice = Math.round(productPrice * item.quantity);
       totalPrice += totalItemPrice;
 
       return {
         name: item.productId.name,
         productId: item.productId._id,
-        originalPrice, // Include original price
-        price: productPrice, // Discounted price if applicable
+        originalPrice, 
+        price: productPrice,
         quantity: item.quantity,
         total: totalItemPrice,
         image: item.productId.images.length > 0 ? item.productId.images[0] : null,
       };
     });
+
+    totalPrice = Math.round(totalPrice).toFixed(2);
 
     res.render("User/cart", { items, totalPrice });
   } catch (error) {

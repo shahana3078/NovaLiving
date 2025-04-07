@@ -59,6 +59,7 @@ const getCheckout = async (req, res) => {
           deliveryDate: deliveryDate,
         };
       });
+      totalPrice = Math.round(totalPrice);
     }
 
     res.render("User/checkOut", {
@@ -165,6 +166,7 @@ const applyCoupon = async (req, res) => {
   }
 };
 
+
 const razorPayCreateOrder = async (req, res) => {
   const razorpay = new Razorpay({
     key_id: process.env.RAZORPAY_KEY_ID,
@@ -181,16 +183,25 @@ const razorPayCreateOrder = async (req, res) => {
         .json({ status: "failed", message: "Cart is empty or not found." });
     }
 
-    let totalPrice = cart.items.reduce(
-      (acc, item) => acc + item.quantity * item.productId.price,
-      0
-    );
-    const shipping = 50;
+    let subtotal = 0;
+    cart.items.forEach((item) => {
+      let price = item.productId.price;
 
-    totalPrice = Math.floor(totalPrice + shipping);
+      if (
+        item.productId.offer?.isActive &&
+        item.productId.offer.discountPercentage > 0
+      ) {
+        price -= (price * item.productId.offer.discountPercentage) / 100;
+      }
+
+      subtotal += item.quantity * price;
+    });
+
+    const shipping = 50;
+    let totalPrice = Math.floor(subtotal + shipping);
 
     const options = {
-      amount: totalPrice * 100,
+      amount: totalPrice * 100, 
       currency: "INR",
       receipt: `order_rcptid_${Date.now()}`,
     };

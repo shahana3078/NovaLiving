@@ -34,16 +34,17 @@ const getFilteredOrders = async (startDate, endDate, filterType) => {
       start = new Date(today.getFullYear(), 0, 1);
       end = new Date(today.getFullYear(), 11, 31);
       break;
-    case "custom":
-      start = new Date(startDate);
-      end = new Date(endDate);
-      end.setHours(23, 59, 59, 999);
-      break;
-    case "all":
-    default:
-      start = null;
-      end = null;
-      break;
+      case "custom":
+        start = new Date(startDate);
+        end = new Date(endDate);
+        
+     
+        if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+          throw new Error("Invalid startDate or endDate provided.");
+        }
+      
+        end.setHours(23, 59, 59, 999);
+        break;
   }
 
   if (start && end) {
@@ -174,7 +175,7 @@ const downloadSalesReport = async (req, res) => {
     }
 
     if (format === "pdf") {
-      // 🔵 PDF code remains the same (already implemented)
+ 
       const doc = new PDFDocument({ margin: 30, size: 'A4' });
       res.setHeader("Content-Type", "application/pdf");
       res.setHeader("Content-Disposition", "attachment; filename=SalesReport.pdf");

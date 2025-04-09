@@ -8,6 +8,12 @@ function toggleAddress(orderId) {
 }
 
 
+function downloadInvoice() {
+  const orderId = "ORDER_ID_HERE"; 
+  window.location.href = `/download-invoice?orderId=${orderId}`;
+}
+
+
 document.addEventListener('DOMContentLoaded', function () {
   
   // Return Order

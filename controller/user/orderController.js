@@ -1,5 +1,8 @@
+const PDFDocument = require("pdfkit");
+
 const Order = require("../../Models/orderModel");
 const Wallet = require("../../Models/walletModel");
+
 
 const getOrder = async (req, res) => {
   try {
@@ -49,6 +52,148 @@ const getOrder = async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 };
+
+
+//dowload invoice
+
+const generateInvoicePDF = async (req, res) => {
+  try {
+    const { orderId } = req.query;
+    const userId = req.session.userId;
+
+    const order = await Order.findOne({ _id: orderId, userId })
+      .populate("items.productId")
+      .populate("addressId")
+      .lean();
+
+    if (!order) return res.status(404).send("Order not found");
+
+    const doc = new PDFDocument({ margin: 50 });
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", `attachment; filename=invoice-${order._id}.pdf`);
+    doc.pipe(res);
+
+    const primaryColor = "#02360e";
+    const bgColor = "#f0f5f0";
+    const lightGray = "#e0e0e0";
+    const textGray = "#333";
+
+    doc.rect(0, 0, doc.page.width, 40).fill(primaryColor);
+    doc.fillColor("white").fontSize(20).text("Novaliving", 50, 10);
+    doc.fillColor("white").fontSize(16).text("INVOICE", { align: "right" });
+    doc.moveDown(1);
+
+    const addr = order.addressId;
+
+    doc.fillColor(primaryColor).fontSize(13).text("Sold By:", 50, doc.y);
+    doc.fontSize(11).fillColor(textGray)
+      .text("NOVALIVING RETAIL PRIVATE LIMITED", 50)
+      .text("BROADVIEW CONSTRUCTIONS AND HOLDINGS PVT LTD.", 50)
+      .text("Survey No. 153/1 153/2226/2,229/2,230/2", 50)
+      .text("Chettipalayam, Oratakuppai Village, Palladam Main Road", 50)
+      .text("COIMBATORE, TAMIL NADU, 641201", 50);
+
+    doc.fillColor(primaryColor).fontSize(13).text("Billing Address:", 400, 90);
+    doc.fontSize(11).fillColor(textGray)
+      .text(`${addr.fullName}`, 400)
+      .text(`${addr.address}, ${addr.city}`, 400)
+      .text(`${addr.state} - ${addr.pincode}`, 400)
+      .text(`Mobile: ${addr.mobile}`, 400);
+
+    doc.moveDown(2);
+
+    doc.fillColor(primaryColor).fontSize(13).text("Order Details:", { underline: true });
+    doc.fontSize(11).fillColor(textGray)
+      .text(`Order ID: ${order._id}`)
+      .text(`Order Date: ${new Date(order.createdAt).toLocaleDateString("en-IN")}`)
+      .text(`Delivery Date: ${new Date(order.deliveryDate).toLocaleDateString("en-IN")}`)
+      .text(`Payment Method: ${order.paymentMethod}`);
+
+    doc.moveDown();
+
+    const tableTop = doc.y;
+    const headers = [
+      { label: "No", x: 50, width: 30 },
+      { label: "Description", x: 90, width: 150 },
+      { label: "Price", x: 250, width: 60 },
+      { label: "Qty", x: 310, width: 40 },
+      { label: "Discount", x: 360, width: 60 },
+      { label: "Net", x: 430, width: 50 },
+      { label: "Total", x: 500, width: 90 },
+    ];
+
+    doc.fillColor(lightGray).rect(45, tableTop, 545, 25).fill();
+    doc.font("Helvetica-Bold").fontSize(11).fillColor(primaryColor);
+
+    headers.forEach(h =>
+      doc.text(h.label, h.x, tableTop + 7, { width: h.width, align: "left" })
+    );
+
+    let y = tableTop + 30;
+    let subtotal = 0;
+
+    order.items.forEach((item, i) => {
+      const product = item.productId;
+      const qty = item.quantity;
+      const originalPrice = product.price;
+      let offerPrice = originalPrice;
+      let discount = 0;
+
+      if (product.offer?.isActive && product.offer.discountPercentage > 0) {
+        discount = product.offer.discountPercentage;
+        offerPrice = originalPrice - (originalPrice * discount) / 100;
+      }
+
+      const net = Math.round(offerPrice);
+      const total = net * qty;
+      subtotal += total;
+
+      if (i % 2 === 0) {
+        doc.fillColor("#f9f9f9").rect(45, y - 2, 545, 20).fill();
+      }
+
+      doc.font("Helvetica").fontSize(10).fillColor(textGray);
+      doc.text(`${i + 1}`, headers[0].x, y, { width: headers[0].width });
+      doc.text(product.name, headers[1].x, y, { width: headers[1].width });
+      doc.text(`${originalPrice.toFixed(2)}`, headers[2].x, y, { width: headers[2].width });
+      doc.text(`${qty}`, headers[3].x, y, { width: headers[3].width });
+      doc.text(`${discount}%`, headers[4].x, y, { width: headers[4].width });
+      doc.text(`${net.toFixed(2)}`, headers[5].x, y, { width: headers[5].width });
+      doc.text(`${total.toFixed(2)}`, headers[6].x, y, { width: headers[6].width });
+
+      y += 22;
+      doc.moveTo(45, y - 2).lineTo(590, y - 2).strokeColor("#dddddd").stroke();
+    });
+
+    const shipping = order.shippingCharge || 50;
+    const grandTotal = subtotal + shipping;
+
+    y += 10;
+
+    doc.moveTo(400, y).lineTo(570, y).strokeColor("#cccccc").stroke();
+    y += 10;
+
+    doc.font("Helvetica-Bold").fontSize(11).fillColor(primaryColor);
+    doc.text("Subtotal:", 400, y, { width: 100, align: "right" });
+    doc.text(`${subtotal.toFixed(2)}`, 510, y, { align: "right" });
+
+    y += 20;
+    doc.text("Shipping:", 400, y, { width: 100, align: "right" });
+    doc.text(`${shipping.toFixed(2)}`, 510, y, { align: "right" });
+
+    y += 20;
+    doc.fillColor("#000000").fontSize(12);
+    doc.text("Grand Total:", 400, y, { width: 100, align: "right" });
+    doc.text(`${grandTotal.toFixed(2)}`, 510, y, { align: "right" });
+
+    doc.end();
+  } catch (error) {
+    console.error("PDF generation error:", error);
+    res.status(500).send("Failed to generate invoice.");
+  }
+};
+
+
 
 const orderDetails = async (req, res) => {
 
@@ -260,5 +405,6 @@ module.exports = {
   cancelOrder,
   returnOrder,
   requestReturn,
+  generateInvoicePDF
 };
 

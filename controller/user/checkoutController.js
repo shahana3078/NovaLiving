@@ -320,7 +320,6 @@ const placeOrder = async (req, res) => {
           .json({ success: false, message: "Invalid or expired coupon code." });
       }
     }
-    
 
     if (paymentMethod === "wallet") {
       const wallet = await Wallet.findOne({ userId });
@@ -364,7 +363,7 @@ const placeOrder = async (req, res) => {
       discountAmount,
       grandTotal,
       couponCode,
-      couponUsed,             // <-- NEW
+      couponUsed,             
     couponDiscount: discountAmount,
       paymentMethod,
       orderDate: Date.now(),

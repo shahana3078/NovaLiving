@@ -40,8 +40,6 @@ const getCart = async (req, res) => {
       };
     });
 
-    totalPrice = Math.round(totalPrice).toFixed(2);
-
     res.render("User/cart", { items, totalPrice });
   } catch (error) {
     console.error("Error fetching cart:", error);

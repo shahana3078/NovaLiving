@@ -80,7 +80,8 @@ async function updateQuantity(productId, action) {
       }
   } catch (error) {
       if (error.response) {
-     
+        const message = error.response.data?.message || "Something went wrong.";
+        showMessage(message, 'danger');
           console.error('Error response:', error.response.data);
          
       } else if (error.request) {

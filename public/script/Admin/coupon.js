@@ -22,9 +22,9 @@ document.getElementById("addCouponForm").addEventListener("submit", async (e) =>
         showConfirmButton: false,
         timer: 1500
       }).then(() => {
-        document.getElementById("addCouponForm").reset(); // Clear the form
-        $("#addCouponModal").modal("hide"); // Hide the modal (Bootstrap)
-        location.reload(); // Reload to update the coupon list
+        document.getElementById("addCouponForm").reset(); 
+        $("#addCouponModal").modal("hide");
+        location.reload();
       });
     } else {
       Swal.fire({
@@ -34,10 +34,11 @@ document.getElementById("addCouponForm").addEventListener("submit", async (e) =>
       });
     }
   } catch (error) {
+    const errorMessage = error.response?.data?.message || "Something went wrong! Please try again later.";
     Swal.fire({
       icon: "error",
       title: "Server Error",
-      text: "Something went wrong! Please try again later.",
+      text: errorMessage,
     });
   }
 });

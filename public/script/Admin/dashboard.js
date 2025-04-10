@@ -6,6 +6,8 @@ function toggleDateRange() {
     customDateRange.classList.toggle('d-none', filterType !== 'custom');
   }
   
+  let salesChartInstance; // Declare this globally at the top of your script
+
   async function fetchReport() {
     const filterType = document.getElementById("filterType").value;
     const startDate = document.getElementById("startDate").value;
@@ -21,12 +23,13 @@ function toggleDateRange() {
       const result = response.data;
   
       if (result.success) {
+        // Update summary cards
         document.getElementById("totalSales").textContent = `₹${result.data.totalSales.toFixed(2)}`;
         document.getElementById("totalCouponDiscount").textContent = `₹${result.data.totalCouponDiscount.toFixed(2)}`;
         document.getElementById("totalOfferDiscount").textContent = `₹${result.data.totalOfferDiscount.toFixed(2)}`;
         document.getElementById("totalOrders").textContent = result.data.totalOrders;
-
   
+        // Update table
         const tableBody = document.getElementById("salesTable");
         tableBody.innerHTML = "";
   
@@ -37,19 +40,72 @@ function toggleDateRange() {
               <td>${order.name}</td>
               <td>${order.date}</td>
               <td>${order.items}</td>
-            <td>₹${order.grandTotal.toFixed(2)}</td>
-               <td>₹${parseFloat(order.offerDiscount).toFixed(2)}</td>
+              <td>₹${order.grandTotal.toFixed(2)}</td>
+              <td>₹${parseFloat(order.offerDiscount).toFixed(2)}</td>
               <td>₹${order.couponDiscount.toFixed(2)}</td>
-              <td> ${order.paymentMethod}</td>
+              <td>${order.paymentMethod}</td>
             </tr>
           `;
           tableBody.innerHTML += row;
         });
+  
+        // Only render chart if there are orders
+        if (result.data.orders.length > 0) {
+          const labels = result.data.orders.map(order => order.date);
+          const salesData = result.data.orders.map(order => order.grandTotal);
+  
+          // Destroy previous chart instance
+          if (salesChartInstance) {
+            salesChartInstance.destroy();
+          }
+  
+          const ctx = document.getElementById("salesChart").getContext("2d");
+          salesChartInstance = new Chart(ctx, {
+            type: "line",
+            data: {
+              labels: labels,
+              datasets: [{
+                label: "Total Sales (₹)",
+                data: salesData,
+                fill: false,
+                borderColor: "rgba(75, 192, 192, 1)",
+                backgroundColor: "rgba(75, 192, 192, 0.2)",
+                tension: 0.4,
+              }]
+            },
+            options: {
+              responsive: true,
+              plugins: {
+                legend: {
+                  labels: {
+                    color: "#ffffff"
+                  }
+                }
+              },
+              scales: {
+                x: {
+                  ticks: {
+                    color: "#ffffff"
+                  }
+                },
+                y: {
+                  ticks: {
+                    color: "#ffffff"
+                  }
+                }
+              }
+            }
+          });
+        }
       }
     } catch (error) {
       console.error("Error fetching sales report:", error);
     }
   }
+  
+
+
+
   window.onload = function () {
     document.getElementById("filterType").value = "all";
     fetchReport();

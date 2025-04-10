@@ -22,6 +22,8 @@
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+ 
+
 
     <style>
         .stats-card {
@@ -85,6 +87,11 @@
                       <button class="btn btn-primary" onclick="fetchReport()">Submit</button>
                   </div>
             
+                  <div class="mt-5">
+                    <h4 class="text-white text-center">Sales Overview Chart</h4>
+                    <canvas id="salesChart" height="100"></canvas>
+                  </div>
+                  
 
                   <div class="row mt-4">
                     <div class="col-md-3">
@@ -147,6 +154,7 @@
 
 
     <!-- Include necessary JS libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>

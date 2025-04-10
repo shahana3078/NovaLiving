@@ -256,6 +256,8 @@ const confirmPaymentRazorPay = (req, res) => {
 };
 
 const placeOrder = async (req, res) => {
+  console.log('hgbhuyh');
+  
   try {
     const {
       addressId,
@@ -320,6 +322,7 @@ const placeOrder = async (req, res) => {
           .json({ success: false, message: "Invalid or expired coupon code." });
       }
     }
+    
 
     if (paymentMethod === "wallet") {
       const wallet = await Wallet.findOne({ userId });

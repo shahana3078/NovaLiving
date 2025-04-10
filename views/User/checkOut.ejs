@@ -225,23 +225,27 @@
 <!-- payment method -->
 
 
-<div id="paymentContainer" style="width: 80%; max-width: 800px; margin: 50px auto; padding: 20px; background-color: white; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0px 0px 8px rgba(0,0,0,0.1); text-align: left;">
+<div id="paymentContainer"
+     data-total="<%= totalPrice %>"
+     style="width: 80%; max-width: 800px; margin: 50px auto; padding: 20px; background-color: white; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0px 0px 8px rgba(0,0,0,0.1); text-align: left;">
   
   <h2 style="font-size: 20px; margin-bottom: 15px;">Payment Method</h2>
 
-  
-
-  <!-- Default Payment Method Display -->
+  <!-- No default method -->
   <div id="selectedPayment">
-    <strong>Pay on Delivery (Cash/Card)</strong>
+    <strong style="color: gray;">Choose a payment method</strong>
     <a href="#" onclick="showPaymentOptions()" style="color: blue; text-decoration: underline; float: right;">Change</a>
   </div>
 
-
   <div id="paymentOptions" style="display: none;">
     <div class="payment-option">
-      <input type="radio" id="cod" name="payment" checked onclick="selectPayment('cash on delivery')">
+      <input type="radio" id="cod" name="payment"
+        onclick="selectPayment('cash on delivery')"
+        <%= totalPrice > 20000 ? 'disabled' : '' %>>
       <label for="cod">Cash on Delivery</label>
+      <% if (totalPrice > 20000) { %>
+        <div style="color: red;">Not available for orders above ₹20,000</div>
+      <% } %>
     </div>
 
     <div class="payment-option">
@@ -250,22 +254,23 @@
     </div>
 
     <div class="payment-option">
-      <input type="radio" id="wallet" name="payment" onclick="selectPayment('wallet')"
-        <%= wallet && wallet.balance < totalPrice ? 'disabled' : '' %> >
+      <input type="radio" id="wallet" name="payment"
+        onclick="selectPayment('wallet')"
+        <%= wallet && wallet.balance < totalPrice ? 'disabled' : '' %>>
       <label for="wallet">Wallet</label>
       <div style="color: rgb(231, 130, 14)">Wallet balance: ₹<%= wallet ? wallet.balance.toFixed(2) : '0.00' %></div>
-    
       <% if (wallet && wallet.balance < totalPrice) { %>
         <div style="color: red; font-weight: bold;">Insufficient balance</div>
       <% } %>
-    </div>    
-    
+    </div>
+
     <button onclick="confirmPayment()" style="margin-top: 15px; background-color: #ff9900; color: #fff; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
       Use this payment method
     </button>
   </div>
-
 </div>
+
+
   </div>
 </div>
 
@@ -409,7 +414,6 @@
 </div>
 
 </div>
-
 
 <script src="/script/User/checkOut.js"></script>
 

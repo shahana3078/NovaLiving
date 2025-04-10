@@ -45,31 +45,77 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
-//payment
-let selectedMethod = "cash on delivery";
 
-function showPaymentOptions() {
-    document.getElementById('selectedPayment').style.display = 'none';
-    document.getElementById('paymentOptions').style.display = 'block';
-}
 
-function selectPayment(method) {
+// let selectedMethod = "cash on delivery";
+
+// function showPaymentOptions() {
+//     document.getElementById('selectedPayment').style.display = 'none';
+//     document.getElementById('paymentOptions').style.display = 'block';
+// }
+
+// function selectPayment(method) {
  
 
-    selectedMethod = method;
+//     selectedMethod = method;
  
    
-    document.querySelectorAll('.payment-option').forEach(option => {
-        const radioInput = option.querySelector(`input[id="${method}"]`);
-        if (radioInput) {
-            option.style.border = '2px solid #ff9900';
-        } else {
-            option.style.border = '1px solid #ddd';
-        }
-    });
-}
+//     document.querySelectorAll('.payment-option').forEach(option => {
+//         const radioInput = option.querySelector(`input[id="${method}"]`);
+//         if (radioInput) {
+//             option.style.border = '2px solid #ff9900';
+//         } else {
+//             option.style.border = '1px solid #ddd';
+//         }
+//     });
+// }
 
-function confirmPayment() {
+// function confirmPayment() {
+
+//       fetch('/update-payment-method', {
+//           method: 'POST',
+//           headers: { 'Content-Type': 'application/json' },
+//           body: JSON.stringify({ paymentMethod: selectedMethod })
+//       })
+//       .then(response => response.json())
+//       .then(data => {
+//           if (data.success) {
+//               document.getElementById('paymentOptions').style.display = 'none';
+//               document.getElementById('selectedPayment').innerHTML = `<strong>${getPaymentMethodText(selectedMethod)}</strong>`;
+//               document.getElementById('selectedPayment').style.display = 'block';
+//           } else {
+//               alert(data.message);
+//           }
+//       })
+//       .catch(error => console.error('Error:', error));
+
+//     }
+
+let selectedMethod = null;
+
+  function showPaymentOptions() {
+      document.getElementById('selectedPayment').style.display = 'none';
+      document.getElementById('paymentOptions').style.display = 'block';
+  }
+
+  function selectPayment(method) {
+      selectedMethod = method;
+
+      document.querySelectorAll('.payment-option').forEach(option => {
+          const radio = option.querySelector('input[type="radio"]');
+          if (radio && radio.id === method) {
+              option.style.border = '2px solid #ff9900';
+          } else {
+              option.style.border = '1px solid #ddd';
+          }
+      });
+  }
+
+  function confirmPayment() {
+      if (!selectedMethod) {
+          alert("Please choose a payment method.");
+          return;
+      }
 
       fetch('/update-payment-method', {
           method: 'POST',
@@ -80,15 +126,24 @@ function confirmPayment() {
       .then(data => {
           if (data.success) {
               document.getElementById('paymentOptions').style.display = 'none';
-              document.getElementById('selectedPayment').innerHTML = `<strong>${getPaymentMethodText(selectedMethod)}</strong>`;
+              document.getElementById('selectedPayment').innerHTML = `<strong>${getPaymentMethodText(selectedMethod)}</strong> <a href="#" onclick="showPaymentOptions()" style="color: blue; text-decoration: underline; float: right;">Change</a>`;
               document.getElementById('selectedPayment').style.display = 'block';
           } else {
               alert(data.message);
           }
       })
       .catch(error => console.error('Error:', error));
+  }
 
-    }
+  function getPaymentMethodText(method) {
+      switch(method) {
+          case 'cash on delivery': return 'Pay on Delivery (Cash/Card)';
+          case 'razorpay': return 'Razorpay';
+          case 'wallet': return 'Wallet';
+          default: return method;
+      }
+  }
+
 
 
 //coupon
@@ -211,9 +266,22 @@ function removeCoupon() {
 
 function placeOrder() {
   if (!addressId) {
-    alert("Please select an address before placing your order.");
+    Swal.fire({
+      icon: 'warning',
+      title: 'Address Required',
+      text: 'Please select an address before placing your order.',
+    });
     return;
-}
+  }
+  
+  if (!selectedMethod) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Select Payment Method',
+      text: 'Please choose a payment method before placing your order.',
+    });
+    return;
+  }
 
   const appliedCouponCode = document.getElementById("appliedCouponCode").innerText || null;
   if (selectedMethod === 'razorpay') {
@@ -278,7 +346,7 @@ function getPaymentMethodText(method) {
       case 'cash on delivery': return "Pay on Delivery (Cash/Card)";
       case 'razorpay': return "Razorpay";
       case 'wallet': return "Wallet";
-      default: return "Unknown Payment Method";
+      default: return method;
   }
 }
 

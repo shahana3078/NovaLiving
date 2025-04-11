@@ -47,50 +47,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
-// let selectedMethod = "cash on delivery";
-
-// function showPaymentOptions() {
-//     document.getElementById('selectedPayment').style.display = 'none';
-//     document.getElementById('paymentOptions').style.display = 'block';
-// }
-
-// function selectPayment(method) {
- 
-
-//     selectedMethod = method;
- 
-   
-//     document.querySelectorAll('.payment-option').forEach(option => {
-//         const radioInput = option.querySelector(`input[id="${method}"]`);
-//         if (radioInput) {
-//             option.style.border = '2px solid #ff9900';
-//         } else {
-//             option.style.border = '1px solid #ddd';
-//         }
-//     });
-// }
-
-// function confirmPayment() {
-
-//       fetch('/update-payment-method', {
-//           method: 'POST',
-//           headers: { 'Content-Type': 'application/json' },
-//           body: JSON.stringify({ paymentMethod: selectedMethod })
-//       })
-//       .then(response => response.json())
-//       .then(data => {
-//           if (data.success) {
-//               document.getElementById('paymentOptions').style.display = 'none';
-//               document.getElementById('selectedPayment').innerHTML = `<strong>${getPaymentMethodText(selectedMethod)}</strong>`;
-//               document.getElementById('selectedPayment').style.display = 'block';
-//           } else {
-//               alert(data.message);
-//           }
-//       })
-//       .catch(error => console.error('Error:', error));
-
-//     }
-
 let selectedMethod = null;
 
   function showPaymentOptions() {

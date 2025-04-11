@@ -6,7 +6,7 @@ function toggleDateRange() {
     customDateRange.classList.toggle('d-none', filterType !== 'custom');
   }
   
-  let salesChartInstance; // Declare this globally at the top of your script
+  let salesChartInstance; 
 
   async function fetchReport() {
     const filterType = document.getElementById("filterType").value;
@@ -23,13 +23,11 @@ function toggleDateRange() {
       const result = response.data;
   
       if (result.success) {
-        // Update summary cards
         document.getElementById("totalSales").textContent = `₹${result.data.totalSales.toFixed(2)}`;
         document.getElementById("totalCouponDiscount").textContent = `₹${result.data.totalCouponDiscount.toFixed(2)}`;
         document.getElementById("totalOfferDiscount").textContent = `₹${result.data.totalOfferDiscount.toFixed(2)}`;
         document.getElementById("totalOrders").textContent = result.data.totalOrders;
   
-        // Update table
         const tableBody = document.getElementById("salesTable");
         tableBody.innerHTML = "";
   
@@ -48,13 +46,11 @@ function toggleDateRange() {
           `;
           tableBody.innerHTML += row;
         });
-  
-        // Only render chart if there are orders
+
         if (result.data.orders.length > 0) {
           const labels = result.data.orders.map(order => order.date);
           const salesData = result.data.orders.map(order => order.grandTotal);
-  
-          // Destroy previous chart instance
+
           if (salesChartInstance) {
             salesChartInstance.destroy();
           }

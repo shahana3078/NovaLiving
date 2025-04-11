@@ -109,21 +109,26 @@ const updatePaymentMethod = async (req, res) => {
 
 const getCoupon = async (req, res) => {
   try {
+    const userId = req.session.userId;
+
     const coupons = await Coupon.find({
       isDeleted: false,
       expirationDate: { $gte: new Date() },
+      usedBy: { $ne: userId },
     });
+
     res.render("User/checkOut", { coupons });
   } catch (error) {
-    res
-      .status(500)
-      .json({ success: false, message: "Error fetching coupons", error });
+    console.error("Error fetching coupons:", error);
+    res.status(500).json({ success: false, message: "Error fetching coupons", error });
   }
 };
+
 
 const applyCoupon = async (req, res) => {
   try {
     const { couponCode, totalPrice } = req.body;
+    const userId = req.session.userId; 
 
     if (!couponCode) {
       return res
@@ -152,7 +157,24 @@ const applyCoupon = async (req, res) => {
       });
     }
 
+  
+    if (coupon.usedBy.includes(userId)) {
+      return res.status(400).json({
+        success: false,
+        message: "You have already used this coupon.",
+      });
+    }
+
+    if (coupon.usedBy.length >= coupon.limit) {
+      return res.status(400).json({
+        success: false,
+        message: "This coupon has reached its usage limit.",
+      });
+    }
+
     const discountedPrice = Math.max(totalPrice - coupon.discountPrice, 0);
+    coupon.usedBy.push(userId);
+    await coupon.save();
 
     res.json({
       success: true,
@@ -165,6 +187,7 @@ const applyCoupon = async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
 
 
 const razorPayCreateOrder = async (req, res) => {

@@ -3,11 +3,81 @@ const path = require("path");
 const PDFDocument = require("pdfkit");
 const ExcelJS = require("exceljs");
 
+// const getDashboard = async (req, res) => {
+//   try {
+//     res.render("Admin/pages/dashboard");
+//   } catch (error) {
+//     console.log(error);
+//   }
+// };
+
 const getDashboard = async (req, res) => {
   try {
-    res.render("Admin/pages/dashboard");
+    // Top 10 best-selling products
+    const bestSellingProducts = await Order.aggregate([
+      { $unwind: "$items" },
+      {
+        $group: {
+          _id: "$items.productId",
+          totalQuantity: { $sum: "$items.quantity" },
+        },
+      },
+      {
+        $lookup: {
+          from: "products", // collection name
+          localField: "_id",
+          foreignField: "_id",
+          as: "product",
+        },
+      },
+      { $unwind: "$product" },
+      {
+        $project: {
+          name: "$product.name",
+          totalQuantity: 1,
+           images: "$product.images"
+        },
+      },
+      { $sort: { totalQuantity: -1 } },
+      { $limit: 10 },
+    ]);
+
+    // Top 10 best-selling categories
+    const bestSellingCategories = await Order.aggregate([
+      { $unwind: "$items" },
+      {
+        $lookup: {
+          from: "products",
+          localField: "items.productId",
+          foreignField: "_id",
+          as: "productInfo",
+        },
+      },
+      { $unwind: "$productInfo" },
+      {
+        $group: {
+          _id: "$productInfo.category", // assuming category field exists
+          totalQuantity: { $sum: "$items.quantity" },
+        },
+      },
+      {
+        $project: {
+          category: "$_id",
+          totalQuantity: 1,
+          _id: 0,
+        },
+      },
+      { $sort: { totalQuantity: -1 } },
+      { $limit: 10 },
+    ]);
+
+    res.render("Admin/pages/dashboard", {
+      bestSellingProducts,
+      bestSellingCategories,
+    });
   } catch (error) {
     console.log(error);
+    res.status(500).send("Something went wrong");
   }
 };
 

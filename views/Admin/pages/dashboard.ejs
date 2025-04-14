@@ -54,6 +54,25 @@
   background-color: #343a40;
   z-index: 2;
 }
+.card-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .list-group-item {
+    background-color: #2c2f33;
+    color: #f8f9fa;
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+  .list-group-item .badge {
+    font-size: 0.9rem;
+  }
+  .product-thumbnail {
+  transition: transform 0.3s ease;
+}
+
+.product-thumbnail:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+}
       </style>
       
   </head>
@@ -63,7 +82,54 @@
             <%- include('./Partials/sideBar'); %>
             <div class="container-fluid page-body-wrapper">
                 <%- include('./Partials/navBar'); %>
+                
                 <div class="container mt-4">
+
+                  <div class="row mt-5 px-4">
+                    <div class="col-md-6 mb-4">
+                      <div class="card bg-secondary shadow rounded">
+                        <div class="card-header bg-dark text-white">
+                          <h5 class="mb-0">Top 10 Best Selling Products</h5>
+                        </div>
+                        <ul class="list-group list-group-flush p-3">
+                          <% bestSellingProducts.forEach(product => { %>
+                            <li class="list-group-item mb-3" style="border: 1px solid #ddd; border-radius: 5px; display: flex; align-items: center; background: #f9f9f9;">
+                              <img 
+                    src="/uploads/images/<%= product.images && product.images[0] %>" 
+                    alt="<%= product.name %>" 
+                    class="img-fluid product-thumbnail" 
+                    style="width: 80px; height: 80px; object-fit: cover; margin-right: 15px; border-radius: 8px;"
+                     />
+
+                              <div style="flex-grow: 1;">
+                                <strong style="font-size: 16px; color: #333;"><%= product.name %></strong><br>
+                                <span class="badge badge-primary p-2 mt-2"><%= product.totalQuantity %> sold</span>
+                              </div>
+                            </li>
+                          <% }); %>
+                        </ul>
+                      </div>
+                    </div>
+                  
+                    <div class="col-md-6 mb-4">
+                      <div class="card bg-secondary shadow rounded">
+                        <div class="card-header bg-dark text-white">
+                          <h5 class="mb-0">Top 10 Best Selling Categories</h5>
+                        </div>
+                        <ul class="list-group list-group-flush p-3">
+                          <% bestSellingCategories.forEach(category => { %>
+                            <li class="list-group-item d-flex justify-content-between align-items-center mb-2" style="background: #f9f9f9; border: 1px solid #ddd; border-radius: 5px;">
+                              <span style="color: #333;"><%= category.category %></span>
+                              <span class="badge badge-success p-2"><%= category.totalQuantity %> sold</span>
+                            </li>
+                          <% }); %>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  
+                  
                     <h1 class="text-white" style="color: #f8f9fa; text-align: center; margin: 20px 0; font-size: 2.5rem; padding-top: 20px;" >Sales Report</h1>
                     <p class="text-white">View total sales, orders, and discounts.</p>
                     <div class="d-flex align-items-center gap-3 bg-dark p-3 rounded">

@@ -3,17 +3,9 @@ const path = require("path");
 const PDFDocument = require("pdfkit");
 const ExcelJS = require("exceljs");
 
-// const getDashboard = async (req, res) => {
-//   try {
-//     res.render("Admin/pages/dashboard");
-//   } catch (error) {
-//     console.log(error);
-//   }
-// };
 
 const getDashboard = async (req, res) => {
   try {
-    // Top 10 best-selling products
     const bestSellingProducts = await Order.aggregate([
       { $unwind: "$items" },
       {
@@ -24,7 +16,7 @@ const getDashboard = async (req, res) => {
       },
       {
         $lookup: {
-          from: "products", // collection name
+          from: "products", 
           localField: "_id",
           foreignField: "_id",
           as: "product",
@@ -42,7 +34,6 @@ const getDashboard = async (req, res) => {
       { $limit: 10 },
     ]);
 
-    // Top 10 best-selling categories
     const bestSellingCategories = await Order.aggregate([
       { $unwind: "$items" },
       {
@@ -56,7 +47,7 @@ const getDashboard = async (req, res) => {
       { $unwind: "$productInfo" },
       {
         $group: {
-          _id: "$productInfo.category", // assuming category field exists
+          _id: "$productInfo.category", 
           totalQuantity: { $sum: "$items.quantity" },
         },
       },

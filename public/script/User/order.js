@@ -199,3 +199,141 @@ if (returnOrderBtn) {
   }
 });
 
+function retryPayment(orderId) {
+  fetch('/retry-razorpay-order', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ orderId })
+  })
+    .then(res => res.json())
+    .then(order => {
+      const options = {
+        key: 'rzp_test_29wLZVOKsQCqZx', // Replace with your key
+        amount: order.amount,
+        currency: 'INR',
+        order_id: order.id,
+        name: "NovaLiving",
+        description: "Retry Payment",
+
+        handler: function (response) {
+          fetch('/retry-verify-razorpay-payment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              orderId,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_signature: response.razorpay_signature
+            })
+          })
+            .then(res => res.json())
+            .then(data => {
+              if (data.success) {
+                Swal.fire({
+                  icon: 'success',
+                  title: 'Payment Successful',
+                  text: 'Your payment has been verified.',
+                }).then(() => {
+                  window.location.reload();
+                });
+              } else {
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Payment Failed',
+                  text: data.message || 'Verification failed.',
+                });
+              }
+            });
+        },
+
+        modal: {
+          ondismiss: function () {
+            Swal.fire({
+              icon: 'warning',
+              title: 'Payment Cancelled',
+              text: 'Payment was not completed.',
+            });
+          }
+        }
+      };
+
+      const rzp1 = new Razorpay(options);
+      rzp1.open();
+    })
+    .catch(err => console.error('Retry payment error:', err));
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+  const retryButton = document.querySelector(".retry-payment-btn");
+
+  if (retryButton) {
+    retryButton.addEventListener("click", function () {
+      const orderId = this.dataset.orderId;
+
+      fetch('/retry-razorpay-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderId })
+      })
+      .then(response => response.json())
+      .then(order => {
+        const options = {
+          key: 'rzp_test_29wLZVOKsQCqZx', // Replace with your actual key
+          amount: order.amount,
+          currency: 'INR',
+          order_id: order.id,
+          name: "NovaLiving",
+          description: "Retry Order Payment",
+
+          handler: function (response) {
+            fetch('/confirm-retry-payment', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ 
+                orderId,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_signature: response.razorpay_signature
+              })
+            })
+            .then(res => res.json())
+            .then(data => {
+              if (data.success) {
+                window.location.href = "/order-confirmed";
+              } else {
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Payment Failed',
+                  text: 'Retry failed. Please try again.',
+                });
+              }
+            });
+          },
+
+          modal: {
+            ondismiss: function () {
+              Swal.fire({
+                icon: 'info',
+                title: 'Payment Not Completed',
+                text: 'You dismissed the Razorpay payment window.',
+              });
+            }
+          }
+        };
+
+        const rzp = new Razorpay(options);
+        rzp.open();
+      })
+      .catch(error => {
+        console.error("Error initiating retry:", error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Retry Failed',
+          text: 'Could not retry the payment. Please try again later.',
+        });
+      });
+    });
+  }
+});
+
+

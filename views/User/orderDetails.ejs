@@ -10,6 +10,7 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
   <link href="/css/tiny-slider.css" rel="stylesheet">
   <link href="/css/style.css" rel="stylesheet">
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   <body style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f7f7f7;">
     <%- include('partials/navBar') %>
     <h1 style="text-align: center; font-size: 30px; margin-top: 30px;">Order Details</h1>
@@ -26,7 +27,6 @@
           
           <div style="flex: 1; margin-right: 20px;">
             <h3 style="font-size: 20px; color: #000000;">Shipping Address</h3>
-            <% console.log(order,' this is order'); %>
             <p>
               <%= order.addressId?.fullName %><br>
               <%= order.addressId?.mobile %><br>
@@ -41,7 +41,16 @@
           <div style="flex: 1; text-align: center; margin-right: 20px;">
             <h3 style="font-size: 20px; color: #000000;">Payment Method</h3>
             <p><%= order.paymentMethod %></p>
+          
+            <% if (order.paymentMethod === 'payment failed') { %>
+              <button onclick="retryPayment('<%= order._id %>')" 
+                      style="margin-top: 10px; background-color: #f0ad4e; color: white; padding: 8px 16px; border: none; border-radius: 5px; cursor: pointer;">
+                Retry Payment
+              </button>
+            <% } %>
+            
           </div>
+          
           
           <div style="flex: 1; text-align: right;">
             <h3 style="font-size: 20px; color: #000000;">Order Summary</h3>

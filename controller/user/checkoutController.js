@@ -279,7 +279,7 @@ const confirmPaymentRazorPay = (req, res) => {
 };
 
 const placeOrder = async (req, res) => {
-  console.log('hgbhuyh');
+  console.log('order placed');
   
   try {
     const {
@@ -366,19 +366,62 @@ const placeOrder = async (req, res) => {
       await wallet.save();
     }
 
+    // if (paymentMethod === "razorpay") {
+    //   const body = razorpay_order_id + "|" + razorpay_payment_id;
+    //   const expectedSignature = crypto
+    //     .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
+    //     .update(body)
+    //     .digest("hex");
+
+    //   if (expectedSignature !== razorpay_signature) {
+    //     return res
+    //       .status(400)
+    //       .json({ success: false, message: "Payment verification failed." });
+    //   }
+    // }
     if (paymentMethod === "razorpay") {
       const body = razorpay_order_id + "|" + razorpay_payment_id;
       const expectedSignature = crypto
         .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
         .update(body)
         .digest("hex");
-
-      if (expectedSignature !== razorpay_signature) {
-        return res
-          .status(400)
-          .json({ success: false, message: "Payment verification failed." });
+    
+      const isPaymentVerified = expectedSignature === razorpay_signature;
+    
+      const order = new Order({
+        userId,
+        addressId,
+        items: orderItems,
+        subtotal,
+        shippingCharge,
+        discountAmount,
+        grandTotal,
+        couponCode,
+        couponUsed,
+        couponDiscount: discountAmount,
+        paymentMethod: isPaymentVerified ? "razorpay" : "payment failed",
+        orderDate: Date.now(),
+        orderStatus: isPaymentVerified ? "pending" : "pending", // still pending
+      });
+    
+      await order.save();
+      await Cart.updateOne({ userId }, { $set: { items: [] } });
+    
+      if (isPaymentVerified) {
+        return res.json({
+          success: true,
+          message: "Order placed and payment verified",
+          newTotal: grandTotal,
+        });
+      } else {
+        return res.status(200).json({
+          success: false,
+          orderId: order._id,
+          message: "Payment failed. Order placed with pending status. You can retry payment from My Orders.",
+        });
       }
     }
+    
 
     const order = new Order({
       userId,

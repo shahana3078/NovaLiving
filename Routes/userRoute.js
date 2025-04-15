@@ -105,6 +105,8 @@ router.get('/order-confirmed',checkoutController.orderConfirmed)
 router.get('/orders',orderController.getOrder)
 router.get('/order/invoice',orderController.generateInvoicePDF)
 router.get('/order/details',orderController.orderDetails)
+router.post('/retry-razorpay-order',orderController.retryRazorpayOrder)
+router.post('/retry-verify-razorpay-payment',orderController.confirmRetryPayment)
 router.post('/cancel-order/:orderId',orderController.cancelOrder)
 router.post('/return-order/:orderId',orderController.returnOrder)
 router.post('/request-return/:orderId', orderController.requestReturn);

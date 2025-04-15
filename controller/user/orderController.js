@@ -1,5 +1,6 @@
 const PDFDocument = require("pdfkit");
-
+const Razorpay = require("razorpay");
+const crypto = require("crypto");
 const Order = require("../../Models/orderModel");
 const Wallet = require("../../Models/walletModel");
 
@@ -399,12 +400,66 @@ const requestReturn = async (req, res) => {
   }
 };
 
+const retryRazorpayOrder = async (req, res) => {
+  const { orderId } = req.body;
+  const orderData = await Order.findById(orderId);
+  if (!orderData || orderData.paymentMethod !== 'payment failed') {
+    return res.status(400).json({ success: false, message: 'Invalid order for retry.' });
+  }
+
+  const razorpay = new Razorpay({
+    key_id: process.env.RAZORPAY_KEY_ID,
+    key_secret: process.env.RAZORPAY_KEY_SECRET,
+  });
+
+  const options = {
+    amount: orderData.grandTotal * 100,
+    currency: "INR",
+    receipt: `retry_rcpt_${Date.now()}`
+  };
+
+  try {
+    const newOrder = await razorpay.orders.create(options);
+    res.json(newOrder);
+  } catch (err) {
+    console.error("Error retrying payment:", err);
+    res.status(500).json({ success: false, message: "Could not create retry payment order." });
+  }
+};
+
+const confirmRetryPayment = async (req, res) => {
+  const { orderId, razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
+
+  const order = await Order.findById(orderId);
+  if (!order) return res.status(404).json({ success: false, message: "Order not found" });
+
+  const expectedSignature = crypto
+    .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
+    .update(`${razorpay_order_id}|${razorpay_payment_id}`)
+    .digest("hex");
+
+  if (expectedSignature === razorpay_signature) {
+    order.paymentMethod = 'razorpay';
+    order.paymentId = razorpay_payment_id;
+    order.orderStatus = 'pending'; 
+    await order.save();
+
+    return res.json({ success: true });
+  }
+
+  res.status(400).json({ success: false, message: "Payment verification failed." });
+};
+
+
+
 module.exports = {
   getOrder,
   orderDetails,
   cancelOrder,
   returnOrder,
   requestReturn,
-  generateInvoicePDF
+  generateInvoicePDF,
+  retryRazorpayOrder,
+  confirmRetryPayment
 };
 

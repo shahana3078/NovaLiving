@@ -113,7 +113,7 @@
         </div>
         
 
-        <% if (order.orderStatus !== 'cancelled' && order.orderStatus !== 'delivered' && order.orderStatus !== 'returned') { %>
+        <% if (order.orderStatus !== 'cancelled' && order.orderStatus !== 'delivered' && order.orderStatus !== 'returned' && order.paymentMethod !== 'payment failed') { %>
           <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
               <button id="cancelOrderBtn"
                       data-order-id="<%= order._id %>"

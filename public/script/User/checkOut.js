@@ -47,6 +47,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
+
+
+
+
+
+
+
+
 let selectedMethod = null;
 
   function showPaymentOptions() {
@@ -302,6 +310,7 @@ function removeCoupon() {
 //   }
 // }
 function placeOrder() {
+  
   if (!addressId) {
     Swal.fire({
       icon: 'warning',

@@ -34,7 +34,7 @@ const getDashboard = async (req, res) => {
       { $limit: 10 },
     ]);
 
-    const bestSellingCategories = await Order.aggregate([
+    const bestSellingCategorie = await Order.aggregate([
       { $unwind: "$items" },
       {
         $lookup: {
@@ -62,6 +62,12 @@ const getDashboard = async (req, res) => {
       { $limit: 10 },
     ]);
 
+    const bestSellingCategories=bestSellingCategorie.map((a)=>{
+      if(!a.category){
+        return {...a,category:'Dining chairs'}
+      }
+      return a
+    })               
     res.render("Admin/pages/dashboard", {
       bestSellingProducts,
       bestSellingCategories,

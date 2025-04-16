@@ -61,7 +61,7 @@ function toggleDateRange() {
             data: {
               labels: labels,
               datasets: [{
-                label: "Total Sales (₹)",
+                label: '',
                 data: salesData,
                 fill: false,
                 borderColor: "rgba(75, 192, 192, 1)",

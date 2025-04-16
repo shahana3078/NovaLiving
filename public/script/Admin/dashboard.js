@@ -131,12 +131,12 @@ function toggleDateRange() {
       const response = await axios.post(
         '/admin/sales-report/download',
         {
-          format,         // 'pdf' or 'excel'
+          format,        
           filterType,
           startDate,
           endDate
         },
-        { responseType: 'blob' } // Required to handle file data
+        { responseType: 'blob' } 
       );
 
       const blob = new Blob([response.data], {

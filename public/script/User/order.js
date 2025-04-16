@@ -208,7 +208,7 @@ function retryPayment(orderId) {
     .then(res => res.json())
     .then(order => {
       const options = {
-        key: 'rzp_test_29wLZVOKsQCqZx', // Replace with your key
+        key: 'rzp_test_29wLZVOKsQCqZx',
         amount: order.amount,
         currency: 'INR',
         order_id: order.id,
@@ -263,6 +263,40 @@ function retryPayment(orderId) {
     .catch(err => console.error('Retry payment error:', err));
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 document.addEventListener("DOMContentLoaded", function () {
   const retryButton = document.querySelector(".retry-payment-btn");
 
@@ -278,7 +312,7 @@ document.addEventListener("DOMContentLoaded", function () {
       .then(response => response.json())
       .then(order => {
         const options = {
-          key: 'rzp_test_29wLZVOKsQCqZx', // Replace with your actual key
+          key: 'rzp_test_29wLZVOKsQCqZx', 
           amount: order.amount,
           currency: 'INR',
           order_id: order.id,

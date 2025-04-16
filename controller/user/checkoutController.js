@@ -366,19 +366,6 @@ const placeOrder = async (req, res) => {
       await wallet.save();
     }
 
-    // if (paymentMethod === "razorpay") {
-    //   const body = razorpay_order_id + "|" + razorpay_payment_id;
-    //   const expectedSignature = crypto
-    //     .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
-    //     .update(body)
-    //     .digest("hex");
-
-    //   if (expectedSignature !== razorpay_signature) {
-    //     return res
-    //       .status(400)
-    //       .json({ success: false, message: "Payment verification failed." });
-    //   }
-    // }
     if (paymentMethod === "razorpay") {
       const body = razorpay_order_id + "|" + razorpay_payment_id;
       const expectedSignature = crypto
@@ -401,7 +388,7 @@ const placeOrder = async (req, res) => {
         couponDiscount: discountAmount,
         paymentMethod: isPaymentVerified ? "razorpay" : "payment failed",
         orderDate: Date.now(),
-        orderStatus: isPaymentVerified ? "pending" : "pending", // still pending
+        orderStatus: isPaymentVerified ? "pending" : "pending", 
       });
     
       await order.save();

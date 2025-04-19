@@ -151,12 +151,6 @@ const productDetails = async (req, res) => {
   }
 };
 
-
-
-
-
-
-
 module.exports = {
   getShop,
   productDetails,

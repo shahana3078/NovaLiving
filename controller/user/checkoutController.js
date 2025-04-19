@@ -114,7 +114,7 @@ const getCoupon = async (req, res) => {
     const coupons = await Coupon.find({
       isDeleted: false,
       expirationDate: { $gte: new Date() },
-      usedBy: { $ne: userId },
+      usedBy: { $not: { $elemMatch: { $eq: userId } } },
     });
 
     res.render("User/checkOut", { coupons });
@@ -123,6 +123,8 @@ const getCoupon = async (req, res) => {
     res.status(500).json({ success: false, message: "Error fetching coupons", error });
   }
 };
+
+
 
 
 const applyCoupon = async (req, res) => {
@@ -154,14 +156,6 @@ const applyCoupon = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: `This coupon is only applicable for orders of ₹${coupon.minimumPrice} or more.`,
-      });
-    }
-
-  
-    if (coupon.usedBy.includes(userId)) {
-      return res.status(400).json({
-        success: false,
-        message: "You have already used this coupon.",
       });
     }
 

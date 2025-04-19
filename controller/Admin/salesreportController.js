@@ -324,26 +324,24 @@ const downloadSalesReport = async (req, res) => {
       doc.end();
     }
 
-    // ✅ EXCEL Export
+
     else if (format === "excel") {
       const workbook = new ExcelJS.Workbook();
       const worksheet = workbook.addWorksheet("Sales Report");
 
-      // Title & Date
       worksheet.addRow([reportTitle]).font = { size: 16, bold: true };
       if (filterType === "custom") {
         worksheet.addRow([`From: ${startDate} To: ${endDate}`]);
       }
       worksheet.addRow([]);
 
-      // Summary
+  
       worksheet.addRow(["Total Sales", formatRupees(totalSales)]);
       worksheet.addRow(["Total Coupon Discount", formatRupees(totalCouponDiscount)]);
       worksheet.addRow(["Total Offer Discount", formatRupees(totalOfferDiscount)]);
       worksheet.addRow(["Total Orders", totalOrders]);
       worksheet.addRow([]);
 
-      // Table Headers
       const headers = [
         "Order ID", "Customer Name", "Date", "Items",
         "Grand Total", "Offer Discount", "Coupon Discount", "Payment"
@@ -359,7 +357,6 @@ const downloadSalesReport = async (req, res) => {
         cell.alignment = { horizontal: 'center' };
       });
 
-      // Table Data
       orders.forEach(order => {
         worksheet.addRow([
           order.id,
@@ -373,7 +370,6 @@ const downloadSalesReport = async (req, res) => {
         ]);
       });
 
-      // Set response headers
       res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
       res.setHeader("Content-Disposition", "attachment; filename=SalesReport.xlsx");
 
@@ -381,7 +377,6 @@ const downloadSalesReport = async (req, res) => {
       res.end();
     }
 
-    // Invalid format
     else {
       res.status(400).json({ success: false, message: "Invalid format" });
     }

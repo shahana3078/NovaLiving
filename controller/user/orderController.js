@@ -254,7 +254,6 @@ order.items.forEach((item) => {
 
 // cancel order
 
-
 const cancelOrder = async (req, res) => {
   try {
     const { orderId } = req.params;
@@ -262,11 +261,7 @@ const cancelOrder = async (req, res) => {
 
     console.log("req.body", req.body);
 
-    const order = await Order.findByIdAndUpdate(orderId, {
-      orderStatus: "cancelled",
-      cancelReason: cancelReason || "No reason provided",
-    });
-
+    const order = await Order.findById(orderId);
     if (!order) {
       return res
         .status(404)
@@ -277,7 +272,7 @@ const cancelOrder = async (req, res) => {
     order.cancelReason = cancelReason || "No reason provided";
     await order.save();
 
-    if (order.paymentMethod === "razorpay") {
+    if (["razorpay", "wallet"].includes(order.paymentMethod)) {
       let wallet = await Wallet.findOne({ userId: order.userId });
 
       if (!wallet) {
@@ -312,6 +307,7 @@ const cancelOrder = async (req, res) => {
   }
 };
 
+
 //return order
 
 const returnOrder = async (req, res) => {
@@ -319,10 +315,7 @@ const returnOrder = async (req, res) => {
     const { orderId } = req.params;
     const { returnReason } = req.body;
 
-    const order = await Order.findByIdAndUpdate(orderId, {
-      orderStatus: "returned",
-      returnReason: returnReason || "No reason provided",
-    });
+    const order = await Order.findById(orderId);
     if (!order) {
       return res
         .status(404)
@@ -333,7 +326,7 @@ const returnOrder = async (req, res) => {
     order.returnReason = returnReason || "No reason provided";
     await order.save();
 
-    if (order.paymentMethod === "razorpay") {
+    if (["razorpay", "wallet"].includes(order.paymentMethod)) {
       let wallet = await Wallet.findOne({ userId: order.userId });
 
       if (!wallet) {
@@ -367,6 +360,7 @@ const returnOrder = async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
 
 const requestReturn = async (req, res) => {
   const { orderId, returnReason } = req.body;

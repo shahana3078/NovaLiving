@@ -15,6 +15,8 @@ const getWallet = async (req, res) => {
       await wallet.save();
     }
 
+    wallet.transactions.sort((a, b) => b.date - a.date);
+    
     res.render("User/wallet", { wallet });
   } catch (error) {
     console.error("Error fetching wallet:", error);

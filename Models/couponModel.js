@@ -23,7 +23,7 @@ const CouponSchema = new mongoose.Schema({
     required: true,
     default: 1,
   },
-  usedBy: [{  // <- new field to track users who used the coupon
+  usedBy: [{  
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
   }],

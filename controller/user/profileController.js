@@ -58,12 +58,8 @@ const updateProfile = async (req, res) => {
 };
 
 
-
-
-
 module.exports={
   getUserProfile,
   getMyProfile,
-  
   updateProfile
 }

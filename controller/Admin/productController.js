@@ -3,26 +3,66 @@ const Category = require("../../Models/categoryModel");
 
 // PRODUCTS
 
+// const getProducts = async (req, res) => {
+//   try {
+//     const products = await Product.find().populate({
+//        path: 'categoryId',
+//       select: 'categoryName'
+//     }).sort({addedDate:-1})
+    
+//     const categories = await Category.find({ isDeleted: false });
+//     const updatedProducts = products.map((product) => ({
+//       ...product.toObject(),
+//       categoryName: product.categoryId ? product.categoryId.categoryName : "No Category",
+//     }));
+
+
+//     res.render("Admin/pages/products", { categories, products:updatedProducts });
+//   } catch (error) {
+//     console.error("Error fetching products:", error);
+//     res.status(500).send("Server error");
+//   }
+// };
 const getProducts = async (req, res) => {
   try {
-    const products = await Product.find().populate({
-       path: 'categoryId',
-      select: 'categoryName'
-    })
-    
+    const page = parseInt(req.query.page) || 1;
+    const limit = 5;
+    const skip = (page - 1) * limit;
+
+    // Total count for pagination
+    const totalProducts = await Product.countDocuments();
+
+    // Fetch paginated products
+    const products = await Product.find()
+      .populate({
+        path: 'categoryId',
+        select: 'categoryName'
+      })
+      .sort({ addedDate: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    const totalPages = Math.ceil(totalProducts / limit);
+
     const categories = await Category.find({ isDeleted: false });
+
     const updatedProducts = products.map((product) => ({
       ...product.toObject(),
       categoryName: product.categoryId ? product.categoryId.categoryName : "No Category",
     }));
 
-
-    res.render("Admin/pages/products", { categories, products:updatedProducts });
+    res.render("Admin/pages/products", {
+      categories,
+      products: updatedProducts,
+      currentPage: page,
+      totalPages
+    });
   } catch (error) {
     console.error("Error fetching products:", error);
     res.status(500).send("Server error");
   }
 };
+
 
 const addProduct = async (req, res) => {
   try {

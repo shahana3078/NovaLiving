@@ -355,7 +355,7 @@
             <tbody id="productList">
               <% products.forEach((product, index)=> { %>
               <tr data-id="<%= product._id %>">
-                <td><%= index + 1 %></td>
+                <td><%= (currentPage - 1) * 5 + index + 1 %></td>
                 <td><%= product.name %></td>
                 <td style="max-width: 400px; font-size: 10px" class="">
                   <%= product.description %>
@@ -426,6 +426,17 @@
         </div>
       </div>
     </div>
+
+    <nav aria-label="Page navigation" class="mt-4">
+      <ul class="pagination justify-content-center">
+        <% for (let i = 1; i <= totalPages; i++) { %>
+          <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+            <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+          </li>
+        <% } %>
+      </ul>
+    </nav>
+    
 
     <!-- Edit Product Modal -->
 

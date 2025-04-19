@@ -29,9 +29,6 @@ app.use(session({
     secret: 'secret',  
     resave: false,
     saveUninitialized: true,
-    store: MongoStore.create({
-        mongoUrl: 'mongodb://localhost/test-app'
-    }),
     cookie: {
         secure:false,
         httpOnly:true,

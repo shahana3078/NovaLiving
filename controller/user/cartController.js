@@ -2,7 +2,7 @@ const Cart = require("../../Models/cartModel");
 const Product = require("../../Models/productModel");
 const Address = require("../../Models/addressModel");
 const Order = require("../../Models/orderModel");
-const Razorpay=require('Razorpay')
+const Razorpay=require('razorpay')
 
 
 

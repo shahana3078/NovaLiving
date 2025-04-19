@@ -4,24 +4,36 @@ const User = require('../../Models/userSchema');
 
 const getOrder = async (req, res) => {
   try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = 5;
+    const skip = (page - 1) * limit;
+
+    const totalOrders = await Order.countDocuments();
 
     const orders = await Order.find()
-      .populate('userId') 
-      .populate('addressId','fullName') 
-      .sort({orderDate:-1})
+      .populate('userId')
+      .populate('addressId', 'fullName')
+      .sort({ orderDate: -1 })
+      .skip(skip)
+      .limit(limit)
       .lean();
 
     orders.forEach(order => {
       if (!order.grandTotal) {
         const subtotal = order.items.reduce((acc, item) => acc + (item.price * item.quantity), 0);
         order.subtotal = subtotal;
-        order.shippingCharge = order.shippingCharge || 50; 
+        order.shippingCharge = order.shippingCharge || 50;
         order.grandTotal = subtotal + order.shippingCharge;
       }
     });
 
-   
-    res.render('Admin/pages/orders', { orders });
+    const totalPages = Math.ceil(totalOrders / limit);
+
+    res.render('Admin/pages/orders', {
+      orders,
+      currentPage: page,
+      totalPages
+    });
   } catch (error) {
     console.log('Error fetching admin orders:', error);
     res.status(500).send('Internal Server Error');

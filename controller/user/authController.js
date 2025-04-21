@@ -1,4 +1,5 @@
 const bcrypt = require("bcrypt");
+require('dotenv').config();
 const User = require("../../Models/userSchema");
 const OTP = require("../../Models/OTPSchema");
 const crypto = require("crypto");

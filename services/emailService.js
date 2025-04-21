@@ -14,13 +14,13 @@ const sendResetEmail = async (recipientEmail, resetToken) => {
 
     // Email content
     const mailOptions = {
-      from: process.env.EMAIL, // Sender's email address
-      to: recipientEmail, // Recipient's email address
+      from: process.env.EMAIL, 
+      to: recipientEmail, 
       subject: 'Password Reset Request',
       html: `
         <h1>Password Reset</h1>
         <p>You requested a password reset. Please click the link below to reset your password:</p>
-        <a href="http://localhost:3000/reset-password/${resetToken}">Reset Password</a>
+        <a href="http://novaliving.zapto.org/reset-password/${resetToken}">Reset Password</a>
         <p>If you did not request this, please ignore this email.</p>
       `,
     };

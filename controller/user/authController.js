@@ -303,7 +303,7 @@ const getForgotPassword = (req, res) => {
   res.render("User/forgot-password", { message: null });
 };
 const sendResetEmail = async (email, resetToken) => {
-  const resetLink = `http://localhost:3000/reset-password?token=${resetToken}`;
+  const resetLink = `https://novaliving.zapto.org/reset-password?token=${resetToken}`;
   const mailOptions = {
     from: process.env.EMAIL,
     to: email,

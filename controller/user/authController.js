@@ -387,9 +387,7 @@ const postResetPassword = async (req, res) => {
     await user.save();
 
    
-    return res.redirect(
-      "/"
-    );
+    return res.render('User/login');
   } catch (error) {
     console.error("Error resetting password:", error);
 

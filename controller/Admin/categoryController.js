@@ -6,7 +6,7 @@ const Product = require("../../Models/productModel");
 const getCategories = async (req, res) => {
   try {
     const categories = await Category.find();
-    res.render("admin/pages/categoryManagement", { categories });
+    res.render("Admin/pages/categoryManagement", { categories });
   } catch (error) {
     console.error("Error fetching categories:", error);
     res.status(500).send("Server Error");
@@ -37,7 +37,7 @@ const updateCategory = async (req, res) => {
 
     let categoryOffer = updatedData.offer
     ? {
-        discountPercentage: Math.max(0, Math.min(100, updatedData.offer.discountPercentage || 0)), // Ensure between 0-100
+        discountPercentage: Math.max(0, Math.min(100, updatedData.offer.discountPercentage || 0)), 
         isActive: updatedData.offer.discountPercentage > 0
       }
     : highestOfferProduct?.offer || { discountPercentage: 0, isActive: false };
@@ -79,6 +79,10 @@ const addOrUpdateCategory = async (req, res) => {
     const { name, description,offer } = req.body;
 
     const existingCategory = await Category.findOne({ categoryName: name });
+
+   
+
+
 
     if (existingCategory) {
       return res

@@ -34,7 +34,6 @@ function toggleDateRange() {
         result.data.orders.forEach(order => {
           const row = `
             <tr>
-              <td>${order.items.name} </td>
               <td>${order.id}</td>
               <td>${order.name}</td>
               <td>${order.date}</td>

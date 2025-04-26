@@ -17,6 +17,7 @@ const getCoupon = async (req, res) => {
     const totalPages = Math.ceil(totalCoupons / limit);
 
     res.render("Admin/pages/coupon", { coupons, currentPage: page, totalPages });
+
   } catch (error) {
     console.error("Error fetching coupons:", error);
     res.status(500).send("Internal Server Error");

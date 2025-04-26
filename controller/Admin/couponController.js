@@ -2,15 +2,27 @@ const Coupon=require('../../Models/couponModel')
 
 const getCoupon = async (req, res) => {
   try {
- 
-    const coupons = await Coupon.find({ isDeleted: false }).sort({ createdAt: -1 });
+    const page = parseInt(req.query.page) || 1; 
+    const limit = 5; 
+    const skip = (page - 1) * limit;
 
-    res.render("Admin/pages/coupon", { coupons });
+    const [coupons, totalCoupons] = await Promise.all([
+      Coupon.find({ isDeleted: false })
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit),
+      Coupon.countDocuments({ isDeleted: false })
+    ]);
+
+    const totalPages = Math.ceil(totalCoupons / limit);
+
+    res.render("Admin/pages/coupon", { coupons, currentPage: page, totalPages });
   } catch (error) {
     console.error("Error fetching coupons:", error);
     res.status(500).send("Internal Server Error");
   }
 };
+
 
 
 const addCoupon = async (req, res) => {

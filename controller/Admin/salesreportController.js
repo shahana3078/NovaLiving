@@ -297,30 +297,30 @@ const downloadSalesReport = async (req, res) => {
           formatRupees(order.couponDiscount),
           order.paymentMethod
         ];
-
+      
         values.forEach((value, i) => {
           value = String(value).replace(/[^\x00-\x7F.,0-9-]/g, '');
-
+      
           doc.rect(x, y, columnWidths[i], rowHeight)
             .strokeColor("#cccccc")
             .lineWidth(0.5)
             .stroke();
-
+      
           doc.text(value, x + 5, y + 8, {
-            width: columnWidths[i] - 10,
-            align: "center",
+            width: columnWidths[i] - 10,  // Reduced width by 10 to give padding both sides
+            align: "left", // Use "left" instead of "center" for better reading
           });
-
+      
           x += columnWidths[i];
         });
-
+      
         y += rowHeight;
         if (y + rowHeight > doc.page.height - 50) {
           doc.addPage();
           y = 30;
         }
       });
-
+      
       doc.end();
     }
 

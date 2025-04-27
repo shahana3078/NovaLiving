@@ -307,8 +307,8 @@ const downloadSalesReport = async (req, res) => {
             .stroke();
       
           doc.text(value, x + 5, y + 8, {
-            width: columnWidths[i] - 10,  // Reduced width by 10 to give padding both sides
-            align: "left", // Use "left" instead of "center" for better reading
+            width: columnWidths[i] - 10,  
+            align: "center",
           });
       
           x += columnWidths[i];

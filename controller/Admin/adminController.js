@@ -32,7 +32,7 @@ const postLogin = (req, res) => {
 const getUsers = async (req, res) => {
   try {
     const users = await User.find();
-    res.render("admin/pages/userList", { users });
+    res.render("Admin/pages/userList", { users });
   } catch (error) {
     console.error(error);
     res.status(500).send("Error fetching users");

@@ -305,10 +305,10 @@ const downloadSalesReport = async (req, res) => {
             .strokeColor("#cccccc")
             .lineWidth(0.5)
             .stroke();
-      
-          doc.text(value, x + 5, y + 8, {
-            width: columnWidths[i] - 10,  
-            align: "center",
+  
+          doc.text(value, x + 8, y + 8, {
+            width: columnWidths[i] - 16, 
+            align: "left",                 
           });
       
           x += columnWidths[i];
@@ -320,6 +320,7 @@ const downloadSalesReport = async (req, res) => {
           y = 30;
         }
       });
+      
       
       doc.end();
     }

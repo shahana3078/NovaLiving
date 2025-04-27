@@ -5,8 +5,22 @@ const Product = require("../../Models/productModel");
 
 const getCategories = async (req, res) => {
   try {
-    const categories = await Category.find();
-    res.render("Admin/pages/categoryManagement", { categories });
+    const page = parseInt(req.query.page) || 1;
+    const limit = 5; 
+    const skip = (page - 1) * limit;
+
+    const categories = await Category.find()
+      .skip(skip)
+      .limit(limit);
+
+    const totalCategories = await Category.countDocuments(); 
+    const totalPages = Math.ceil(totalCategories / limit);
+
+    res.render("Admin/pages/categoryManagement", { 
+      categories, 
+      currentPage: page,
+      totalPages
+    });
   } catch (error) {
     console.error("Error fetching categories:", error);
     res.status(500).send("Server Error");

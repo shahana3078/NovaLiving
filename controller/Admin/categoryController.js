@@ -5,16 +5,15 @@ const Product = require("../../Models/productModel");
 
 const getCategories = async (req, res) => {
   try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = 5; 
+    const page = parseInt(req.query.page) || 1; // default page 1
+    const limit = 5; // 5 categories per page
     const skip = (page - 1) * limit;
 
     const categories = await Category.find()
       .skip(skip)
-      .limit(limit)
-      .sort(1);
+      .limit(limit);
 
-    const totalCategories = await Category.countDocuments(); 
+    const totalCategories = await Category.countDocuments(); // count total
     const totalPages = Math.ceil(totalCategories / limit);
 
     res.render("Admin/pages/categoryManagement", { 

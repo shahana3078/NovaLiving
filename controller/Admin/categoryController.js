@@ -11,7 +11,8 @@ const getCategories = async (req, res) => {
 
     const categories = await Category.find()
       .skip(skip)
-      .limit(limit);
+      .limit(limit)
+      .sort(1);
 
     const totalCategories = await Category.countDocuments(); 
     const totalPages = Math.ceil(totalCategories / limit);

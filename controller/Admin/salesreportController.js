@@ -243,7 +243,7 @@ const downloadSalesReport = async (req, res) => {
 
     if (format === "pdf") {
  
-      const doc = new PDFDocument({ margin: 30, size: 'A4' });
+      const doc = new PDFDocument({ margin: 30, size: 'A3' });
       res.setHeader("Content-Type", "application/pdf");
       res.setHeader("Content-Disposition", "attachment; filename=SalesReport.pdf");
       doc.pipe(res);
@@ -260,7 +260,7 @@ const downloadSalesReport = async (req, res) => {
       doc.text(`Total Orders: ${totalOrders}`).moveDown();
 
       const tableTop = doc.y;
-      const rowHeight = 30;
+      const rowHeight = 50;
       const headers = [
         "Order ID", "Customer Name", "Date", "Items",
         "Grand Total", "Offer Discount", "Coupon Discount", "Payment"

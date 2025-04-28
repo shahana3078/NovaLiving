@@ -136,7 +136,7 @@ const postSignup = async (req, res) => {
 
 const getVerifyOtp = (req, res) => {
   const { email } = req.query;
-  res.render("User/verify-otp", { email });
+  res.render("User/verify-otp", { email ,});
 };
 
 
@@ -207,6 +207,8 @@ const postResendOtp = async (req, res) => {
 
 const getLogin = (req, res) => {
   const message = req.query.message;
+ 
+  
   res.render("User/login", { message });
 };
 

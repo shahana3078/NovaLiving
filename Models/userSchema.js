@@ -51,7 +51,7 @@ const UserSchema = new mongoose.Schema({
         type: Date,
         default: Date.now 
     },
-    referralCode: String,  // Unique referral code
+    referralCode: String, 
   referredBy: String, 
 
 });

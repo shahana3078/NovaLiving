@@ -9,12 +9,10 @@ const getShop = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const itemsPerPage = 8;
     const categoryFilter = req.query.category || null;
-    const maxPrice = parseInt(req.query.price) || 70000;
     const sortBy = req.query.sortBy || "featured";
     const searchQuery = req.query.query ? req.query.query.trim() : null;
     let filterQuery = {
       isDeleted: false,
-      price: { $lte: maxPrice },
     };
 
     if (categoryFilter) {
@@ -86,7 +84,6 @@ const getShop = async (req, res) => {
       categories,
       sortBy,
       categoryFilter,
-      maxPrice,
       currentPage: page,
       totalPages,
       searchQuery,

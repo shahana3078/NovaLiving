@@ -1,11 +1,11 @@
 document.getElementById("applyFilters").addEventListener("click", () => {
   const category = document.getElementById("categoryFilter").value;
-  const price = document.getElementById("priceRange").value;
+
 
   const queryParams = new URLSearchParams();
 
   if (category) queryParams.append("category", category);
-  queryParams.append("price", price);
+
 
   window.location.href = `/shop?${queryParams.toString()}`;
 });

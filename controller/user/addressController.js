@@ -3,7 +3,10 @@ const Address=require("../../Models/addressModel")
 
 const getAddresses = async (req, res) => {
   try {
-    const addresses = await Address.find();
+    const userId =req.session.userId;
+   
+
+    const addresses = await Address.find({userId:userId});
   
     res.render('User/address', { addresses });
   } catch (err) {
@@ -18,6 +21,10 @@ const getAddresses = async (req, res) => {
 const addAddress = async (req, res) => {
   try {
     const { fullName, mobile, pincode, address, landmark, city, state, defaultAddress } = req.body;
+    console.log(req.body);
+    
+    const userId=req.session.userId;
+console.log(req.session);
 
     if (!fullName || !mobile || !pincode || !address || !city || !state) {
       return res.status(400).json({ message: "Please provide all required fields." });
@@ -26,8 +33,10 @@ const addAddress = async (req, res) => {
     if (defaultAddress) {
       await Address.updateMany({ defaultAddress: true }, { $set: { defaultAddress: false } });
     }
+console.log(userId);
 
     const newAddress = new Address({
+      userId:userId,
       fullName,
       mobile,
       pincode,

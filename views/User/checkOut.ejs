@@ -72,21 +72,24 @@
     <% const defaultAddress = addresses.find(addr => addr.defaultAddress); %>
  
     <div class="address-box rounded p-3 mb-4" style="border: 1px solid #ddd; box-shadow: 0 2px 8px rgba(0,0,0,0.1); background-color: #fff;">
-      <% if (defaultAddress) { %>
+      <% if (addresses && addresses.length > 0) { %>
+        <% const defaultAddress = addresses.find(addr => addr.defaultAddress) || addresses[0]; %>
         <div class="address-content" style="text-align: left;">
-          <p style="margin: 5px 0; font-size: 14px;"><strong><%= defaultAddress.fullName %></strong></p>
-          <p style="margin: 5px 0; font-size: 14px;">
-            <%= defaultAddress.address %>, 
-            <%= defaultAddress.city %>, 
-            <%= defaultAddress.state %> - 
-            <%= defaultAddress.pincode %>
+          <p id="address-name" style="margin: 5px 0; font-size: 14px;">
+            <strong><%= defaultAddress.fullName %></strong>
           </p>
-          <p style="margin: 5px 0; font-size: 14px;">Mobile: <%= defaultAddress.mobile %></p>
+          <p id="address-details" style="margin: 5px 0; font-size: 14px;">
+            <%= defaultAddress.address %>, <%= defaultAddress.city %>, <%= defaultAddress.state %> - <%= defaultAddress.pincode %>
+          </p>
+          <p id="address-mobile" style="margin: 5px 0; font-size: 14px;">
+            Mobile: <%= defaultAddress.mobile %>
+          </p>
         </div>
         <div style="text-align: left; margin-top: 10px;">
           <button class="change-btn btn-link p-0" style="color: blue; text-decoration: underline;" data-bs-toggle="modal" data-bs-target="#changeAddressModal">
             Change
           </button>
+        </div>
       <% } else { %>
         <div class="address-content" style="text-align: left;">
           <p style="margin: 5px 0; font-size: 14px;">Please select an address </p>

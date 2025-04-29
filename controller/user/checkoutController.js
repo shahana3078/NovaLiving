@@ -11,7 +11,7 @@ const getCheckout = async (req, res) => {
   try {
     const userId = req.session.userId;
 
-    const addresses = await Address.find();
+    const addresses = await Address.find({userId});
 
     const cart = await Cart.findOne({ userId }).populate("items.productId");
     const wallet = await Wallet.findOne({ userId });

@@ -55,10 +55,14 @@ mongodb()
 app.use('/', userRoute);
 app.use('/admin',adminRoute)
 
-app.use((err,req,res,next)=>{
-    console.error(err.stack)
-    res.status(500).json({message:err.message})
-})
+app.use((req, res, next) => {
+    res.status(404).render('User/404page');
+});
+
+app.use((err, req, res, next) => {
+    console.error(err.stack); 
+    res.status(500).render('User/500page');
+});
 
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);

@@ -83,22 +83,22 @@ router.put("/products/delete/:id", productController.deleteProduct);
 router.put("/products/undo/:id",productController.undoProduct);
 router.post("/toggle-offer/:id",productController.toggleOfferStatus);
 
-router.get('/orders',orderController.getOrder)
+router.get('/orders',noCache,adminAuth, orderController.getOrder)
 router.post('/updateOrderStatus',orderController.updateOrderStatus)
 
-router.get('/orderDetails',orderController.orderDetails)
+router.get('/orderDetails',noCache,adminAuth,orderController.orderDetails)
 router.get('/return-requests', orderController.showReturnRequests);
 router.post('/accept-return/:orderId', orderController.acceptReturn);
 router.post('/reject-return/:orderId', orderController.rejectReturn);
 
-router.get('/stock',stockController.getStocks)
+router.get('/stock',noCache,adminAuth,stockController.getStocks)
 router.put('/update-stock/:id',stockController.stockUpdate)
 
-router.get('/coupon',couponController.getCoupon)
+router.get('/coupon',noCache,adminAuth,couponController.getCoupon)
 router.post("/add-coupon", couponController.addCoupon);
 router.delete("/delete-coupon/:id", couponController.deleteCoupon)
 
-router.get('/dashboard',salesReport.getDashboard)
+router.get('/dashboard',noCache,adminAuth,salesReport.getDashboard)
 router.post('/sales-report',salesReport.getSalesReport)
 router.post('/sales-report/download',salesReport.downloadSalesReport)
 

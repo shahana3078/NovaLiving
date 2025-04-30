@@ -74,35 +74,35 @@ router.route("/shop").get(requireLogin, homeController.getShop);
 router.get("/product/details/:id", requireLogin,homeController.productDetails);
 
 //address route
-router.get('/address',addressController.getAddresses)
+router.get('/address',requireLogin,addressController.getAddresses)
 router.post('/address',addressController.addAddress)
 router.post('/remove-address/:id',addressController.removeAddress)
-router.get('/edit-address/:id',addressController.getEditAddress)
+router.get('/edit-address/:id',requireLogin,addressController.getEditAddress)
 router.put('/edit-address/:id',addressController.updateAddress)
 
 //cart route
-router.get('/cart',cartController.getCart)
+router.get('/cart',requireLogin,cartController.getCart)
 router.post('/cart/add',cartController.addCart)
 router.post('/cart/remove', cartController.removeProductFromCart)
 router.post('/cart/update-quantity',cartController.updateQuantity)
 
 //profile route
-router.get('/profile',profileController.getUserProfile)
-router.get('/my-profile',profileController.getMyProfile)
+router.get('/profile',requireLogin,profileController.getUserProfile)
+router.get('/my-profile',requireLogin,profileController.getMyProfile)
 router.post('/update-profile',profileController.updateProfile)
 
 
 
 
 //orders
-router.get('/checkout', checkoutController.getCheckout)
+router.get('/checkout', requireLogin,checkoutController.getCheckout)
 router.post('/update-payment-method',checkoutController.updatePaymentMethod)
 router.post('/create-razorpay-order',checkoutController.razorPayCreateOrder)
 router.post('/confirm-razorpay-payment',checkoutController.confirmPaymentRazorPay)
 router.post('/place-order',checkoutController.placeOrder)
-router.get('/order-confirmed',checkoutController.orderConfirmed)
+router.get('/order-confirmed',requireLogin,checkoutController.orderConfirmed)
 
-router.get('/orders',orderController.getOrder)
+router.get('/orders',requireLogin,orderController.getOrder)
 router.get('/order/invoice',orderController.generateInvoicePDF)
 router.get('/order/details',orderController.orderDetails)
 router.post('/retry-razorpay-order',orderController.retryRazorpayOrder)
@@ -112,20 +112,20 @@ router.post('/return-order/:orderId',orderController.returnOrder)
 router.post('/request-return/:orderId', orderController.requestReturn);
 
 //coupon
-router.get('/get-coupons',checkoutController.getCoupon)
+router.get('/get-coupons',requireLogin,checkoutController.getCoupon)
 router.post('/apply-coupon',checkoutController.applyCoupon)
 
 //wishlist
 
-router.get('/wishlist',wishlistController.getWishlist)
+router.get('/wishlist',requireLogin,wishlistController.getWishlist)
 router.post('/wishlist/add',wishlistController.addToWishlist)
 router.post('/wishlist/remove',wishlistController.removeProduct)
 
 //wallet
 
-router.get('/wallet',walletController.getWallet)
+router.get('/wallet',requireLogin,walletController.getWallet)
 
 //referral
-router.get('/referral',referalController.getReferal)
+router.get('/referral',requireLogin,referalController.getReferal)
 
 module.exports = router;

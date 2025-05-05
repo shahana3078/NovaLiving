@@ -6,6 +6,7 @@ const Order = require("../../Models/orderModel");
 const Wallet = require("../../Models/walletModel");
 const crypto = require("crypto");
 const Coupon = require("../../Models/couponModel");
+const mongoose = require('mongoose')
 
 const getCheckout = async (req, res) => {
   try {
@@ -15,10 +16,26 @@ const getCheckout = async (req, res) => {
 
     const cart = await Cart.findOne({ userId }).populate("items.productId");
     const wallet = await Wallet.findOne({ userId });
-    const coupons = await Coupon.find({
-      isDeleted: false,
-      expirationDate: { $gte: new Date() },
-    });
+    const coupons = await Coupon.aggregate([
+      {
+        $match: {
+          isDeleted: false,
+          expirationDate: { $gte: new Date() },
+          usedBy: { $not: { $elemMatch: { $eq: new mongoose.Types.ObjectId(userId) } } },
+        },
+      },
+      {
+        $addFields: {
+          usedCount: { $size: "$usedBy" },
+        },
+      },
+      {
+        $match: {
+          $expr: { $lt: ["$usedCount", "$limit"] },
+        },
+      },
+    ]);
+    
 
     let totalPrice = 0;
     let cartItems = [];
@@ -114,7 +131,6 @@ const getCoupon = async (req, res) => {
     const coupons = await Coupon.find({
       isDeleted: false,
       expirationDate: { $gte: new Date() },
-      usedBy: { $not: { $elemMatch: { $eq: userId } } },
     });
 
     res.render("User/checkOut", { coupons });

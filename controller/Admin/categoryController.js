@@ -10,8 +10,10 @@ const getCategories = async (req, res) => {
     const skip = (page - 1) * limit;
 
     const categories = await Category.find()
+    .sort({ createdAt: -1 }) 
       .skip(skip)
-      .limit(limit);
+      .limit(limit)
+     
 
     const totalCategories = await Category.countDocuments(); 
     const totalPages = Math.ceil(totalCategories / limit);
@@ -91,10 +93,10 @@ const addCategory = async (req, res) => {
 
   try {
     const { name,offer } = req.body;
-    
+
     const existingCategory = await Category.findOne({
       categoryName: { $regex: `^${name}$`, $options: "i" }
-    });
+    })
     
 
     if (existingCategory) {

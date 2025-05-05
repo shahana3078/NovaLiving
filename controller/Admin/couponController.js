@@ -30,6 +30,13 @@ const addCoupon = async (req, res) => {
   try {
       const { couponCode, discountPrice, minimumPrice, expirationDate } = req.body;
 
+      if (Number(discountPrice) >= Number(minimumPrice)) {
+        return res.status(400).json({
+          success: false,
+          message: "Minimum price should be greater than the discount amount",
+        });
+      }
+
       const existingCoupon = await Coupon.findOne({ couponCode });
       if (existingCoupon) {
           return res.status(400).json({ success: false, message: "Coupon code already exists" });

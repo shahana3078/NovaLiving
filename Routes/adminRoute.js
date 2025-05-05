@@ -34,7 +34,7 @@ router.post("/users/delete/:id", adminController.deleteUser);
 //CATEGORIES
 
 router.get("/categories", noCache, adminAuth, categoryController.getCategories);
-router.post("/categories/add", categoryController.addOrUpdateCategory);
+router.post("/categories/add", categoryController.addCategory);
 router.put("/categories/delete/:id", categoryController.deleteCategory);
 router.put("/categories/undo/:id", categoryController.undoDelete);
 router.put("/categories/update/:id", categoryController.updateCategory);

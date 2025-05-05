@@ -86,17 +86,16 @@ const updateCategory = async (req, res) => {
 };
 
 // ADD CATEGORY
-const addOrUpdateCategory = async (req, res) => {
+const addCategory = async (req, res) => {
   console.log(req.body);
 
   try {
-    const { name, description,offer } = req.body;
-
-    const existingCategory = await Category.findOne({ categoryName: name });
-
-   
-
-
+    const { name,offer } = req.body;
+    
+    const existingCategory = await Category.findOne({
+      categoryName: { $regex: `^${name}$`, $options: "i" }
+    });
+    
 
     if (existingCategory) {
       return res
@@ -106,7 +105,6 @@ const addOrUpdateCategory = async (req, res) => {
 
     const newCategory = new Category({
       categoryName: name,
-      description: description,
       offer: {
         discountPercentage: offer.discountPercentage || 0,
         isActive: offer.isActive || false,
@@ -208,7 +206,7 @@ const toggleCategoryOffer = async (req, res) => {
 
 module.exports = {
   getCategories,
-  addOrUpdateCategory,
+  addCategory,
   deleteCategory,
   undoDelete,
   updateCategory,

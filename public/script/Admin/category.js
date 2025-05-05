@@ -155,13 +155,7 @@ document.getElementById("categoryForm").addEventListener("submit", async functio
     hideValidationError("categoryName");
   }
 
-  if (!categoryDescription) {
-    showValidationError("categoryDescription", "Category description cannot be empty or whitespace.");
-    isValid = false;
-  } else {
-    hideValidationError("categoryDescription");
-  }
-
+ 
   categoryOffer = parseFloat(categoryOffer) || 0;
   if (categoryOffer < 0 || categoryOffer > 100) {
     showValidationError("categoryOffer", "Discount must be between 0 and 100.");

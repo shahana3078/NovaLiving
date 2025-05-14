@@ -25,38 +25,7 @@ const getMyProfile = async (req, res) => {
 };
 
 
-
 //edit
-// const updateProfile = async (req, res) => {
-//   if (!req.session.userId) {
-//     return res.status(401).json({ success: false, message: 'User not authenticated' });
-//   }
-
-//   const { fullName} = req.body;
-
-//   if (!fullName  ) {
-//     return res.status(400).json({ success: false, message: 'All fields are required' });
-//   }
-
-//   try {
-//     const user = await User.findById(req.session.userId);
-//     if (!user) {
-//       return res.status(404).json({ success: false, message: 'User not found' });
-//     }
-
-//     user.full_name = fullName;
-    
-    
-
-//     await user.save();
-
-//     res.json({ success: true, message: 'Profile updated successfully' });
-//   } catch (error) {
-//     console.error('Error updating profile:', error);
-//     res.status(500).json({ success: false, message: 'Server error' });
-//   }
-// };
-
 
 const updateProfile = async (req, res) => {
   if (!req.session.userId) {
@@ -79,10 +48,19 @@ const updateProfile = async (req, res) => {
     return res.status(400).json({ success: false, message: 'Full name cannot be only numbers' });
   }
 
+  if (/^_+$/.test(trimmedName)) {
+    return res.status(400).json({ success: false, message: 'Full name cannot be only underscores' });
+  }
+
+  if (!/[A-Za-z0-9]/.test(trimmedName)) {
+    return res.status(400).json({ success: false, message: 'Full name cannot be only special characters' });
+  }
+  
+
   if (/^[A-Za-z]+$/.test(trimmedName)) {
     return res.status(400).json({ success: false, message: 'Full name must include more than just letters (e.g. include space or other characters)' });
   }
-
+ 
   try {
     const user = await User.findById(req.session.userId);
     if (!user) {

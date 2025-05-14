@@ -8,9 +8,8 @@ document.getElementById('editbtn').addEventListener('click', () => {
 
 document.getElementById('saveChangesBtn').addEventListener('click', () => {
   const fullName = document.getElementById('modalUsername').value;
-  const email = document.getElementById('modalEmail').value;
 
-  if (!fullName || !email ) {
+  if (!fullName  ) {
     showMessage('Please enter valid details.','danger');
     return;
   }
@@ -26,7 +25,6 @@ document.getElementById('saveChangesBtn').addEventListener('click', () => {
     },
     body: JSON.stringify({
       fullName,
-      email,
       
     }),
   })
@@ -34,13 +32,12 @@ document.getElementById('saveChangesBtn').addEventListener('click', () => {
     .then((data) => {
       if (data.success) {
         document.getElementById('username').value = fullName;
-        document.getElementById('email').value = email;
 
         const editModal = bootstrap.Modal.getInstance(document.getElementById('editModal'));
         editModal.hide();
         showMessage('Profile updated successfully!','success');
       } else {
-        showMessage('Error updating profile.','danger');
+        showMessage(data.message ||'Error updating profile.','danger');
       }
     })
     .catch((error) => {

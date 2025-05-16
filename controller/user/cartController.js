@@ -83,7 +83,13 @@ const addCart = async (req, res) => {
           message: "You can only add a maximum of 5 of this product.",
         });
       }
+
+      if (product.stock < 1) {
+        return res.status(400).json({ message: "The product is out of stock" });
+      }
+
       existingItem.quantity += 1;
+      product.stock -= 1; 
     } else {
       cart.items.push({
         productId: product._id,
@@ -92,6 +98,8 @@ const addCart = async (req, res) => {
         image: product.images[0],
         quantity: 1,
       });
+
+      product.stock -= 1; 
     }
 
     cart.totalPrice = cart.items.reduce(
@@ -103,7 +111,7 @@ const addCart = async (req, res) => {
       cart.totalPrice = 0;
     }
 
-
+    await product.save(); 
     await cart.save();
 
     res.json({ message: "Product added to cart", cart });
@@ -115,11 +123,8 @@ const addCart = async (req, res) => {
   }
 };
 
-//REMOVE
-
 const removeProductFromCart = async (req, res) => {
   const { productId } = req.body;
-
   const userId = req.session.userId;
 
   try {
@@ -129,6 +134,22 @@ const removeProductFromCart = async (req, res) => {
       return res.status(404).json({ message: "Cart not found" });
     }
 
+    const cartItem = cart.items.find(
+      (item) => item.productId.toString() === productId
+    );
+
+    if (!cartItem) {
+      return res.status(404).json({ message: "Product not found in cart" });
+    }
+
+    // 🟢 Find the product to restock
+    const product = await Product.findById(productId);
+    if (product) {
+      product.stock += cartItem.quantity;
+      await product.save();
+    }
+
+    // 🟢 Remove product from cart
     cart.items = cart.items.filter(
       (item) => item.productId.toString() !== productId
     );
@@ -139,11 +160,14 @@ const removeProductFromCart = async (req, res) => {
     );
 
     await cart.save();
-    res.status(200).json({ message: "Product removed successfully" });
+
+    res.status(200).json({ message: "Product removed and stock updated successfully" });
   } catch (err) {
+    console.error("Error removing product from cart:", err);
     res.status(500).json({ message: "An error occurred", error: err.message });
   }
 };
+
 
 //UPDATE QUANTITY
 
@@ -154,33 +178,44 @@ const updateQuantity = async (req, res) => {
   try {
     const cart = await Cart.findOne({ userId });
     if (!cart) {
-      return res.status(404).json({ message: "cart not found" });
+      return res.status(404).json({ message: "Cart not found" });
     }
+
     const cartItem = cart.items.find(
       (item) => item.productId.toString() === productId
     );
-
     if (!cartItem) {
-      return res.status(404).json({ message: "product not found" });
+      return res.status(404).json({ message: "Product not found in cart" });
     }
+
+    const product = await Product.findById(productId);
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
     if (action === "increment") {
       if (cartItem.quantity >= 5) {
-        return res
-          .status(400)
-          .json({ message: "Maximum quantity of 5 reached" });
+        return res.status(400).json({ message: "Maximum quantity of 5 reached" });
       }
+      if (product.stock < 1) {
+        return res.status(400).json({ message: "No more stock available" });
+      }
+
       cartItem.quantity += 1;
+      product.stock -= 1;
     } else if (action === "decrement") {
       cartItem.quantity -= 1;
+      product.stock += 1;
 
       if (cartItem.quantity <= 0) {
-        return res
-          .status(400)
-          .json({ message: "negative value is not possible" });
+        return res.status(400).json({ message: "Negative quantity not allowed" });
       }
     } else {
-      return res.status(400).res.json({ message: "invalid action" });
+      return res.status(400).json({ message: "Invalid action" });
     }
+
+    await product.save();
+
     cart.totalPrice = cart.items.reduce(
       (total, item) => total + item.price * item.quantity,
       0
@@ -193,12 +228,13 @@ const updateQuantity = async (req, res) => {
       updatedTotalPrice: cart.totalPrice,
     });
   } catch (error) {
-    console.error("error updating cart quantity", error);
+    console.error("Error updating cart quantity:", error);
     res.status(500).json({
-      message: "An error occures while updating the cart",
+      message: "An error occurred while updating the cart",
     });
   }
 };
+
 
 
 

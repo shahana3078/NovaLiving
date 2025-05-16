@@ -30,6 +30,14 @@ const addCoupon = async (req, res) => {
   try {
       const { couponCode, discountPrice, minimumPrice, expirationDate } = req.body;
 
+       const isValidCouponCode = /^[A-Za-z0-9]+$/.test(couponCode);
+       if (!isValidCouponCode) {
+      return res.status(400).json({
+        success: false,
+        message: "Coupon code should contain only letters and numbers (no special characters)",
+      });
+       }
+       
       if (Number(discountPrice) >= Number(minimumPrice)) {
         return res.status(400).json({
           success: false,

@@ -1,6 +1,7 @@
 
 const Order=require('../../Models/orderModel')
 const User = require('../../Models/userSchema');
+const Wallet = require("../../Models/walletModel");
 
 const getOrder = async (req, res) => {
   try {
@@ -40,21 +41,72 @@ const getOrder = async (req, res) => {
   }
 };
 
+// const updateOrderStatus = async (req, res) => {
+//   try {
+//     const { orderId, orderStatus } = req.body;
+
+//     const updatedOrder = await Order.findByIdAndUpdate(
+//       orderId,
+//       { orderStatus },
+//       { new: true }
+//     );
+
+//     if (!updatedOrder) {
+//       return res.status(404).json({ success: false, message: 'Order not found' });
+//     }
+
+//     res.json({ success: true, message: 'Order status updated successfully', order: updatedOrder });
+//   } catch (error) {
+//     console.error('Error updating order status:', error);
+//     res.status(500).json({ success: false, message: 'Internal Server Error' });
+//   }
+// };
 const updateOrderStatus = async (req, res) => {
   try {
     const { orderId, orderStatus } = req.body;
 
-    const updatedOrder = await Order.findByIdAndUpdate(
-      orderId,
-      { orderStatus },
-      { new: true }
-    );
+    const order = await Order.findById(orderId);
 
-    if (!updatedOrder) {
+    if (!order) {
       return res.status(404).json({ success: false, message: 'Order not found' });
     }
 
-    res.json({ success: true, message: 'Order status updated successfully', order: updatedOrder });
+    order.orderStatus = orderStatus;
+
+    // If status is cancelled, refund to wallet
+    if (orderStatus === 'cancelled') {
+      if (["razorpay", "wallet"].includes(order.paymentMethod)) {
+        let wallet = await Wallet.findOne({ userId: order.userId });
+
+        if (!wallet) {
+          wallet = new Wallet({
+            userId: order.userId,
+            balance: 0,
+            transactions: [],
+          });
+        }
+
+        const alreadyCredited = wallet.transactions.some(
+          (t) => t.description === `Refund for cancelled order #${order._id}`
+        );
+
+        if (!alreadyCredited) {
+          wallet.balance += order.grandTotal;
+
+          wallet.transactions.push({
+            amount: order.grandTotal,
+            type: "credit",
+            description: `Refund for cancelled order #${order._id}`,
+          });
+
+          await wallet.save();
+        }
+      }
+    }
+
+    await order.save();
+
+    res.json({ success: true, message: 'Order status updated successfully', order });
   } catch (error) {
     console.error('Error updating order status:', error);
     res.status(500).json({ success: false, message: 'Internal Server Error' });

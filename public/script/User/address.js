@@ -156,19 +156,16 @@ function saveAddress() {
     })
       .then((response) => response.json())
       .then((data) => {
-        if (data.message === "Address added successfully!") {
-          createAddressBox(data.address);
-          document.getElementById("addressForm").reset();
-          $("#addressModal").modal("hide");
-          showMessage("Your address has been added successfully!", "success");
-        } else {
-          showMessage("Error adding address.", "danger");
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-        showMessage("Error adding address. Please try again.", "danger");
-      });
+  if (data.message === "Address added successfully!") {
+    createAddressBox(data.address);
+    document.getElementById("addressForm").reset();
+    $("#addressModal").modal("hide");
+    showMessage("Your address has been added successfully!", "success");
+  } else {
+    showMessage(data.message || "Error adding address.", "danger");
+  }
+})
+
   }
 }
 

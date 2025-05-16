@@ -18,32 +18,103 @@ const getAddresses = async (req, res) => {
 
 //ADD ADDRESS
 
+// const addAddress = async (req, res) => {
+//   try {
+//     const { fullName, mobile, pincode, address, landmark, city, state, defaultAddress } = req.body;
+//     console.log(req.body);
+    
+//     const userId=req.session.userId;
+// console.log(req.session);
+
+//     if (!fullName || !mobile || !pincode || !address || !city || !state) {
+//       return res.status(400).json({ message: "Please provide all required fields." });
+//     }
+
+//     if (defaultAddress) {
+//       await Address.updateMany({ defaultAddress: true }, { $set: { defaultAddress: false } });
+//     }
+// console.log(userId);
+
+//     const newAddress = new Address({
+//       userId:userId,
+//       fullName,
+//       mobile,
+//       pincode,
+//       address,
+//       landmark,
+//       city,
+//       state,
+//       defaultAddress: defaultAddress || false,
+//     });
+
+//     await newAddress.save();
+
+//     res.status(201).json({ message: "Address added successfully!", address: newAddress });
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ message: "Server error while adding address." });
+//   }
+// };
+
+
 const addAddress = async (req, res) => {
   try {
     const { fullName, mobile, pincode, address, landmark, city, state, defaultAddress } = req.body;
-    console.log(req.body);
-    
-    const userId=req.session.userId;
-console.log(req.session);
+    const userId = req.session.userId;
+
+    if (!userId) {
+      return res.status(401).json({ message: "User not authenticated." });
+    }
 
     if (!fullName || !mobile || !pincode || !address || !city || !state) {
       return res.status(400).json({ message: "Please provide all required fields." });
     }
 
-    if (defaultAddress) {
-      await Address.updateMany({ defaultAddress: true }, { $set: { defaultAddress: false } });
+    const trimmedLandmark=landmark.trim()
+    const trimmedName = fullName.trim();
+    const trimmedCity = city.trim();
+    const trimmedState = state.trim();
+ 
+    if (trimmedName === '' || !/[A-Za-z0-9]/.test(trimmedName)) {
+      return res.status(400).json({ message: "Full name must contain letters or numbers and not only special characters." });
     }
-console.log(userId);
+
+    if (trimmedCity === '' || !/[A-Za-z0-9]/.test(trimmedCity)) {
+      return res.status(400).json({ message: "City name must contain letters or numbers and not only special characters." });
+    }
+
+    if(trimmedLandmark === '' ||!/[A-Za-z0-9]/.test(trimmedLandmark) ){
+      return res.status(400).json({message:'Landmark must contain letters or numbers and not only special characters'})
+    }
+
+    if (trimmedState === '' || !/[A-Za-z0-9]/.test(trimmedState)) {
+      return res.status(400).json({ message: "State name must contain letters or numbers and not only special characters." });
+    }
+
+    if (!/^\d{10}$/.test(mobile)) {
+      return res.status(400).json({ message: "Mobile number must be exactly 10 digits." });
+    }
+
+    if (!/^\d{6}$/.test(pincode)) {
+      return res.status(400).json({ message: "Pincode must be exactly 6 digits." });
+    }
+
+    if (defaultAddress) {
+      await Address.updateMany(
+        { userId, defaultAddress: true },
+        { $set: { defaultAddress: false } }
+      );
+    }
 
     const newAddress = new Address({
-      userId:userId,
-      fullName,
+      userId,
+      fullName: trimmedName,
       mobile,
       pincode,
       address,
       landmark,
-      city,
-      state,
+      city: trimmedCity,
+      state: trimmedState,
       defaultAddress: defaultAddress || false,
     });
 
@@ -51,10 +122,11 @@ console.log(userId);
 
     res.status(201).json({ message: "Address added successfully!", address: newAddress });
   } catch (err) {
-    console.error(err);
+    console.error("Error while adding address:", err);
     res.status(500).json({ message: "Server error while adding address." });
   }
 };
+
 
 //REMOVE ADDRESS
 const removeAddress=async(req,res)=>{

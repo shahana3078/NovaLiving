@@ -402,7 +402,6 @@ document.addEventListener("DOMContentLoaded", function () {
         if (data.message) {
           showMessage(data.message, "success");
           addProductForm.reset();
-          // window.location.reload();  
         }
       })
       .catch((error) => {

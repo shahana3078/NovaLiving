@@ -90,6 +90,7 @@ router.post('/cart/update-quantity',cartController.updateQuantity)
 router.get('/profile',requireLogin,profileController.getUserProfile)
 router.get('/my-profile',requireLogin,profileController.getMyProfile)
 router.post('/update-profile',profileController.updateProfile)
+router.post('/change-password',profileController.changePassword)
 
 
 

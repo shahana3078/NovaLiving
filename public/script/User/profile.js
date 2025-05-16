@@ -50,6 +50,47 @@ document.getElementById('saveChangesBtn').addEventListener('click', () => {
     });
 });
 
+document.getElementById("submitPasswordChange").addEventListener("click", async () => {
+  const currentPassword = document.getElementById("currentPassword").value;
+  const newPassword = document.getElementById("newPassword").value;
+  const confirmPassword = document.getElementById("confirmPassword").value;
+  const errorBox = document.getElementById("passwordError");
+
+  errorBox.style.display = "none";
+  errorBox.textContent = "";
+
+  if (newPassword !== confirmPassword) {
+    errorBox.textContent = "New passwords do not match.";
+    errorBox.style.display = "block";
+    return;
+  }
+
+  try {
+    const response = await fetch("/change-password", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ currentPassword, newPassword }),
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      alert("Password changed successfully!");
+      document.getElementById("changePasswordForm").reset();
+      const modal = bootstrap.Modal.getInstance(document.getElementById("changePasswordModal"));
+      modal.hide();
+    } else {
+      errorBox.textContent = data.message || "Error changing password.";
+      errorBox.style.display = "block";
+    }
+  } catch (error) {
+    console.error("Password change error:", error);
+    errorBox.textContent = "Something went wrong.";
+    errorBox.style.display = "block";
+  }
+});
 
 
 

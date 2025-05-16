@@ -1,4 +1,5 @@
 const User = require("../../Models/userSchema");
+const bcrypt = require('bcrypt');
 
 const getUserProfile=async(req,res)=>{
   res.render('User/Profile')
@@ -21,6 +22,34 @@ const getMyProfile = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).send("Server Error");
+  }
+};
+
+
+
+const changePassword = async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+
+  if (!req.session.userId) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
+  try {
+    const user = await User.findById(req.session.userId);
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+
+    if (!isMatch) {
+      return res.status(400).json({ message: "Current password is incorrect" });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+    await user.save();
+
+    return res.status(200).json({ message: "Password updated successfully" });
+  } catch (err) {
+    console.error("Error changing password:", err);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -84,5 +113,6 @@ const updateProfile = async (req, res) => {
 module.exports={
   getUserProfile,
   getMyProfile,
-  updateProfile
+  updateProfile,
+  changePassword
 }

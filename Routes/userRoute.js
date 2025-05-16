@@ -20,7 +20,7 @@ router
   .get(noCache,userLogined,authController.getSignup)
   .post(noCache,userLogined,authController.postSignup);
 
-router.route("/otp/resend").post(authController.postResendOtp);
+router.route("/resend-otp").post(authController.postResendOtp);
 
 router
   .route("/")

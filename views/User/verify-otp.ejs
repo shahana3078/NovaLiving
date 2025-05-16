@@ -106,7 +106,7 @@
         <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
           <p style="color:red;"><%= errorMessage %></p>
         <% } %>
-        <button >Verify</button>
+        <button type="submit">Verify</button>
       </form>
       <button class="resend-btn" onclick="resendOTP()">Resend OTP</button>
     </div>
@@ -140,7 +140,7 @@
         const email = "<%= email %>";
         const messageContainer = document.getElementById("message-container");
 
-        fetch("/otp/resend", {
+        fetch("/resend-otp", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -179,49 +179,6 @@
             }, 3000);
           });
       }
-
-      // document
-      //   .getElementById("otp-form")
-      //   .addEventListener("submit", async (event) => {
-      //     event.preventDefault();
-
-      //     const otp = document.getElementById("otp").value;
-      //     const email = "<%= email %>";
-      //     const messageContainer = document.getElementById("message-container");
-
-      //     try {
-      //       const response = await fetch("/verify-otp", {
-      //         method: "POST",
-      //         headers: {
-      //           "Content-Type": "application/json",
-      //         },
-      //         body: JSON.stringify({ otp, email }),
-      //       });
-      //       console.log(response);
-            
-
-      //       const result = await response.json();
-      //       if(result.success){
-
-      //       }
-      //       messageContainer.style.display = "block";
-      //       messageContainer.textContent =
-      //         result.error || "OTP verified successfully!";
-      //       messageContainer.className = result.error ? "error" : "success";
-
-      //       if (!result.error) {
-      //         setTimeout(() => {
-      //           window.location.href = "/dashboard";
-      //         }, 2000);
-      //       }
-      //     } catch (error) {
-      //       console.error("Error verifying OTP:", error);
-      //       messageContainer.style.display = "block";
-      //       messageContainer.textContent =
-      //         "An error occurred while verifying the OTP.";
-      //       messageContainer.className = "error";
-      //     }
-      //   });
     </script>
   </body>
 </html>

@@ -142,14 +142,12 @@ const removeProductFromCart = async (req, res) => {
       return res.status(404).json({ message: "Product not found in cart" });
     }
 
-    // 🟢 Find the product to restock
     const product = await Product.findById(productId);
     if (product) {
       product.stock += cartItem.quantity;
       await product.save();
     }
 
-    // 🟢 Remove product from cart
     cart.items = cart.items.filter(
       (item) => item.productId.toString() !== productId
     );

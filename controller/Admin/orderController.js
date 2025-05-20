@@ -41,26 +41,6 @@ const getOrder = async (req, res) => {
   }
 };
 
-// const updateOrderStatus = async (req, res) => {
-//   try {
-//     const { orderId, orderStatus } = req.body;
-
-//     const updatedOrder = await Order.findByIdAndUpdate(
-//       orderId,
-//       { orderStatus },
-//       { new: true }
-//     );
-
-//     if (!updatedOrder) {
-//       return res.status(404).json({ success: false, message: 'Order not found' });
-//     }
-
-//     res.json({ success: true, message: 'Order status updated successfully', order: updatedOrder });
-//   } catch (error) {
-//     console.error('Error updating order status:', error);
-//     res.status(500).json({ success: false, message: 'Internal Server Error' });
-//   }
-// };
 const updateOrderStatus = async (req, res) => {
   try {
     const { orderId, orderStatus } = req.body;
@@ -73,7 +53,6 @@ const updateOrderStatus = async (req, res) => {
 
     order.orderStatus = orderStatus;
 
-    // If status is cancelled, refund to wallet
     if (orderStatus === 'cancelled') {
       if (["razorpay", "wallet"].includes(order.paymentMethod)) {
         let wallet = await Wallet.findOne({ userId: order.userId });

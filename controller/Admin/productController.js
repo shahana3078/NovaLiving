@@ -32,7 +32,7 @@ const getProducts = async (req, res) => {
       categories,
       products: updatedProducts,
       currentPage: page,
-      totalPages
+      totalPages,
     });
   } catch (error) {
     console.error("Error fetching products:", error);

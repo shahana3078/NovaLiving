@@ -4,10 +4,9 @@ const Address=require("../../Models/addressModel")
 const getAddresses = async (req, res) => {
   try {
     const userId =req.session.userId;
-   
-
-    const addresses = await Address.find({userId:userId});
   
+    const addresses = await Address.find({userId:userId});
+    
     res.render('User/address', { addresses });
   } catch (err) {
     console.error(err);
@@ -17,44 +16,6 @@ const getAddresses = async (req, res) => {
 
 
 //ADD ADDRESS
-
-// const addAddress = async (req, res) => {
-//   try {
-//     const { fullName, mobile, pincode, address, landmark, city, state, defaultAddress } = req.body;
-//     console.log(req.body);
-    
-//     const userId=req.session.userId;
-// console.log(req.session);
-
-//     if (!fullName || !mobile || !pincode || !address || !city || !state) {
-//       return res.status(400).json({ message: "Please provide all required fields." });
-//     }
-
-//     if (defaultAddress) {
-//       await Address.updateMany({ defaultAddress: true }, { $set: { defaultAddress: false } });
-//     }
-// console.log(userId);
-
-//     const newAddress = new Address({
-//       userId:userId,
-//       fullName,
-//       mobile,
-//       pincode,
-//       address,
-//       landmark,
-//       city,
-//       state,
-//       defaultAddress: defaultAddress || false,
-//     });
-
-//     await newAddress.save();
-
-//     res.status(201).json({ message: "Address added successfully!", address: newAddress });
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).json({ message: "Server error while adding address." });
-//   }
-// };
 
 
 const addAddress = async (req, res) => {

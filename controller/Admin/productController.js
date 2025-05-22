@@ -115,6 +115,35 @@ const editProduct = async (req, res) => {
       images = [ ...newImages]; 
     }
 
+    if (Number(productPrice) < 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Product price should not be a negative value",
+      });
+    }
+
+    if (Number(productStock) < 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Stock should not be a negative value",
+      });
+    }
+
+    if (Number(offerDiscount) < 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Offer discount should not be a negative value",
+      });
+    }
+
+    if (Number(offerDiscount) > 90) {
+      return res.status(400).json({
+        success: false,
+        message: "Offer discount should not exceed 90%",
+      });
+    }
+
+
     const updatedProduct = await Product.findByIdAndUpdate(
       id,
       {

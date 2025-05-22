@@ -225,90 +225,6 @@ function removeCoupon() {
 }
 
 
-
-//place order
-
-// function placeOrder() {
-//   if (!addressId) {
-//     Swal.fire({
-//       icon: 'warning',
-//       title: 'Address Required',
-//       text: 'Please select an address before placing your order.',
-//     });
-//     return;
-//   }
-  
-//   if (!selectedMethod) {
-//     Swal.fire({
-//       icon: 'warning',
-//       title: 'Select Payment Method',
-//       text: 'Please choose a payment method before placing your order.',
-//     });
-//     return;
-//   }
-
-//   const appliedCouponCode = document.getElementById("appliedCouponCode").innerText || null;
-//   if (selectedMethod === 'razorpay') {
-//     fetch('/create-razorpay-order', {
-//         method: 'POST',
-//         headers: { 'Content-Type': 'application/json' },
-//         body: JSON.stringify({ couponCode: appliedCouponCode })
-//     })
-//     .then(response => response.json())
-//     .then(order => {
-//         const options = {
-//             key: 'rzp_test_29wLZVOKsQCqZx',
-//             amount: order.amount,
-//             currency: 'INR',
-//             order_id: order.id,
-//             name: "NovaLiving",
-//             description: "Order Payment",
-//             handler: function (response) {
-//               fetch('/place-order', {
-//                 method: 'POST',
-//                 headers: { 'Content-Type': 'application/json' },
-//                 body: JSON.stringify({ 
-//                   addressId,
-//                   paymentMethod: 'razorpay',
-//                   razorpay_payment_id: response.razorpay_payment_id,
-//                   razorpay_order_id: response.razorpay_order_id,
-//                   razorpay_signature: response.razorpay_signature,
-//                   couponCode: appliedCouponCode
-//                 })
-//               })
-//               .then(response => response.json())
-//               .then(data => {
-//                 if (data.success) {
-//                   window.location.href = '/order-confirmed';
-//                 } else {
-//                   Swal.fire({
-//                     icon: 'error',
-//                     title: 'Payment Failed',
-//                     text: data.message || 'Payment verification failed. You can retry from My Orders.',
-//                   });
-//                   window.location.href = '/my-orders'; // user can retry payment from there
-//                 }
-//               })
-//               .catch(error => console.error('Error:', error));
-//             }
-            
-//         };
-
-//         const rzp1 = new Razorpay(options);
-//         rzp1.open();
-//     })
-//     .catch(error => console.error('Error:', error));
-//   }else {
-//     axios.post('/place-order', { addressId, paymentMethod: selectedMethod , couponCode: appliedCouponCode })
-//       .then(response => {
-//         window.location.href = '/order-confirmed'; 
-//       })
-//       .catch(error => {
-//         console.error('Error placing order:', error);
-//         alert('An error occurred while placing your order. Please try again.');
-//       });
-//   }
-// }
 function placeOrder() {
   
   if (!addressId) {
@@ -415,18 +331,31 @@ function placeOrder() {
     })
     .catch(error => console.error('Error:', error));
   } else {
-    axios.post('/place-order', {
-      addressId,
-      paymentMethod: selectedMethod,
-      couponCode: appliedCouponCode
-    })
-    .then(response => {
-      window.location.href = '/order-confirmed';
-    })
-    .catch(error => {
-      console.error('Error placing order:', error);
-      alert('An error occurred while placing your order. Please try again.');
+   axios.post('/place-order', {
+  addressId,
+  paymentMethod: selectedMethod,
+  couponCode: appliedCouponCode
+})
+.then(response => {
+  if (response.data.success) {
+    window.location.href = '/order-confirmed';
+  } else {
+    Swal.fire({
+      icon: 'error',
+      title: 'Order Failed',
+      text: response.data.message || 'Something went wrong. Please try again.',
     });
+  }
+})
+.catch(error => {
+  const message = error.response?.data?.message || 'Something went wrong. Please try again.';
+  Swal.fire({
+    icon: 'error',
+    title: 'Order Failed',
+    text: message,
+  });
+});
+
   }
 }
 

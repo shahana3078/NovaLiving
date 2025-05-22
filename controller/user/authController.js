@@ -275,9 +275,6 @@ const postLogin = async (req, res) => {
 };
 
 
-
-
-
 const getHome = async (req, res) => {
   if (!req.session.userId) {
     return res.redirect("/login");
@@ -298,10 +295,6 @@ const getHome = async (req, res) => {
     res.redirect("/login"); 
   }
 };
-
-
-
-
 
 
 //FORGOT PASSWORD
@@ -366,12 +359,9 @@ const postResetPassword = async (req, res) => {
 
 
   try {
-    if (password !== confirmPassword) {
-      return res.render("User/reset-password", {
-        message: "Passwords do not match.",
-        token,
-      });
-    }
+  if (password !== confirmPassword) {
+  return res.status(400).json({ success: false, message: "Passwords do not match." });
+}
 
     const user = await User.findOne({
       resetToken: token,

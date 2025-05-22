@@ -231,6 +231,11 @@ const postLogin = async (req, res) => {
       })
     }
    
+        if (!password || password.trim() === '') {
+      return res.render('User/login', {
+        message: 'Password is required',
+      });
+    }
 
     const user = await User.findOne({ email });
     if (!user) {

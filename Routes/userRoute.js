@@ -42,18 +42,18 @@ router
 
 router
   .route("/forgot-password")
-  .get(authController.getForgotPassword)
-  .post(authController.postForgotPassword);
+  .get(noCache,authController.getForgotPassword)
+  .post(noCache,authController.postForgotPassword);
 
 router
   .route("/forgot-password/:token")
-  .get(authController.getForgotPassword)
-  .post(authController.postForgotPassword);
+  .get(noCache,authController.getForgotPassword)
+  .post(noCache,authController.postForgotPassword);
 
 router
   .route("/reset-password")
-  .get(authController.getResetPassword)
-  .post(authController.postResetPassword);
+  .get(noCache,authController.getResetPassword)
+  .post(noCache,authController.postResetPassword);
 
 router.get(
   "/auth/google",

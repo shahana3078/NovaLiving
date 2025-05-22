@@ -353,15 +353,55 @@ const getResetPassword = (req, res) => {
   res.render("User/reset-password", { token: token, message: null });
 };
 
-const postResetPassword = async (req, res) => {
+// const postResetPassword = async (req, res) => {
   
+//   const { password, confirmPassword, token } = req.body;
+
+
+//   try {
+//   if (password !== confirmPassword) {
+//   return res.status(400).json({ success: false, message: "Passwords do not match." });
+// }
+
+//     const user = await User.findOne({
+//       resetToken: token,
+//       resetTokenExpires: { $gt: Date.now() },
+//     });
+
+//     if (!user) {
+//       return res.render("User/reset-password", {
+//         message: "Invalid or expired token.",
+//         token,
+//       });
+//     }
+
+//     const hashedPassword = await bcrypt.hash(password, 10);
+
+//     user.password = hashedPassword;
+//     user.resetToken = undefined;
+//     user.resetTokenExpires = undefined;
+
+//     await user.save();
+
+   
+//     return res.render('User/login');
+//   } catch (error) {
+//     console.error("Error resetting password:", error);
+
+//     return res.render("User/reset-password", {
+//       message:
+//         "An error occurred while resetting your password. Please try again.",
+//       token,
+//     });
+//   }
+// };
+const postResetPassword = async (req, res) => {
   const { password, confirmPassword, token } = req.body;
 
-
   try {
-  if (password !== confirmPassword) {
-  return res.status(400).json({ success: false, message: "Passwords do not match." });
-}
+    if (password !== confirmPassword) {
+      return res.status(400).json({ success: false, message: "Passwords do not match." });
+    }
 
     const user = await User.findOne({
       resetToken: token,
@@ -369,30 +409,20 @@ const postResetPassword = async (req, res) => {
     });
 
     if (!user) {
-      return res.render("User/reset-password", {
-        message: "Invalid or expired token.",
-        token,
-      });
+      return res.status(400).json({ success: false, message: "Invalid or expired token." });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-
     user.password = hashedPassword;
     user.resetToken = undefined;
     user.resetTokenExpires = undefined;
 
     await user.save();
 
-   
-    return res.render('User/login');
+    return res.json({ success: true, message: "Password reset successfully." });
   } catch (error) {
     console.error("Error resetting password:", error);
-
-    return res.render("User/reset-password", {
-      message:
-        "An error occurred while resetting your password. Please try again.",
-      token,
-    });
+    return res.status(500).json({ success: false, message: "An error occurred. Please try again." });
   }
 };
 

@@ -1,13 +1,43 @@
 const Product = require("../../Models/productModel")
 const Category = require("../../Models/categoryModel");
 
+// const getStocks = async (req, res) => {
+//   try {
+//     const products = await Product.find().populate('categoryId')
+    
+//     const categories = await Category.find({ isDeleted: false });
+
+//     res.render("Admin/pages/stocks", { categories, products });
+//   } catch (error) {
+//     console.error("Error fetching products:", error);
+//     res.status(500).send("Server error");
+//   }
+// };
+
+
+
 const getStocks = async (req, res) => {
   try {
-    const products = await Product.find().populate('categoryId')
-    
+    const page = parseInt(req.query.page) || 1;
+    const limit = 5;
+    const skip = (page - 1) * limit;
+
+    const products = await Product.find()
+      .populate("categoryId")
+      .skip(skip)
+      .limit(limit);
+
+    const totalProducts = await Product.countDocuments();
+    const totalPages = Math.ceil(totalProducts / limit);
+
     const categories = await Category.find({ isDeleted: false });
 
-    res.render("Admin/pages/stocks", { categories, products });
+    res.render("Admin/pages/stocks", {
+      categories,
+      products,
+      currentPage: page,
+      totalPages,
+    });
   } catch (error) {
     console.error("Error fetching products:", error);
     res.status(500).send("Server error");
